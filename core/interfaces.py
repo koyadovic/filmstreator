@@ -1,4 +1,4 @@
-class InterfaceDao:
+class InterfaceDAO:
     # TODO
     pass
 

@@ -2,6 +2,11 @@ from django.db import models
 from django.utils import timezone
 
 
+"""
+TODO remove Django references here. Only describe models and write basic model logic
+"""
+
+
 class BaseModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
