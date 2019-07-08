@@ -1,15 +1,10 @@
-amqp==2.5.0
 backcall==0.1.0
-billiard==3.6.0.0
-celery==4.3.0
-dataclasses==0.6
 decorator==4.4.0
 Django==2.2.3
 ipdb==0.12
 ipython==7.6.1
 ipython-genutils==0.2.0
 jedi==0.14.0
-kombu==4.6.3
 parso==0.5.0
 pexpect==4.7.0
 pickleshare==0.7.5
@@ -19,7 +14,6 @@ Pygments==2.4.2
 pymongo==3.8.0
 pytz==2019.1
 six==1.12.0
-sqlparse==0.2.4
+sqlparse==0.3.0
 traitlets==4.3.2
-vine==1.3.0
 wcwidth==0.1.7
