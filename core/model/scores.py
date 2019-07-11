@@ -1,6 +1,4 @@
-from core.model.audiovisual import BaseModel, AudiovisualRecord
 
-
-class Score(BaseModel):
-    audiovisual_record: AudiovisualRecord
+class ScoringSource:
+    source_name: str
     value: float

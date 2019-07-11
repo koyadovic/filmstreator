@@ -1,5 +1,8 @@
 from datetime import datetime
 from typing import List
+from core import services
+from core.model.downloads import DownloadSource
+from core.model.scores import ScoringSource
 
 
 class BaseModel:
@@ -24,10 +27,13 @@ class AudiovisualRecord(BaseModel):
     writers: List[Person]
     stars: List[Person]
 
+    images: List[bytes]
+
     deleted: bool
     downloads_disabled: bool
 
+    scores: List[ScoringSource]
+    downloads: List[DownloadSource]
 
-class Photo(BaseModel):
-    audiovisual_record: AudiovisualRecord
-    image: bytes
+    def save(self):
+        services.save_audiovisual_record(self)
