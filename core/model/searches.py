@@ -28,15 +28,32 @@ class Search:
     )
 
     True if one of all conditions for whatever group of conditions is True.
+
+    search = (Search.Builder.new_search()
+                            .add_condition(Condition('reference', Condition.OPERATOR_EQUALS, 'UST12345US'))
+                            .add_or()
+                            .add_condition(Condition('reference', Condition.OPERATOR_EQUALS, 'LALALA'))
+                            .build())
     """
     def __init__(self):
         self.conditions = [[]]
 
-    def add_condition(self, condition: Condition) -> None:
-        self.conditions[-1].append(condition)
+    class Builder:
+        def __init__(self):
+            self._search = Search()
 
-    def add_conditions(self, conditions: List[Condition]) -> None:
-        self.conditions[-1] = self.conditions[-1] + conditions
+        @staticmethod
+        def new_search():
+            return Search.Builder()
 
-    def add_or(self) -> None:
-        self.conditions.append([])
+        def add_condition(self, condition: Condition):
+            self._search.conditions[-1].append(condition)
+
+        def add_conditions(self, conditions: List[Condition]):
+            self._search.conditions[-1] = self._search.conditions[-1] + conditions
+
+        def add_or(self) -> None:
+            self._search.conditions.append([])
+
+        def build(self):
+            return self._search
