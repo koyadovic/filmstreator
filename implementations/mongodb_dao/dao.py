@@ -11,3 +11,5 @@ class DAOMongoDB(DAOInterface):
 
     def save_audiovisual_record(self, record: AudiovisualRecord):
         audiovisual_records = self._db.audiovisual_records
+        dict_obj = dict(record)
+        # TODO

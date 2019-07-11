@@ -80,8 +80,6 @@ class ScoringSource(BaseModel):
 
 
 class AudiovisualRecord(BaseModel):
-    id = None
-
     name: str
     genres: List[Genre]
     year: int
@@ -100,7 +98,6 @@ class AudiovisualRecord(BaseModel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.id = kwargs.pop('id', None)
         self.name = kwargs.pop('name', '')
         self.genres = kwargs.pop('genres', list())
         self.year = kwargs.pop('year', 0)
@@ -114,7 +111,6 @@ class AudiovisualRecord(BaseModel):
         self.downloads = kwargs.pop('downloads', list())
 
     def __iter__(self):
-        yield 'id', self.id
         for k, v in dict(super().__iter__()).items():
             yield k, v
         yield 'name', self.name
