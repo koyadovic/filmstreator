@@ -20,6 +20,8 @@ class Condition:
 
 
 class Search:
+    target_class = None  # AudiovisualRecord, Person, Genre
+
     """
     (
         # this three will be AND
@@ -29,22 +31,23 @@ class Search:
 
     True if one of all conditions for whatever group of conditions is True.
 
-    search = (Search.Builder.new_search()
+    search = (Search.Builder.new_search(AudiovisualRecord)
                             .add_condition(Condition('reference', Condition.OPERATOR_EQUALS, 'UST12345US'))
                             .add_or()
                             .add_condition(Condition('reference', Condition.OPERATOR_EQUALS, 'LALALA'))
                             .build())
     """
-    def __init__(self):
+    def __init__(self, klass):
         self.conditions = [[]]
+        self.target_class = klass
 
     class Builder:
-        def __init__(self):
-            self._search = Search()
+        def __init__(self, klass):
+            self._search = Search(klass)
 
         @staticmethod
-        def new_search():
-            return Search.Builder()
+        def new_search(klass):
+            return Search.Builder(klass)
 
         def add_condition(self, condition: Condition):
             self._search.conditions[-1].append(condition)

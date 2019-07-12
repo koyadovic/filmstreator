@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.urls import path
 
-from implementations.mongodb_dao.dao import DAOMongoDB
 from core import services
+
+from implementations.mongodb.dao import DAOMongoDB
+from implementations.mongodb.searches import SearchMongoDB
 
 
 urlpatterns = [
@@ -11,9 +13,11 @@ urlpatterns = [
 
 
 def wire_implementations():
-    print('lalala')
-    dao = DAOMongoDB()
-    services.inject_dao_interface_implementation(dao)
+    print('Wire implementations')
+    dao_implementation = DAOMongoDB()
+    search_implementation = SearchMongoDB()
+    services.inject_dao_interface_implementation(dao_implementation)
+    services.inject_search_interface_implementation(search_implementation)
 
 
 wire_implementations()
