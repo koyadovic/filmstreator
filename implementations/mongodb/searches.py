@@ -28,6 +28,7 @@ class SearchMongoDB(SearchInterface):
 
         collection = self._db[target_class.collection_name]
         results = collection.find(_translate_search_to_mongodb_dict(search))
+        # TODO sort by
         for result in results:
             yield target_class(**result)
 
