@@ -8,9 +8,11 @@ class Condition:
     OPERATOR_GREAT_THAN = 'gt'
     OPERATOR_LESS_OR_EQUAL_THAN = 'lte'
     OPERATOR_GREAT_OR_EQUAL_THAN = 'gte'
+    OPERATOR_IN = 'in'
+    OPERATOR_NOT_IN = 'nin'
 
     ALL_OPERATORS = (OPERATOR_EQUALS, OPERATOR_NON_EQUALS, OPERATOR_LESS_THAN, OPERATOR_LESS_OR_EQUAL_THAN,
-                     OPERATOR_GREAT_THAN, OPERATOR_GREAT_OR_EQUAL_THAN)
+                     OPERATOR_GREAT_THAN, OPERATOR_GREAT_OR_EQUAL_THAN, OPERATOR_IN, OPERATOR_NOT_IN)
 
     def __init__(self, field_path, operator, value):
         assert operator in Condition.ALL_OPERATORS, 'Invalid operator provided'
