@@ -6,6 +6,10 @@ class MongoGenre(Genre):
 
     collection_name = 'genres'
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._id = kwargs.pop('_id', None)
+
     def __iter__(self):
         yield '_id', self._id if hasattr(self, '_id') else None
         yield 'created_date', self.created_date
@@ -33,6 +37,10 @@ class MongoPerson(Person):
     _id: str = None
 
     collection_name = 'people'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._id = kwargs.pop('_id', None)
 
     def __iter__(self):
         yield '_id', self._id if hasattr(self, '_id') else None
@@ -62,6 +70,10 @@ class MongoAudiovisualRecord(AudiovisualRecord):
 
     collection_name = 'audiovisual_records'
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._id = kwargs.pop('_id', None)
+
     def __iter__(self):
         yield '_id', self._id if hasattr(self, '_id') else None
         yield 'created_date', self.created_date
@@ -77,6 +89,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         yield 'downloads_disabled', self.downloads_disabled
         yield 'scores', [self.serialize_scoring_source(_) for _ in self.scores]
         yield 'downloads', [self.serialize_download_source(_) for _ in self.downloads]
+        yield 'general_information_fetched', self.general_information_fetched
 
     @classmethod
     def convert(cls, audiovisual_record):
@@ -102,6 +115,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
 
             scores=[cls.serialize_scoring_source(_) for _ in audiovisual_record.scores],
             downloads=[cls.serialize_download_source(_) for _ in audiovisual_record.downloads],
+            general_information_fetched=audiovisual_record.general_information_fetched
         )
 
     @classmethod
@@ -117,6 +131,8 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         return {
             'last_check': download.last_check,
             'source_name': download.source_name,
+            'name': download.name,
+            'quality': download.quality,
             'link': download.link,
         }
 

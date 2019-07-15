@@ -30,11 +30,15 @@ class Person(BaseModel):
 class DownloadSource:
     last_check: datetime
     source_name: str
+    name: str
+    quality: str
     link: str
 
     def __init__(self, **kwargs):
         self.last_check = kwargs.pop('last_check', datetime.utcnow().replace(tzinfo=timezone.utc))
         self.source_name = kwargs.pop('source_name', '')
+        self.name = kwargs.pop('name', '')
+        self.quality = kwargs.pop('quality', '')
         self.link = kwargs.pop('link', '')
 
 
@@ -66,6 +70,8 @@ class AudiovisualRecord(BaseModel):
     scores: List[ScoringSource]
     downloads: List[DownloadSource]
 
+    general_information_fetched: bool
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.name = kwargs.pop('name', '')
@@ -79,3 +85,4 @@ class AudiovisualRecord(BaseModel):
         self.downloads_disabled = kwargs.pop('downloads_disabled', False)
         self.scores = kwargs.pop('scores', list())
         self.downloads = kwargs.pop('downloads', list())
+        self.general_information_fetched = kwargs.pop('general_information_fetched', False)
