@@ -12,10 +12,6 @@ class MongoGenre(Genre):
         yield 'updated_date', self.updated_date
         yield 'name', self.name
 
-    @property
-    def pk(self):
-        return self._id
-
     @classmethod
     def convert(cls, genre):
         if isinstance(genre, MongoGenre):
@@ -26,6 +22,11 @@ class MongoGenre(Genre):
             updated_date=genre.updated_date,
             name=genre.name,
         )
+
+    @classmethod
+    def check_collection(cls, db):
+        collection = db[MongoPerson.collection_name]
+        collection.create_index('name')
 
 
 class MongoPerson(Person):
@@ -39,10 +40,6 @@ class MongoPerson(Person):
         yield 'updated_date', self.updated_date
         yield 'name', self.name
 
-    @property
-    def pk(self):
-        return self._id
-
     @classmethod
     def convert(cls, person):
         if isinstance(person, MongoPerson):
@@ -53,6 +50,11 @@ class MongoPerson(Person):
             updated_date=person.updated_date,
             name=person.name,
         )
+
+    @classmethod
+    def check_collection(cls, db):
+        collection = db[MongoPerson.collection_name]
+        collection.create_index('name')
 
 
 class MongoAudiovisualRecord(AudiovisualRecord):
@@ -65,20 +67,16 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         yield 'created_date', self.created_date
         yield 'updated_date', self.updated_date
         yield 'name', self.name
-        yield 'genres', [dict(MongoGenre.convert(_)) for _ in self.genres]
+        yield 'genres', [_.name for _ in self.genres]
         yield 'year', self.year
-        yield 'directors', [dict(MongoPerson.convert(_)) for _ in self.directors]
-        yield 'writers', [dict(MongoPerson.convert(_)) for _ in self.writers]
-        yield 'stars', [dict(MongoPerson.convert(_)) for _ in self.stars]
+        yield 'directors', [_.name for _ in self.directors]
+        yield 'writers', [_.name for _ in self.writers]
+        yield 'stars', [_.name for _ in self.stars]
         yield 'images', self.images
         yield 'deleted', self.deleted
         yield 'downloads_disabled', self.downloads_disabled
-        yield 'scores', [dict(_) for _ in self.scores]
-        yield 'downloads', [dict(_) for _ in self.downloads]
-
-    @property
-    def pk(self):
-        return self._id
+        yield 'scores', [self.serialize_scoring_source(_) for _ in self.scores]
+        yield 'downloads', [self.serialize_download_source(_) for _ in self.downloads]
 
     @classmethod
     def convert(cls, audiovisual_record):
@@ -121,3 +119,8 @@ class MongoAudiovisualRecord(AudiovisualRecord):
             'source_name': download.source_name,
             'link': download.link,
         }
+
+    @classmethod
+    def check_collection(cls, db):
+        MongoGenre.check_collection(db)
+        MongoPerson.check_collection(db)
