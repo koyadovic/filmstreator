@@ -1,10 +1,13 @@
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
 
-from core import services
+import sentry_sdk
 
 from implementations.mongodb.dao import DAOMongoDB
 from implementations.mongodb.searches import SearchMongoDB
+from sentry_sdk.integrations.django import DjangoIntegration
+from core import services
 
 
 urlpatterns = [
@@ -21,3 +24,11 @@ def wire_implementations():
 
 
 wire_implementations()
+
+
+# TODO remove or True. Enabled by now for tests
+if settings.DEBUG or True:
+    sentry_sdk.init(
+        dsn="https://3f87cf408a0042fc929df4e3ec80e390@sentry.io/1505406",
+        integrations=[DjangoIntegration()]
+    )
