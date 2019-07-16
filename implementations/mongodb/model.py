@@ -96,7 +96,6 @@ class MongoAudiovisualRecord(AudiovisualRecord):
     def convert(cls, audiovisual_record):
         if isinstance(audiovisual_record, MongoAudiovisualRecord):
             return audiovisual_record
-
         return MongoAudiovisualRecord(
             _id=getattr(audiovisual_record, '_id') if hasattr(audiovisual_record, '_id') else None,
             created_date=audiovisual_record.created_date,

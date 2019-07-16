@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 
 import sentry_sdk
@@ -12,6 +12,7 @@ from core import services
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('web.urls')),
 ]
 
 

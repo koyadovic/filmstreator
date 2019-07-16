@@ -74,7 +74,7 @@ class AudiovisualRecord(BaseModel):
     writers: List[Person]
     stars: List[Person]
 
-    images: List[bytes]
+    images: List[str]  # URIs with images
 
     deleted: bool
     downloads_disabled: bool

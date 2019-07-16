@@ -27,9 +27,14 @@ class SearchMongoDB(SearchInterface):
             target_class = CLASS_MAPPINGS[target_class]
         collection = self._db[target_class.collection_name]
         results = collection.find(_translate_search_to_mongodb_dict(search))
-        results = results.sort(_translate_sort_by_to_mongo_dict(sort_by))
-        for result in results:
-            yield target_class(**result)
+        if sort_by is not None:
+            results = results.sort(_translate_sort_by_to_mongo_dict(sort_by))
+
+        if results.count() > 0:
+            for result in results:
+                yield target_class(**result)
+        else:
+            return []
 
 
 def _translate_search_to_mongodb_dict(search):

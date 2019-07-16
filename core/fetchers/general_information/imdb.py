@@ -20,10 +20,7 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
     @property
     def main_image(self):
         try:
-            src = self.base_tree.xpath('//div[@class="poster"]/a/img')[0].get('src')
-            web_image = urlopen(src)
-            image_contents = web_image.read()
-            return image_contents
+            return self.base_tree.xpath('//div[@class="poster"]/a/img')[0].get('src')
         except IndexError:
             raise GeneralInformationException(f'Cannot locate the main image for {self.audiovisual_record.name}')
 
