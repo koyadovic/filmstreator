@@ -1,4 +1,4 @@
-from core.model.audiovisual import AudiovisualRecord
+from core.model.audiovisual import AudiovisualRecord, ScoringSource
 import abc
 
 
@@ -10,5 +10,5 @@ class AbstractScoringSource(metaclass=abc.ABCMeta):
         self.audiovisual_record = audiovisual_record
 
     @property
-    def score(self):
+    def score(self) -> ScoringSource:
         raise NotImplementedError

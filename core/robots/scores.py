@@ -1,5 +1,5 @@
 from core.fetchers.services import get_all_scoring_sources
-from core.model.audiovisual import AudiovisualRecord, ScoringSource
+from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
 from core import services
 from core.services import save_audiovisual_record
@@ -20,11 +20,10 @@ async def compile_scores_from_audiovisual_records():
         for audiovisual_record in audiovisual_records:
             source = klass(audiovisual_record)
             try:
-                score_value = source.score
+                scoring_source_instance = source.score
             except ScoringSourceException as e:
                 log_exception(e)
                 continue
-            scoring_source_instance = ScoringSource(source_name=source.name, value=score_value)
             audiovisual_record.scores.append(scoring_source_instance)
             save_audiovisual_record(audiovisual_record)
 
