@@ -13,19 +13,22 @@ class PackageDiscover:
 
     @property
     def packages(self):
+        all_packages = []
         base_package = self._package
         for importer, modname, ispkg in pkgutil.iter_modules(base_package.__path__):
             module_name = base_package.__name__ + '.' + modname
             if ispkg:
-                yield importlib.import_module(module_name)
+                all_packages.append(importlib.import_module(module_name))
+        return all_packages
 
     @property
     def modules(self):
+        all_modules = []
         base_package = self._package
         for importer, modname, ispkg in pkgutil.iter_modules(base_package.__path__):
-            module_name = base_package.__name__ + '.' + modname
             if not ispkg:
-                yield importlib.import_module(module_name)
+                all_modules.append(importlib.import_module('.' + modname, package=base_package.__name__))
+        return all_modules
 
 
 class ModuleDiscover:

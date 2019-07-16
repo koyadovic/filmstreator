@@ -1,11 +1,10 @@
+import re
 
 from core.fetchers.general_information.base import AbstractGeneralInformation
 from core.model.audiovisual import AudiovisualRecord, Genre, Person
 from core.tools.exceptions import GeneralInformationException
 from core.tools.strings import are_similar_strings
 from core.tools.urls import percent_encoding
-
-from urllib.request import urlopen
 from lxml import html
 import requests
 
@@ -21,23 +20,29 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
     def main_image(self):
         try:
             src = self.base_tree.xpath('//div[@class="poster"]/a/img')[0].get('src')
-            web_image = urlopen(src)
-            image_contents = web_image.read()
-            return image_contents
+            if src[0] == '/':
+                src = self.base_url + src
+            return src
         except IndexError:
             raise GeneralInformationException(f'Cannot locate the main image for {self.audiovisual_record.name}')
 
     @property
-    def score(self):
-        try:
-            return self.base_tree.xpath('//*[@itemprop="ratingValue"]/text()')[0]
-        except IndexError:
-            raise GeneralInformationException(f'Cannot locate the score for {self.audiovisual_record.name}')
-
-    @property
     def year(self):
         try:
-            return self.base_tree.xpath('//*[@id="titleYear"]/a/text()')[0]
+            # //*[@id="title-overview-widget"]/div[1]/div[2]/div/div[2]/div[2]/div/a[3]/text()
+            year_text_results = self.base_tree.xpath(
+                '//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[2]/div[2]/div/a[4]/text()'
+            )
+            if len(year_text_results) == 0:
+                year_text_results = self.base_tree.xpath(
+                    '//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[2]/div[2]/div/a[3]/text()'
+                )
+            year_text = year_text_results[0]
+            result = re.search(r'.*(\d{4}).*', year_text)
+            if result:
+                return result.group(1)
+            else:
+                raise IndexError
         except IndexError:
             raise GeneralInformationException(f'Cannot locate the year for {self.audiovisual_record.name}')
 
@@ -51,6 +56,8 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
         for text_found in self.base_tree.xpath('//div[@class="credit_summary_item"]/h4/text()|'
                                                '//div[@class="credit_summary_item"]/a/text()'):
             if are_similar_strings(text_found, 'See full cast & crew'):
+                continue
+            if are_similar_strings(text_found.lower(), ' more credit'):
                 continue
             target_changed = False
             for possible_target in possible_targets:
@@ -98,4 +105,5 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
         href = IMDBGeneralInformation.base_url + first_result_node.get('href')
         response = requests.get(href)
         self._base_tree = html.fromstring(response.content)
+
         return self._base_tree

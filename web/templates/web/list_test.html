@@ -1,0 +1,23 @@
+<html>
+<head>
+    <title>Filmstreator</title>
+</head>
+<body>
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Write new film">
+    <input type="submit" name="submit">
+</form>
+
+<a href="/">Refresh</a>
+
+{% for audiovisual_record in audiovisual_records %}
+    <p><a href="/{{ audiovisual_record.slug }}/">{{ audiovisual_record.name }}</a></p>
+{% endfor %}
+<hr>
+{% for audiovisual_record in pending_audiovisual_records %}
+    <p>{{ audiovisual_record.name }}</p>
+{% endfor %}
+
+</body>
+</html>

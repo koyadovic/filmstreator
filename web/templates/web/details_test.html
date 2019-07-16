@@ -1,0 +1,25 @@
+<html>
+<head>
+    <title>Filmstreator</title>
+</head>
+<body>
+<h1>{{ audiovisual_record.name }}</h1>
+{% for image in audiovisual_record.images %}
+    <img src="{{ image }}"/>
+{% endfor %}
+
+<h4>Géneros: {% for genre in audiovisual_record.genres %}<small>{{ genre.name }} </small>{% endfor %}</h4>
+
+
+<p>Directores: {% for person in audiovisual_record.directors %}<small>{{ person.name }} </small>{% endfor %}</p>
+<p>Escritores: {% for person in audiovisual_record.writers %}<small>{{ person.name }} </small>{% endfor %}</p>
+<p>Estrellas: {% for person in audiovisual_record.stars %}<small>{{ person.name }} </small>{% endfor %}</p>
+
+<h4>Puntuaciones</h4>
+{% for score in audiovisual_record.scores %}
+    <p><span><strong>{{ score.source_name }}:</strong> {{ score.value }}</span></p>
+{% endfor %}
+
+<a href="/">Volver</a>
+</body>
+</html>

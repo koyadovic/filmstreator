@@ -25,11 +25,18 @@ class SearchMongoDB(SearchInterface):
         target_class = search.target_class
         if target_class not in CLASS_MAPPINGS.values():
             target_class = CLASS_MAPPINGS[target_class]
+
         collection = self._db[target_class.collection_name]
-        results = collection.find(_translate_search_to_mongodb_dict(search))
-        results = results.sort(_translate_sort_by_to_mongo_dict(sort_by))
-        for result in results:
-            yield target_class(**result)
+        mongodb_search = _translate_search_to_mongodb_dict(search)
+        results = collection.find(mongodb_search)
+        if sort_by is not None:
+            results = results.sort(_translate_sort_by_to_mongo_dict(sort_by))
+
+        if results.count() > 0:
+            for result in results:
+                yield target_class(**result)
+        else:
+            return []
 
 
 def _translate_search_to_mongodb_dict(search):

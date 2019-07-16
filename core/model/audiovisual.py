@@ -2,21 +2,32 @@ from datetime import datetime, timezone
 from typing import List
 
 
+def utc_now():
+    return datetime.utcnow().replace(tzinfo=timezone.utc)
+
+
 class BaseModel:
     created_date: datetime
     updated_date: datetime
 
     def __init__(self, **kwargs):
-        self.created_date = kwargs.pop('created_date', datetime.utcnow().replace(tzinfo=timezone.utc))
-        self.updated_date = kwargs.pop('updated_date', datetime.utcnow().replace(tzinfo=timezone.utc))
+        self.created_date = kwargs.pop('created_date', utc_now())
+        self.updated_date = kwargs.pop('updated_date', utc_now())
 
 
 class Genre(BaseModel):
-    name: str
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self.updated_date = utc_now()
+        self._name = name
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.name = kwargs.pop('name', '')
+        self._name = kwargs.pop('name', '')
 
     def __str__(self):
         return f'Genre {self.name}'
@@ -26,11 +37,18 @@ class Genre(BaseModel):
 
 
 class Person(BaseModel):
-    name: str
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self.updated_date = utc_now()
+        self._name = name
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.name = kwargs.pop('name', '')
+        self._name = kwargs.pop('name', '')
 
     def __str__(self):
         return f'Person {self.name}'
@@ -40,6 +58,7 @@ class Person(BaseModel):
 
 
 class DownloadSource:
+    # TODO detail this
     last_check: datetime
     source_name: str
     name: str
@@ -57,49 +76,156 @@ class DownloadSource:
 class ScoringSource:
     last_check: datetime
     source_name: str
-    value: float
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self.last_check = utc_now()
+        self._value = value
 
     def __init__(self, **kwargs):
         self.last_check = kwargs.pop('last_check', datetime.utcnow().replace(tzinfo=timezone.utc))
         self.source_name = kwargs.pop('source_name')
-        self.value = kwargs.pop('value')
+        self._value = kwargs.pop('value')
 
 
 class AudiovisualRecord(BaseModel):
-    name: str
-    genres: List[Genre]
-    year: int
 
-    directors: List[Person]
-    writers: List[Person]
-    stars: List[Person]
+    @property
+    def name(self) -> str:
+        return self._name
 
-    images: List[bytes]
+    @name.setter
+    def name(self, name):
+        self.updated_date = utc_now()
+        self._name = name
 
-    deleted: bool
-    downloads_disabled: bool
+    @property
+    def genres(self) -> List[Genre]:
+        return self._genres
 
-    scores: List[ScoringSource]
-    downloads: List[DownloadSource]
+    @genres.setter
+    def genres(self, genres):
+        self.updated_date = utc_now()
+        self._genres = genres
 
-    general_information_fetched: bool
-    is_a_film: bool
+    @property
+    def year(self) -> str:
+        return self._year
+
+    @year.setter
+    def year(self, year):
+        self.updated_date = utc_now()
+        self._year = year
+
+    @property
+    def directors(self) -> List[Person]:
+        return self._directors
+
+    @directors.setter
+    def directors(self, directors):
+        self.updated_date = utc_now()
+        self._directors = directors
+
+    @property
+    def writers(self) -> List[Person]:
+        return self._writers
+
+    @writers.setter
+    def writers(self, writers):
+        self.updated_date = utc_now()
+        self._writers = writers
+
+    @property
+    def stars(self) -> List[Person]:
+        return self._stars
+
+    @stars.setter
+    def stars(self, stars):
+        self.updated_date = utc_now()
+        self._stars = stars
+
+    @property
+    def images(self) -> List[str]:
+        return self._images
+
+    @images.setter
+    def images(self, images):
+        self.updated_date = utc_now()
+        self._images = images
+
+    @property
+    def deleted(self) -> bool:
+        return self._deleted
+
+    @deleted.setter
+    def deleted(self, deleted):
+        self.updated_date = utc_now()
+        self._deleted = deleted
+
+    @property
+    def downloads_disabled(self) -> bool:
+        return self._downloads_disabled
+
+    @downloads_disabled.setter
+    def downloads_disabled(self, downloads_disabled):
+        self.updated_date = utc_now()
+        self._downloads_disabled = downloads_disabled
+
+    @property
+    def scores(self) -> List[ScoringSource]:
+        return self._scores
+
+    @scores.setter
+    def scores(self, scores):
+        self.updated_date = utc_now()
+        self._scores = scores
+
+    @property
+    def downloads(self) -> List[DownloadSource]:
+        return self._downloads
+
+    @downloads.setter
+    def downloads(self, downloads):
+        self.updated_date = utc_now()
+        self._downloads = downloads
+
+    @property
+    def general_information_fetched(self) -> bool:
+        return self._general_information_fetched
+
+    @general_information_fetched.setter
+    def general_information_fetched(self, general_information_fetched):
+        self.updated_date = utc_now()
+        self._general_information_fetched = general_information_fetched
+
+    @property
+    def is_a_film(self) -> bool:
+        return self._is_a_film
+
+    @is_a_film.setter
+    def is_a_film(self, is_a_film):
+        self.updated_date = utc_now()
+        self._is_a_film = is_a_film
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.name = kwargs.pop('name', '')
-        self.genres = kwargs.pop('genres', list())
-        self.year = kwargs.pop('year', 0)
-        self.directors = kwargs.pop('directors', list())
-        self.writers = kwargs.pop('writers', list())
-        self.stars = kwargs.pop('stars', list())
-        self.images = kwargs.pop('images', list())
-        self.deleted = kwargs.pop('deleted', False)
-        self.downloads_disabled = kwargs.pop('downloads_disabled', False)
-        self.scores = kwargs.pop('scores', list())
-        self.downloads = kwargs.pop('downloads', list())
-        self.general_information_fetched = kwargs.pop('general_information_fetched', False)
-        self.is_a_film = kwargs.pop('is_a_film', True)
+        self._name = kwargs.pop('name', '')
+        self._genres = kwargs.pop('genres', list())
+        self._year = kwargs.pop('year', 0)
+        self._directors = kwargs.pop('directors', list())
+        self._writers = kwargs.pop('writers', list())
+        self._stars = kwargs.pop('stars', list())
+        self._images = kwargs.pop('images', list())
+        self._deleted = kwargs.pop('deleted', False)
+        self._downloads_disabled = kwargs.pop('downloads_disabled', False)
+        self._scores = kwargs.pop('scores', list())
+        self._downloads = kwargs.pop('downloads', list())
+        self._general_information_fetched = kwargs.pop('general_information_fetched', False)
+        self._is_a_film = kwargs.pop('is_a_film', True)
 
     def __str__(self):
         return f'AudiovisualRecord {self.name} ({self.year})'

@@ -1,7 +1,6 @@
 from core.fetchers.services import get_all_scoring_sources
-from core.model.audiovisual import AudiovisualRecord, ScoringSource
+from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
-from core import services
 from core.services import save_audiovisual_record
 from core.tools.exceptions import ScoringSourceException
 from core.tools.logs import log_exception
@@ -9,23 +8,23 @@ from core.tools.logs import log_exception
 
 async def compile_scores_from_audiovisual_records():
     for klass in get_all_scoring_sources():
-        search = (
+        audiovisual_records = (
             Search.Builder
                   .new_search(AudiovisualRecord)
-                  .add_condition(Condition('downloads__source_name', Condition.OPERATOR_NOT_IN, [klass.source_name]))
-                  .build()
+                  .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
+                  .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, True))
+                  .add_condition(Condition('scores__source_name', Condition.OPERATOR_NOT_IN, [klass.source_name]))
+                  .search()
         )
 
-        audiovisual_records = services.search(search)
         for audiovisual_record in audiovisual_records:
             source = klass(audiovisual_record)
             try:
-                score_value = source.score
+                scoring_source_instance = source.score
             except ScoringSourceException as e:
                 log_exception(e)
                 continue
-            scoring_source_instance = ScoringSource(source_name=source.name, value=score_value)
             audiovisual_record.scores.append(scoring_source_instance)
             save_audiovisual_record(audiovisual_record)
 
-compile_scores_from_audiovisual_records.interval = '30-minute'
+compile_scores_from_audiovisual_records.interval = '1-minute'

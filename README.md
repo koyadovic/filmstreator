@@ -11,4 +11,7 @@ Y sin ningún orden en particular:
 
 
 # TODO
-- autodiscover de download sources, general information, scoring sources
+- Relacionado con el de arriba, vista detalles, por ver todo, imagen, datos, etc.
+- Detallar de qué constará un Download Source. Por no añadir varios iguales.
+- A no mucho tardar toca ver cómo mantener todo actualizado.
+- Implementar Cache, para ahorrar pasos en los fetchers

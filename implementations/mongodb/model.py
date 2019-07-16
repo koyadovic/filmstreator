@@ -1,9 +1,8 @@
 from core.model.audiovisual import Genre, Person, AudiovisualRecord
+from slugify import slugify
 
 
 class MongoGenre(Genre):
-    _id: str = None
-
     collection_name = 'genres'
 
     def __init__(self, **kwargs):
@@ -11,7 +10,6 @@ class MongoGenre(Genre):
         self._id = kwargs.pop('_id', None)
 
     def __iter__(self):
-        yield '_id', self._id if hasattr(self, '_id') else None
         yield 'created_date', self.created_date
         yield 'updated_date', self.updated_date
         yield 'name', self.name
@@ -20,8 +18,9 @@ class MongoGenre(Genre):
     def convert(cls, genre):
         if isinstance(genre, MongoGenre):
             return genre
+        if type(genre) == dict:
+            return MongoGenre(**genre)
         return MongoGenre(
-            _id=getattr(genre, '_id') if hasattr(genre, '_id') else None,
             created_date=genre.created_date,
             updated_date=genre.updated_date,
             name=genre.name,
@@ -34,8 +33,6 @@ class MongoGenre(Genre):
 
 
 class MongoPerson(Person):
-    _id: str = None
-
     collection_name = 'people'
 
     def __init__(self, **kwargs):
@@ -43,7 +40,6 @@ class MongoPerson(Person):
         self._id = kwargs.pop('_id', None)
 
     def __iter__(self):
-        yield '_id', self._id if hasattr(self, '_id') else None
         yield 'created_date', self.created_date
         yield 'updated_date', self.updated_date
         yield 'name', self.name
@@ -52,8 +48,9 @@ class MongoPerson(Person):
     def convert(cls, person):
         if isinstance(person, MongoPerson):
             return person
+        if type(person) == dict:
+            return MongoGenre(**person)
         return MongoPerson(
-            _id=getattr(person, '_id') if hasattr(person, '_id') else None,
             created_date=person.created_date,
             updated_date=person.updated_date,
             name=person.name,
@@ -61,29 +58,33 @@ class MongoPerson(Person):
 
     @classmethod
     def check_collection(cls, db):
+        # TODO https://stackoverflow.com/a/31030886/7893881
         collection = db[MongoPerson.collection_name]
         collection.create_index('name')
 
 
 class MongoAudiovisualRecord(AudiovisualRecord):
     _id: str = None
+    slug: str = None
 
     collection_name = 'audiovisual_records'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._id = kwargs.pop('_id', None)
+        self.slug = kwargs.pop('slug', None)
 
     def __iter__(self):
         yield '_id', self._id if hasattr(self, '_id') else None
+        yield 'slug', self.slug if self.slug else slugify(self.name)
         yield 'created_date', self.created_date
         yield 'updated_date', self.updated_date
         yield 'name', self.name
-        yield 'genres', [_.name for _ in self.genres]
+        yield 'genres', [dict(_) for _ in self.genres]
         yield 'year', self.year
-        yield 'directors', [_.name for _ in self.directors]
-        yield 'writers', [_.name for _ in self.writers]
-        yield 'stars', [_.name for _ in self.stars]
+        yield 'directors', [dict(_) for _ in self.directors]
+        yield 'writers', [dict(_) for _ in self.writers]
+        yield 'stars', [dict(_) for _ in self.stars]
         yield 'images', self.images
         yield 'deleted', self.deleted
         yield 'downloads_disabled', self.downloads_disabled
@@ -95,10 +96,12 @@ class MongoAudiovisualRecord(AudiovisualRecord):
     @classmethod
     def convert(cls, audiovisual_record):
         if isinstance(audiovisual_record, MongoAudiovisualRecord):
+            if audiovisual_record.slug is None:
+                audiovisual_record.slug = slugify(audiovisual_record.name)
             return audiovisual_record
-
         return MongoAudiovisualRecord(
             _id=getattr(audiovisual_record, '_id') if hasattr(audiovisual_record, '_id') else None,
+            slug=audiovisual_record.slug if hasattr(audiovisual_record, 'slug') else slugify(audiovisual_record.name),
             created_date=audiovisual_record.created_date,
             updated_date=audiovisual_record.updated_date,
             name=audiovisual_record.name,
@@ -122,6 +125,8 @@ class MongoAudiovisualRecord(AudiovisualRecord):
 
     @classmethod
     def serialize_scoring_source(cls, score):
+        if type(score) == dict:
+            return score
         return {
             'last_check': score.last_check,
             'source_name': score.source_name,
@@ -130,6 +135,8 @@ class MongoAudiovisualRecord(AudiovisualRecord):
 
     @classmethod
     def serialize_download_source(cls, download):
+        if type(download) == dict:
+            return download
         return {
             'last_check': download.last_check,
             'source_name': download.source_name,

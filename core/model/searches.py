@@ -53,12 +53,16 @@ class Search:
 
         def add_condition(self, condition: Condition):
             self._search.conditions[-1].append(condition)
+            return self
 
         def add_conditions(self, conditions: List[Condition]):
             self._search.conditions[-1] = self._search.conditions[-1] + conditions
+            return self
 
-        def add_or(self) -> None:
+        def add_or(self):
             self._search.conditions.append([])
+            return self
 
-        def build(self):
-            return self._search
+        def search(self):
+            from core import services
+            return services.search(self._search)

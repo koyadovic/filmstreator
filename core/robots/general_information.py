@@ -1,19 +1,18 @@
 from core.fetchers.services import get_all_general_information_sources
 from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
-from core import services
 from core.services import save_audiovisual_record
 from core.tools.exceptions import GeneralInformationException
 from core.tools.logs import log_exception
 
 
 async def autocomplete_general_information_for_empty_audiovisual_records():
-    search = (Search.Builder.new_search(AudiovisualRecord)
-                            .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, False))
-                            .build())
-
-    audiovisual_records = services.search(search)
-
+    audiovisual_records = (
+        Search.Builder.new_search(AudiovisualRecord)
+                      .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
+                      .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, False))
+                      .search()
+    )
     for audiovisual_record in audiovisual_records:
         for general_information_klass in get_all_general_information_sources():
             general_information = general_information_klass(audiovisual_record)
@@ -36,4 +35,4 @@ async def autocomplete_general_information_for_empty_audiovisual_records():
                 continue
 
 
-autocomplete_general_information_for_empty_audiovisual_records.interval = '5-minute'
+autocomplete_general_information_for_empty_audiovisual_records.interval = '1-minute'
