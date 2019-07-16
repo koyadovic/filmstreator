@@ -16,13 +16,13 @@ class DAOMongoDB(DAOInterface):
     def save_audiovisual_record(self, record: AudiovisualRecord):
         # TODO images, need to save to local filesystem and store only the path
         record = MongoAudiovisualRecord.convert(record)
-        for n, genre in record.genres:
+        for n, genre in enumerate(record.genres):
             record.genres[n] = self.save_if_not_exist_genre(genre)
-        for n, director in record.directors:
+        for n, director in enumerate(record.directors):
             record.directors[n] = self.save_if_not_exists_person(director)
-        for n, writer in record.writers:
+        for n, writer in enumerate(record.writers):
             record.writers[n] = self.save_if_not_exists_person(writer)
-        for n, star in record.stars:
+        for n, star in enumerate(record.stars):
             record.stars[n] = self.save_if_not_exists_person(star)
         dict_obj = dict(record)
         collection = self._get_collection(MongoAudiovisualRecord)

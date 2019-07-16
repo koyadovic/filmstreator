@@ -10,7 +10,7 @@ def get_all_general_information_sources():
     for submodule in package.modules:
         module = ModuleDiscover(submodule)
         for klass in module.classes:
-            if issubclass(klass, AbstractGeneralInformation):
+            if klass != AbstractGeneralInformation and issubclass(klass, AbstractGeneralInformation):
                 yield klass
 
 
@@ -19,7 +19,7 @@ def get_all_scoring_sources():
     for submodule in package.modules:
         module = ModuleDiscover(submodule)
         for klass in module.classes:
-            if issubclass(klass, AbstractScoringSource):
+            if klass != AbstractScoringSource and issubclass(klass, AbstractScoringSource):
                 yield klass
 
 
@@ -28,5 +28,5 @@ def get_all_download_sources():
     for submodule in package.modules:
         module = ModuleDiscover(submodule)
         for klass in module.classes:
-            if issubclass(klass, AbstractDownloadSource):
+            if klass != AbstractDownloadSource and issubclass(klass, AbstractDownloadSource):
                 yield klass

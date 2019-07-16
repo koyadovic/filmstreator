@@ -9,7 +9,13 @@
     <input type="submit" name="submit">
 </form>
 
+<a href="/">Refresh</a>
+
 {% for audiovisual_record in audiovisual_records %}
+    <p>{{ audiovisual_record.name }}</p>
+{% endfor %}
+<hr>
+{% for audiovisual_record in pending_audiovisual_records %}
     <p>{{ audiovisual_record.name }}</p>
 {% endfor %}
 
