@@ -39,24 +39,24 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
         stars = []
         writers = []
         target = None
-        for container in self.base_tree.xpath('//div[@class="credit_summary_item"]/h4/text()|'
-                                              '//div[@class="credit_summary_item"]/a/text()'):
-            if are_similar_strings(container, 'See full cast & crew'):
+        for text_found in self.base_tree.xpath('//div[@class="credit_summary_item"]/h4/text()|'
+                                               '//div[@class="credit_summary_item"]/a/text()'):
+            if are_similar_strings(text_found, 'See full cast & crew'):
                 continue
             target_changed = False
             for possible_target in possible_targets:
-                if are_similar_strings(container, possible_target):
+                if are_similar_strings(text_found, possible_target):
                     target = possible_target
                     target_changed = True
             if target_changed:
                 continue
 
             if target == 'director:':
-                directors.append(container)
+                directors.append(text_found)
             elif target == 'star:':
-                stars.append(container)
+                stars.append(text_found)
             elif target == 'writer:':
-                writers.append(container)
+                writers.append(text_found)
 
         writers = [Person(name=p) for p in writers]
         directors = [Person(name=p) for p in directors]
@@ -91,8 +91,6 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
 
 
 if __name__ == '__main__':
-    # details_page
-    # _search_by_name('interestelar')
     record = AudiovisualRecord(name='Interestellar')
     information = IMDBGeneralInformation(record)
     writers, directors, stars = information.writers_directors_stars
