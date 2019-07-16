@@ -9,6 +9,7 @@ from core.tools.logs import log_exception
 async def autocomplete_general_information_for_empty_audiovisual_records():
     audiovisual_records = (
         Search.Builder.new_search(AudiovisualRecord)
+                      .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
                       .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, False))
                       .search()
     )
@@ -34,4 +35,4 @@ async def autocomplete_general_information_for_empty_audiovisual_records():
                 continue
 
 
-autocomplete_general_information_for_empty_audiovisual_records.interval = '5-minute'
+autocomplete_general_information_for_empty_audiovisual_records.interval = '1-minute'

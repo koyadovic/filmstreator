@@ -11,9 +11,9 @@ from core import robots
 class Ticker:
     INTERVALS = {
         '1-minute': {'seconds': 1 * 60, 'functions': []},
-        '5-minute': {'seconds': 5 * 60, 'functions': []},
-        '30-minute': {'seconds': 30 * 60, 'functions': []},
-        '60-minute': {'seconds': 60 * 60, 'functions': []},
+        '5-minutes': {'seconds': 5 * 60, 'functions': []},
+        '30-minutes': {'seconds': 30 * 60, 'functions': []},
+        '60-minutes': {'seconds': 60 * 60, 'functions': []},
         '12-hours': {'seconds': 12 * 60 * 60, 'functions': []},
     }
 

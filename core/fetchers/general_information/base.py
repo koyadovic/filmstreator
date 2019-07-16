@@ -12,10 +12,6 @@ class AbstractGeneralInformation(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @property
-    def score(self):
-        raise NotImplementedError
-
-    @property
     def year(self):
         raise NotImplementedError
 

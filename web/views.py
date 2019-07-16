@@ -7,18 +7,19 @@ from core.services import add_audiovisual_record_by_name
 def main_test(request):
     if request.method == 'POST':
         name = request.POST.get('name')
-        saved = add_audiovisual_record_by_name(name)
-        print(saved)
+        add_audiovisual_record_by_name(name)
 
     audiovisual_records = (
         Search.Builder
               .new_search(AudiovisualRecord)
+              .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
               .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, True))
               .search()
     )
     pending_audiovisual_records = (
         Search.Builder
               .new_search(AudiovisualRecord)
+              .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
               .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, False))
               .search()
     )

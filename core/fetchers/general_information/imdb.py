@@ -1,3 +1,4 @@
+import re
 
 from core.fetchers.general_information.base import AbstractGeneralInformation
 from core.model.audiovisual import AudiovisualRecord, Genre, Person
@@ -23,17 +24,16 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
             raise GeneralInformationException(f'Cannot locate the main image for {self.audiovisual_record.name}')
 
     @property
-    def score(self):
-        try:
-            return self.base_tree.xpath('//*[@itemprop="ratingValue"]/text()')[0]
-        except IndexError:
-            raise GeneralInformationException(f'Cannot locate the score for {self.audiovisual_record.name}')
-
-    @property
     def year(self):
-        # TODO las series no tienen #titleYear
         try:
-            return self.base_tree.xpath('//*[@id="titleYear"]/a/text()')[0]
+            year_text = self.base_tree.xpath(
+                '//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[2]/div[2]/div/a[4]/text()'
+            )[0]
+            result = re.search(r'.*(\d{4}).*', year_text)
+            if result:
+                return result.group(1)
+            else:
+                raise IndexError
         except IndexError:
             raise GeneralInformationException(f'Cannot locate the year for {self.audiovisual_record.name}')
 
@@ -96,4 +96,5 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
         href = IMDBGeneralInformation.base_url + first_result_node.get('href')
         response = requests.get(href)
         self._base_tree = html.fromstring(response.content)
+
         return self._base_tree
