@@ -1,9 +1,9 @@
-from sentry_sdk import capture_exception
 from datetime import datetime
 import asyncio
 import glob
 import os
 
+from core.tools.logs import log_exception
 from core.tools.packages import PackageDiscover, ModuleDiscover
 from core import robots
 
@@ -60,7 +60,7 @@ class Ticker:
                 try:
                     await function()
                 except Exception as e:
-                    capture_exception(e)
+                    log_exception(e)
                 finally:
                     Ticker._release_lock(function)
 

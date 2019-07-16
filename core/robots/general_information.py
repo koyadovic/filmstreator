@@ -1,11 +1,10 @@
-from sentry_sdk import capture_exception
-
 from core.fetchers.services import get_all_general_information_sources
 from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
 from core import services
 from core.services import save_audiovisual_record
 from core.tools.exceptions import GeneralInformationException
+from core.tools.logs import log_exception
 
 
 async def autocomplete_general_information_for_empty_audiovisual_records():
@@ -33,7 +32,7 @@ async def autocomplete_general_information_for_empty_audiovisual_records():
                 break
 
             except GeneralInformationException as e:
-                capture_exception(e)
+                log_exception(e)
                 continue
 
 
