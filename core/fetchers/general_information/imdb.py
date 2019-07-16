@@ -1,8 +1,9 @@
 from lxml import html
 import requests
 
+from core.fetchers.general_information.base import AbstractGeneralInformation
 from core.model.audiovisual import AudiovisualRecord, Genre, Person
-from core.fetchers.general_information import AbstractGeneralInformation
+from core.tools.exceptions import GeneralInformationException
 from core.tools.strings import are_similar_strings
 from core.tools.urls import percent_encoding
 
@@ -16,21 +17,24 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
 
     @property
     def main_image(self):
-        return self.base_tree.xpath('//div[@class="poster"]/a/img')[0].get('src')
+        try:
+            return self.base_tree.xpath('//div[@class="poster"]/a/img')[0].get('src')
+        except IndexError:
+            raise GeneralInformationException(f'Cannot locate the main image for {self.audiovisual_record.name}')
 
     @property
     def score(self):
         try:
             return self.base_tree.xpath('//*[@itemprop="ratingValue"]/text()')[0]
         except IndexError:
-            return None
+            raise GeneralInformationException(f'Cannot locate the score for {self.audiovisual_record.name}')
 
     @property
     def year(self):
         try:
             return self.base_tree.xpath('//*[@id="titleYear"]/a/text()')[0]
         except IndexError:
-            return None
+            raise GeneralInformationException(f'Cannot locate the year for {self.audiovisual_record.name}')
 
     @property
     def writers_directors_stars(self):
@@ -67,6 +71,8 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
     def genres(self):
         genres = self.base_tree.xpath('//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[2]/div[2]/div'
                                       '/a[contains(@href, "genres")]/text()')
+        if len(genres) == 0:
+            raise GeneralInformationException(f'Cannot locate the genres for {self.audiovisual_record.name}')
         return [Genre(name=g) for g in genres]
 
     @property
