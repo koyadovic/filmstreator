@@ -118,6 +118,8 @@ class MongoAudiovisualRecord(AudiovisualRecord):
 
     @classmethod
     def serialize_scoring_source(cls, score):
+        if type(score) == dict:
+            return score
         return {
             'last_check': score.last_check,
             'source_name': score.source_name,
@@ -126,6 +128,8 @@ class MongoAudiovisualRecord(AudiovisualRecord):
 
     @classmethod
     def serialize_download_source(cls, download):
+        if type(download) == dict:
+            return download
         return {
             'last_check': download.last_check,
             'source_name': download.source_name,
