@@ -14,19 +14,19 @@ def get_all_general_information_sources():
                 yield klass
 
 
-def get_all_download_sources():
-    package = PackageDiscover(download_sources)
-    for submodule in package.modules:
-        module = ModuleDiscover(submodule)
-        for klass in module.classes:
-            if issubclass(klass, AbstractDownloadSource):
-                yield klass
-
-
 def get_all_scoring_sources():
     package = PackageDiscover(scoring_sources)
     for submodule in package.modules:
         module = ModuleDiscover(submodule)
         for klass in module.classes:
             if issubclass(klass, AbstractScoringSource):
+                yield klass
+
+
+def get_all_download_sources():
+    package = PackageDiscover(download_sources)
+    for submodule in package.modules:
+        module = ModuleDiscover(submodule)
+        for klass in module.classes:
+            if issubclass(klass, AbstractDownloadSource):
                 yield klass

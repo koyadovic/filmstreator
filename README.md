@@ -11,4 +11,9 @@ Y sin ningún orden en particular:
 
 
 # TODO
-- autodiscover de download sources, general information, scoring sources
+- Images, detallar cómo se guardan en la db.
+- Toca crear 1 template que liste todos los audiovisual_records y arriba te deje añadir el nombre de nuevos.
+- Relacionado con el de arriba, vista detalles, por ver todo, imagen, datos, etc.
+- Detallar de qué constará un Download Source. Por no añadir varios iguales.
+- A no mucho tardar toca ver cómo mantener todo actualizado.
+- Implementar Cache, para ahorrar pasos en los fetchers
