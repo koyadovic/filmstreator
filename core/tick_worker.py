@@ -90,7 +90,7 @@ class Ticker:
                     if hasattr(function, 'interval'):
                         interval = function.interval
                     else:
-                        interval = '1-minute'
+                        interval = '5-minute'
                     self.register_function(function, interval)
 
 
