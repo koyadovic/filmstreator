@@ -1,0 +1,18 @@
+<html>
+<head>
+    <title>Filmstreator</title>
+</head>
+<body>
+<h1>{{ audiovisual_record.name }}</h1>
+{% for image in audiovisual_record.images %}
+    <img src="{{ image }}"/>
+{% endfor %}
+
+<h4>Puntuaciones</h4>
+{% for score in audiovisual_record.scores %}
+    <p><span><strong>{{ score.source_name }}:</strong> {{ score.value }}</span></p>
+{% endfor %}
+
+<a href="/">Volver</a>
+</body>
+</html>

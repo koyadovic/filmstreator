@@ -72,6 +72,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._id = kwargs.pop('_id', None)
+        self.slug = kwargs.pop('slug', None)
 
     def __iter__(self):
         yield '_id', self._id if hasattr(self, '_id') else None
