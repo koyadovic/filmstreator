@@ -30,10 +30,11 @@ async def autocomplete_general_information_for_empty_audiovisual_records():
                 audiovisual_record.is_a_film = general_information.is_a_film
                 audiovisual_record.general_information_fetched = True
                 save_audiovisual_record(audiovisual_record)
+                break
 
             except GeneralInformationException as e:
                 capture_exception(e)
                 continue
 
 
-autocomplete_general_information_for_empty_audiovisual_records.interval = '1-minute'
+autocomplete_general_information_for_empty_audiovisual_records.interval = '5-minute'
