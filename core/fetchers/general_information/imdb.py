@@ -1,11 +1,13 @@
-from lxml import html
-import requests
 
 from core.fetchers.general_information.base import AbstractGeneralInformation
 from core.model.audiovisual import AudiovisualRecord, Genre, Person
 from core.tools.exceptions import GeneralInformationException
 from core.tools.strings import are_similar_strings
 from core.tools.urls import percent_encoding
+
+from urllib.request import urlopen
+from lxml import html
+import requests
 
 
 class IMDBGeneralInformation(AbstractGeneralInformation):
@@ -18,7 +20,10 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
     @property
     def main_image(self):
         try:
-            return self.base_tree.xpath('//div[@class="poster"]/a/img')[0].get('src')
+            src = self.base_tree.xpath('//div[@class="poster"]/a/img')[0].get('src')
+            web_image = urlopen(src)
+            image_contents = web_image.read()
+            return image_contents
         except IndexError:
             raise GeneralInformationException(f'Cannot locate the main image for {self.audiovisual_record.name}')
 
@@ -94,13 +99,3 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
         response = requests.get(href)
         self._base_tree = html.fromstring(response.content)
         return self._base_tree
-
-
-if __name__ == '__main__':
-    record = AudiovisualRecord(name='Interestellar')
-    information = IMDBGeneralInformation(record)
-    writers, directors, stars = information.writers_directors_stars
-    print(information.genres)
-    print(writers)
-    print(directors)
-    print(stars)

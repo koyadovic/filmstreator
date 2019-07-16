@@ -37,13 +37,17 @@ class ModuleDiscover:
         self._module = module
 
     @property
-    def all_callables(self):
-        return [f[1] for f in inspect.getmembers(self._module, inspect.isfunction)]
+    def all_members(self):
+        return [member[1] for member in inspect.getmembers(self._module)]
 
     @property
     def functions(self):
-        return [co for co in self.all_callables if not inspect.iscoroutinefunction(co)]
+        return [member for member in self.all_members if inspect.isfunction(member)]
 
     @property
     def coroutines(self):
-        return [co for co in self.all_callables if inspect.iscoroutinefunction(co)]
+        return [member for member in self.all_members if inspect.iscoroutinefunction(member)]
+
+    @property
+    def classes(self):
+        return [member for member in self.all_members if inspect.isclass(member)]

@@ -14,6 +14,7 @@ class DAOMongoDB(DAOInterface):
         MongoAudiovisualRecord.check_collection(self._db)
 
     def save_audiovisual_record(self, record: AudiovisualRecord):
+        # TODO images, need to save to local filesystem and store only the path
         record = MongoAudiovisualRecord.convert(record)
         for n, genre in record.genres:
             record.genres[n] = self.save_if_not_exist_genre(genre)
