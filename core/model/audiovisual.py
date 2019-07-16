@@ -83,6 +83,7 @@ class AudiovisualRecord(BaseModel):
     downloads: List[DownloadSource]
 
     general_information_fetched: bool
+    is_a_film: bool
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -98,6 +99,7 @@ class AudiovisualRecord(BaseModel):
         self.scores = kwargs.pop('scores', list())
         self.downloads = kwargs.pop('downloads', list())
         self.general_information_fetched = kwargs.pop('general_information_fetched', False)
+        self.is_a_film = kwargs.pop('is_a_film', True)
 
     def __str__(self):
         return f'AudiovisualRecord {self.name} ({self.year})'
