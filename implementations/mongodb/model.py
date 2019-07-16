@@ -17,6 +17,8 @@ class MongoGenre(Genre):
     def convert(cls, genre):
         if isinstance(genre, MongoGenre):
             return genre
+        if type(genre) == dict:
+            return MongoGenre(**genre)
         return MongoGenre(
             created_date=genre.created_date,
             updated_date=genre.updated_date,
@@ -45,6 +47,8 @@ class MongoPerson(Person):
     def convert(cls, person):
         if isinstance(person, MongoPerson):
             return person
+        if type(person) == dict:
+            return MongoGenre(**person)
         return MongoPerson(
             created_date=person.created_date,
             updated_date=person.updated_date,
@@ -72,11 +76,11 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         yield 'created_date', self.created_date
         yield 'updated_date', self.updated_date
         yield 'name', self.name
-        yield 'genres', [_.name for _ in self.genres]
+        yield 'genres', [dict(_) for _ in self.genres]
         yield 'year', self.year
-        yield 'directors', [_.name for _ in self.directors]
-        yield 'writers', [_.name for _ in self.writers]
-        yield 'stars', [_.name for _ in self.stars]
+        yield 'directors', [dict(_) for _ in self.directors]
+        yield 'writers', [dict(_) for _ in self.writers]
+        yield 'stars', [dict(_) for _ in self.stars]
         yield 'images', self.images
         yield 'deleted', self.deleted
         yield 'downloads_disabled', self.downloads_disabled
