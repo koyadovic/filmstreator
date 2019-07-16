@@ -2,8 +2,6 @@ from core.model.audiovisual import Genre, Person, AudiovisualRecord
 
 
 class MongoGenre(Genre):
-    _id: str = None
-
     collection_name = 'genres'
 
     def __init__(self, **kwargs):
@@ -11,7 +9,6 @@ class MongoGenre(Genre):
         self._id = kwargs.pop('_id', None)
 
     def __iter__(self):
-        yield '_id', self._id if hasattr(self, '_id') else None
         yield 'created_date', self.created_date
         yield 'updated_date', self.updated_date
         yield 'name', self.name
@@ -21,7 +18,6 @@ class MongoGenre(Genre):
         if isinstance(genre, MongoGenre):
             return genre
         return MongoGenre(
-            _id=getattr(genre, '_id') if hasattr(genre, '_id') else None,
             created_date=genre.created_date,
             updated_date=genre.updated_date,
             name=genre.name,
@@ -34,8 +30,6 @@ class MongoGenre(Genre):
 
 
 class MongoPerson(Person):
-    _id: str = None
-
     collection_name = 'people'
 
     def __init__(self, **kwargs):
@@ -43,7 +37,6 @@ class MongoPerson(Person):
         self._id = kwargs.pop('_id', None)
 
     def __iter__(self):
-        yield '_id', self._id if hasattr(self, '_id') else None
         yield 'created_date', self.created_date
         yield 'updated_date', self.updated_date
         yield 'name', self.name
@@ -53,7 +46,6 @@ class MongoPerson(Person):
         if isinstance(person, MongoPerson):
             return person
         return MongoPerson(
-            _id=getattr(person, '_id') if hasattr(person, '_id') else None,
             created_date=person.created_date,
             updated_date=person.updated_date,
             name=person.name,

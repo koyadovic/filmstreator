@@ -4,8 +4,6 @@ from core.model.audiovisual import AudiovisualRecord, Genre, Person
 from core.tools.exceptions import GeneralInformationException
 from core.tools.strings import are_similar_strings
 from core.tools.urls import percent_encoding
-
-from urllib.request import urlopen
 from lxml import html
 import requests
 
