@@ -1,5 +1,14 @@
 import asyncio
+import glob
+import os
 from datetime import datetime
+
+from sentry_sdk import capture_exception
+
+from core.robots.general_information import autocomplete_general_information_for_empty_audiovisual_records
+
+
+# TODO need to get locks for each callable
 
 
 class Ticker:
@@ -26,9 +35,31 @@ class Ticker:
         },
     }
 
-    def register_function(self, function, interval):
-        assert interval in Ticker.INTERVALS.keys(), 'Invalid interval provided'
-        self.INTERVALS[interval]['functions'].append(function)
+    @classmethod
+    def _can_acquire_lock(cls, func):
+        lock_file = cls._lock_filename(func)
+        if os.path.exists(lock_file):
+            return False
+        else:
+            open(lock_file, 'w').close()
+            return True
+
+    @classmethod
+    def _release_lock(cls, func):
+        lock_file = cls._lock_filename(func)
+        os.remove(lock_file)
+
+    @classmethod
+    def _lock_filename(cls, func):
+        return '/tmp/.' + func.__module__ + '.' + func.__name__ + '.lock'
+
+    @classmethod
+    def release_all_locks(cls):
+        """
+        When system start up all locks must be released
+        """
+        for lock_file in glob.glob('/tmp/.*.lock'):
+            os.remove(lock_file)
 
     async def _get_applying_intervals(self, ts):
         interval_slugs = []
@@ -42,7 +73,14 @@ class Ticker:
         interval_slugs = await self._get_applying_intervals(ts)
         for interval_slug in interval_slugs:
             for function in Ticker.INTERVALS[interval_slug]['functions']:
-                function()
+                if not Ticker._can_acquire_lock(function):
+                    continue
+                try:
+                    function()
+                except Exception as e:
+                    capture_exception(e)
+                finally:
+                    Ticker._release_lock(function)
 
     async def start(self):
         while True:
@@ -50,14 +88,15 @@ class Ticker:
             await self._execute_tasks(ts)
             await asyncio.sleep(1)
 
+    def register_function(self, function, interval):
+        assert interval in Ticker.INTERVALS.keys(), 'Invalid interval provided'
+        self.INTERVALS[interval]['functions'].append(function)
+
+
+# on startup we release all locks
+Ticker.release_all_locks()
 
 ticker = Ticker()
-
-
-"""
-TODO register here all robot callables
-ticker.register_function(function, '1-minute')
-"""
-
+ticker.register_function(autocomplete_general_information_for_empty_audiovisual_records, '1-minute')
 
 await ticker.start()

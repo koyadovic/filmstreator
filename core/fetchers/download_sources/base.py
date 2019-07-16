@@ -4,6 +4,9 @@ import abc
 
 class AbstractDownloadSource(metaclass=abc.ABCMeta):
 
+    # specify a unique name for each source
+    source_name = None
+
     def __init__(self, audiovisual_record: AudiovisualRecord):
         self.audiovisual_record = audiovisual_record
 
