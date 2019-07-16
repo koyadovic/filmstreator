@@ -53,6 +53,7 @@ class MongoPerson(Person):
 
     @classmethod
     def check_collection(cls, db):
+        # TODO https://stackoverflow.com/a/31030886/7893881
         collection = db[MongoPerson.collection_name]
         collection.create_index('name')
 
