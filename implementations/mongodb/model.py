@@ -1,4 +1,5 @@
 from core.model.audiovisual import Genre, Person, AudiovisualRecord
+from slugify import slugify
 
 
 class MongoGenre(Genre):
@@ -64,6 +65,7 @@ class MongoPerson(Person):
 
 class MongoAudiovisualRecord(AudiovisualRecord):
     _id: str = None
+    slug: str = None
 
     collection_name = 'audiovisual_records'
 
@@ -73,6 +75,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
 
     def __iter__(self):
         yield '_id', self._id if hasattr(self, '_id') else None
+        yield 'slug', self.slug if self.slug else slugify(self.name)
         yield 'created_date', self.created_date
         yield 'updated_date', self.updated_date
         yield 'name', self.name
@@ -92,9 +95,12 @@ class MongoAudiovisualRecord(AudiovisualRecord):
     @classmethod
     def convert(cls, audiovisual_record):
         if isinstance(audiovisual_record, MongoAudiovisualRecord):
+            if audiovisual_record.slug is None:
+                audiovisual_record.slug = slugify(audiovisual_record.name)
             return audiovisual_record
         return MongoAudiovisualRecord(
             _id=getattr(audiovisual_record, '_id') if hasattr(audiovisual_record, '_id') else None,
+            slug=audiovisual_record.slug if hasattr(audiovisual_record, 'slug') else slugify(audiovisual_record.name),
             created_date=audiovisual_record.created_date,
             updated_date=audiovisual_record.updated_date,
             name=audiovisual_record.name,
