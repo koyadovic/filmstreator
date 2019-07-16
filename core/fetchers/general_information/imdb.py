@@ -2,7 +2,7 @@ from lxml import html
 import requests
 
 from core.model.audiovisual import AudiovisualRecord, Genre, Person
-from core.robots.general_information.base import AbstractGeneralInformation
+from core.fetchers.general_information import AbstractGeneralInformation
 from core.tools.strings import are_similar_strings
 from core.tools.urls import percent_encoding
 
