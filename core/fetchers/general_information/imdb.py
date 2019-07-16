@@ -31,6 +31,7 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
 
     @property
     def year(self):
+        # TODO las series no tienen #titleYear
         try:
             return self.base_tree.xpath('//*[@id="titleYear"]/a/text()')[0]
         except IndexError:
