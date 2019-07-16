@@ -1,38 +1,22 @@
 import asyncio
 import glob
+import inspect
 import os
+import pkgutil
 from datetime import datetime
 
 from sentry_sdk import capture_exception
 
-from core.robots.general_information import autocomplete_general_information_for_empty_audiovisual_records
-
-
-# TODO need to get locks for each callable
+from core import robots
 
 
 class Ticker:
     INTERVALS = {
-        '1-minute': {
-            'seconds': 1 * 60,
-            'functions': []
-        },
-        '5-minute': {
-            'seconds': 5 * 60,
-            'functions': []
-        },
-        '30-minute': {
-            'seconds': 30 * 60,
-            'functions': []
-        },
-        '60-minute': {
-            'seconds': 60 * 60,
-            'functions': []
-        },
-        '12-hours': {
-            'seconds': 12 * 60 * 60,
-            'functions': []
-        },
+        '1-minute': {'seconds': 1 * 60, 'functions': []},
+        '5-minute': {'seconds': 5 * 60, 'functions': []},
+        '30-minute': {'seconds': 30 * 60, 'functions': []},
+        '60-minute': {'seconds': 60 * 60, 'functions': []},
+        '12-hours': {'seconds': 12 * 60 * 60, 'functions': []},
     }
 
     @classmethod
@@ -76,7 +60,7 @@ class Ticker:
                 if not Ticker._can_acquire_lock(function):
                     continue
                 try:
-                    function()
+                    await function()
                 except Exception as e:
                     capture_exception(e)
                 finally:
@@ -92,11 +76,24 @@ class Ticker:
         assert interval in Ticker.INTERVALS.keys(), 'Invalid interval provided'
         self.INTERVALS[interval]['functions'].append(function)
 
+    def autodiscover_robots(self, base_package):
+        for importer, modname, ispkg in pkgutil.iter_modules(base_package.__path__):
+            if ispkg:
+                continue
+            module = __import__(modname)
+            functions = [o for o in inspect.getmembers(module) if inspect.isfunction(o[1])]
+            for function in functions:
+                if inspect.iscoroutinefunction(function):
+                    if hasattr(function, 'interval'):
+                        interval = function.interval
+                    else:
+                        interval = '1-minute'
+                    self.register_function(function, interval)
 
-# on startup we release all locks
-Ticker.release_all_locks()
 
-ticker = Ticker()
-ticker.register_function(autocomplete_general_information_for_empty_audiovisual_records, '1-minute')
-
-await ticker.start()
+def start_ticker():
+    # on startup we release all locks
+    Ticker.release_all_locks()
+    ticker = Ticker()
+    ticker.autodiscover_robots(robots)
+    await ticker.start()
