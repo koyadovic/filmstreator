@@ -16,4 +16,4 @@ async def compile_download_links_from_audiovisual_records():
         # TODO todas estas películas no tienen buscados enlaces de descarga de source
 
 
-compile_download_links_from_audiovisual_records.interval = '1-minute'
+compile_download_links_from_audiovisual_records.interval = '5-minute'

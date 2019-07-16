@@ -1,5 +1,6 @@
 import asyncio
 import glob
+import importlib
 import inspect
 import os
 import pkgutil
@@ -80,9 +81,11 @@ class Ticker:
         for importer, modname, ispkg in pkgutil.iter_modules(base_package.__path__):
             if ispkg:
                 continue
-            module = __import__(modname)
-            functions = [o for o in inspect.getmembers(module) if inspect.isfunction(o[1])]
-            for function in functions:
+            module_name = base_package.__name__ + '.' + modname
+            module = importlib.import_module(module_name)
+            functions = inspect.getmembers(module, inspect.isfunction)
+            for function_tuple in functions:
+                function = function_tuple[1]
                 if inspect.iscoroutinefunction(function):
                     if hasattr(function, 'interval'):
                         interval = function.interval
@@ -96,4 +99,4 @@ def start_ticker():
     Ticker.release_all_locks()
     ticker = Ticker()
     ticker.autodiscover_robots(robots)
-    await ticker.start()
+    asyncio.run(ticker.start())
