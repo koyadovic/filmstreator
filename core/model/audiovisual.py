@@ -18,6 +18,12 @@ class Genre(BaseModel):
         super().__init__(**kwargs)
         self.name = kwargs.pop('name', '')
 
+    def __str__(self):
+        return f'Genre {self.name}'
+
+    def __repr__(self):
+        return self.__str__()
+
 
 class Person(BaseModel):
     name: str
@@ -25,6 +31,12 @@ class Person(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.name = kwargs.pop('name', '')
+
+    def __str__(self):
+        return f'Person {self.name}'
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class DownloadSource:
@@ -86,3 +98,9 @@ class AudiovisualRecord(BaseModel):
         self.scores = kwargs.pop('scores', list())
         self.downloads = kwargs.pop('downloads', list())
         self.general_information_fetched = kwargs.pop('general_information_fetched', False)
+
+    def __str__(self):
+        return f'AudiovisualRecord {self.name} ({self.year})'
+
+    def __repr__(self):
+        return self.__str__()
