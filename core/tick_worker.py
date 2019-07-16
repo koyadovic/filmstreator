@@ -9,6 +9,7 @@ from datetime import datetime
 from sentry_sdk import capture_exception
 
 from core import robots
+from core.tools.packages import PackageDiscover, ModuleDiscover
 
 
 class Ticker:
@@ -73,25 +74,20 @@ class Ticker:
             await self._execute_tasks(ts)
             await asyncio.sleep(1)
 
-    def register_function(self, function, interval):
+    def register_coroutine(self, function, interval):
         assert interval in Ticker.INTERVALS.keys(), 'Invalid interval provided'
         self.INTERVALS[interval]['functions'].append(function)
 
     def autodiscover_robots(self, base_package):
-        for importer, modname, ispkg in pkgutil.iter_modules(base_package.__path__):
-            if ispkg:
-                continue
-            module_name = base_package.__name__ + '.' + modname
-            module = importlib.import_module(module_name)
-            functions = inspect.getmembers(module, inspect.isfunction)
-            for function_tuple in functions:
-                function = function_tuple[1]
-                if inspect.iscoroutinefunction(function):
-                    if hasattr(function, 'interval'):
-                        interval = function.interval
-                    else:
-                        interval = '5-minute'
-                    self.register_function(function, interval)
+        package_discover = PackageDiscover(base_package)
+        for module in package_discover.modules:
+            module_discover = ModuleDiscover(module)
+            for coroutine in module_discover.coroutines:
+                if hasattr(coroutine, 'interval'):
+                    interval = coroutine.interval
+                else:
+                    interval = '5-minute'
+                self.register_coroutine(coroutine, interval)
 
 
 def start_ticker():
