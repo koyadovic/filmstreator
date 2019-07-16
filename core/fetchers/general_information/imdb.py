@@ -47,6 +47,8 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
                                                '//div[@class="credit_summary_item"]/a/text()'):
             if are_similar_strings(text_found, 'See full cast & crew'):
                 continue
+            if are_similar_strings(text_found.lower(), ' more credit'):
+                continue
             target_changed = False
             for possible_target in possible_targets:
                 if are_similar_strings(text_found, possible_target):
