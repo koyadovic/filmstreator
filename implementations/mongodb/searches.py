@@ -21,16 +21,23 @@ class SearchMongoDB(SearchInterface):
         client = MongoClient()
         self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
 
-    def search(self, search, sort_by=None):
+    def search(self, search, sort_by=None, paginate=False, page_size=20, page=1):
         target_class = search.target_class
         if target_class not in CLASS_MAPPINGS.values():
             target_class = CLASS_MAPPINGS[target_class]
 
+        # filtering
         collection = self._db[target_class.collection_name]
         mongodb_search = _translate_search_to_mongodb_dict(search)
         results = collection.find(mongodb_search)
+
+        # sorting
         if sort_by is not None:
             results = results.sort(_translate_sort_by_to_mongo_dict(sort_by))
+
+        # pagination
+        if paginate:
+            results = results.skip(((page if page > 0 else 1) - 1) * page_size).limit(page_size)
 
         if results.count() > 0:
             for result in results:

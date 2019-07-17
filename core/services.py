@@ -19,8 +19,8 @@ def save_audiovisual_record(audiovisual_record):
     return dao_implementation.save_audiovisual_record(audiovisual_record)
 
 
-def search(s):
-    return search_implementation.search(s)
+def search(s, sort_by=None, paginate=False, page_size=20, page=1):
+    return search_implementation.search(s, sort_by=sort_by, paginate=paginate, page_size=page_size, page=page)
 
 
 def add_audiovisual_record_by_name(name):
