@@ -1,7 +1,7 @@
 from typing import List
 import abc
 
-from core.model.audiovisual import AudiovisualRecord, DownloadSource
+from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
 
 
 class AbstractDownloadSource(metaclass=abc.ABCMeta):
@@ -13,5 +13,5 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
         self.audiovisual_record = audiovisual_record
 
     @abc.abstractmethod
-    def get_download_sources(self) -> List[DownloadSource]:
+    def get_source_results(self) -> List[DownloadSourceResult]:
         raise NotImplementedError

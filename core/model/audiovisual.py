@@ -178,6 +178,15 @@ class AudiovisualRecord(BaseModel):
         self._general_information_fetched = general_information_fetched
 
     @property
+    def downloads_fetched(self) -> bool:
+        return self._downloads_fetched
+
+    @downloads_fetched.setter
+    def downloads_fetched(self, downloads_fetched):
+        self.updated_date = utc_now()
+        self._downloads_fetched = downloads_fetched
+
+    @property
     def is_a_film(self) -> bool:
         return self._is_a_film
 
@@ -199,7 +208,8 @@ class AudiovisualRecord(BaseModel):
         self._downloads_disabled = kwargs.pop('downloads_disabled', False)
         self._scores = kwargs.pop('scores', list())
         self._general_information_fetched = kwargs.pop('general_information_fetched', False)
-        self._is_a_film = kwargs.pop('is_a_film', True)
+        self._downloads_fetched = kwargs.pop('downloads_fetched', False)
+        self._is_a_film = kwargs.pop('is_a_film', None)
 
     def __str__(self):
         return f'AudiovisualRecord {self.name} ({self.year})'

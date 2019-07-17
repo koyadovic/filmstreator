@@ -1,9 +1,11 @@
+from typing import List
+
 from core.interfaces import DAOInterface
-from core.model.audiovisual import AudiovisualRecord, Genre, Person
+from core.model.audiovisual import AudiovisualRecord, Genre, Person, DownloadSourceResult
 from pymongo import MongoClient
 from django.conf import settings
 
-from implementations.mongodb.model import MongoAudiovisualRecord, MongoGenre, MongoPerson
+from implementations.mongodb.model import MongoAudiovisualRecord, MongoGenre, MongoPerson, MongoDownloadSourceResult
 
 
 class DAOMongoDB(DAOInterface):
@@ -14,7 +16,6 @@ class DAOMongoDB(DAOInterface):
         MongoAudiovisualRecord.check_collection(self._db)
 
     def save_audiovisual_record(self, record: AudiovisualRecord):
-        # TODO images, need to save to local filesystem and store only the path
         record = MongoAudiovisualRecord.convert(record)
         for n, genre in enumerate(record.genres):
             record.genres[n] = self.save_if_not_exist_genre(genre)
@@ -32,6 +33,11 @@ class DAOMongoDB(DAOInterface):
         else:
             collection.update({'_id': _id}, dict_obj)
         return record
+
+    def save_download_source_results(self, results: List[MongoDownloadSourceResult]):
+        many_insert = [dict(result) for result in results]
+        collection = self._get_collection(MongoDownloadSourceResult)
+        collection.insert(many_insert)
 
     def save_if_not_exist_genre(self, genre: Genre):
         genre = MongoGenre.convert(genre)
