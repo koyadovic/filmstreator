@@ -79,10 +79,8 @@ class RemoveAudiovisualRecordNameFromString:
             if max_ratio > 0.7:
                 to_remove_word = string[max_ratio_idx:max_ratio_idx + length]
                 to_remove.append(to_remove_word)
-
         for to_remove_word in to_remove:
             string = string.replace(to_remove_word, '')
-
         string = re.sub(r' +', ' ', string)
         string = string.strip()
         string = re.sub(r'(^\W+|\W+$)', '', string)
