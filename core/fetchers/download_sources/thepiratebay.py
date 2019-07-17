@@ -6,6 +6,7 @@ from core.model.audiovisual import DownloadSourceResult
 
 class ThePirateBayDownloadSource(AbstractDownloadSource):
     source_name = 'The pirate bay'
+    base_url = 'https://loquesea.net'
 
     def get_source_results(self) -> List[DownloadSourceResult]:
         audiovisual_record = self.audiovisual_record
