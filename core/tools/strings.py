@@ -26,7 +26,22 @@ class VideoQualityInStringDetector:
 
     qualities = {
         'Cam': ['CAMRip', 'CAM'],
-        'DVD-Rip': ['DVDRip', 'DVDMux', 'DVD-Rip'],
+        'TeleSync': ['TS', 'HDTS', 'TELESYNC', 'PDVD', 'PreDVDRip'],
+        'WorkPrint': ['WP', 'WORKPRINT'],
+        'Telecine': ['TC', 'HDTC', 'TELECINE'],
+        'PPVRip': ['PPV', 'PPVRip'],
+        'Screener': ['SCR', 'SCREENER', 'BDSCR'],
+        'DVDScreener': ['DVDSCREENER'],
+        'R5': ['R5', 'R5.LINE', 'R5.AC3.5.1.HQ'],
+        'DVDRip': ['DVDRip', 'DVDMux', 'DVD-Rip'],
+        'DVDR': ['DVDR', 'DVD-Full', 'Full-Rip', 'ISO rip', 'lossless rip', 'untouced rip', 'DVD-5', 'DVD-9'],
+        'HDTV/PDTV/DSRip': ['DSR', 'DSRip', 'SATRip', 'DTHRip', 'DVBRip', 'HDTV', 'PDTV', 'DTVRip', 'TVRip', 'HDTVRip'],
+        'VODRip': ['VODRip', 'VODR'],
+        'WEBDL': ['WEBDL', 'WEB DL', 'WEB-DL', 'HDRip', 'WEB-DLRip'],
+        'WEBRip': ['WEBRip', 'WEB Rip', 'WEB-Rip', 'WEB'],
+        'WEBCap': ['WEB-Cap', 'WEBCAP', 'WEB Cap'],
+        'HC-HDRip': ['HC', 'HDRip'],
+        'BluRayRip': ['BluRay', 'bdrip', 'brip', 'bdmv', 'bdr'],
     }
 
     def __init__(self, string):
@@ -44,6 +59,8 @@ class VideoQualityInStringDetector:
                 if ratio > max_ratio:
                     max_ratio = ratio
                     selected_quality = label
+        if max_ratio < 0.5:
+            return 'Unknown'
         return selected_quality
 
     def _get_min_length(self):
