@@ -19,10 +19,14 @@ def save_audiovisual_record(audiovisual_record):
     return dao_implementation.save_audiovisual_record(audiovisual_record)
 
 
-def search(s):
-    return search_implementation.search(s)
-
-
 def add_audiovisual_record_by_name(name):
     record = AudiovisualRecord(name=name)
     dao_implementation.save_audiovisual_record(record)
+
+
+def save_download_source_results(download_source_results):
+    dao_implementation.save_download_source_results(download_source_results)
+
+
+def search(s, sort_by=None, paginate=False, page_size=20, page=1):
+    return search_implementation.search(s, sort_by=sort_by, paginate=paginate, page_size=page_size, page=page)

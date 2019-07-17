@@ -57,22 +57,6 @@ class Person(BaseModel):
         return self.__str__()
 
 
-class DownloadSource:
-    # TODO detail this
-    last_check: datetime
-    source_name: str
-    name: str
-    quality: str
-    link: str
-
-    def __init__(self, **kwargs):
-        self.last_check = kwargs.pop('last_check', datetime.utcnow().replace(tzinfo=timezone.utc))
-        self.source_name = kwargs.pop('source_name', '')
-        self.name = kwargs.pop('name', '')
-        self.quality = kwargs.pop('quality', '')
-        self.link = kwargs.pop('link', '')
-
-
 class ScoringSource:
     last_check: datetime
     source_name: str
@@ -185,15 +169,6 @@ class AudiovisualRecord(BaseModel):
         self._scores = scores
 
     @property
-    def downloads(self) -> List[DownloadSource]:
-        return self._downloads
-
-    @downloads.setter
-    def downloads(self, downloads):
-        self.updated_date = utc_now()
-        self._downloads = downloads
-
-    @property
     def general_information_fetched(self) -> bool:
         return self._general_information_fetched
 
@@ -201,6 +176,15 @@ class AudiovisualRecord(BaseModel):
     def general_information_fetched(self, general_information_fetched):
         self.updated_date = utc_now()
         self._general_information_fetched = general_information_fetched
+
+    @property
+    def downloads_fetched(self) -> bool:
+        return self._downloads_fetched
+
+    @downloads_fetched.setter
+    def downloads_fetched(self, downloads_fetched):
+        self.updated_date = utc_now()
+        self._downloads_fetched = downloads_fetched
 
     @property
     def is_a_film(self) -> bool:
@@ -223,12 +207,27 @@ class AudiovisualRecord(BaseModel):
         self._deleted = kwargs.pop('deleted', False)
         self._downloads_disabled = kwargs.pop('downloads_disabled', False)
         self._scores = kwargs.pop('scores', list())
-        self._downloads = kwargs.pop('downloads', list())
         self._general_information_fetched = kwargs.pop('general_information_fetched', False)
-        self._is_a_film = kwargs.pop('is_a_film', True)
+        self._downloads_fetched = kwargs.pop('downloads_fetched', False)
+        self._is_a_film = kwargs.pop('is_a_film', None)
 
     def __str__(self):
         return f'AudiovisualRecord {self.name} ({self.year})'
 
     def __repr__(self):
         return self.__str__()
+
+
+class DownloadSourceResult:
+    last_check: datetime
+    source_name: str
+    name: str
+    link: str
+    audiovisual_record_ref: AudiovisualRecord
+
+    def __init__(self, **kwargs):
+        self.last_check = kwargs.pop('last_check', datetime.utcnow().replace(tzinfo=timezone.utc))
+        self.source_name = kwargs.pop('source_name', '')
+        self.name = kwargs.pop('name', '')
+        self.link = kwargs.pop('link', '')
+        self.audiovisual_record_ref = kwargs.pop('audiovisual_record_ref', '')

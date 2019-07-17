@@ -82,7 +82,7 @@ class Ticker:
                 if hasattr(coroutine, 'interval'):
                     interval = coroutine.interval
                 else:
-                    interval = '5-minute'
+                    interval = '5-minutes'
                 self.register_coroutine(coroutine, interval)
 
 

@@ -1,4 +1,4 @@
-from core.model.audiovisual import Genre, Person, AudiovisualRecord
+from core.model.audiovisual import Genre, Person, AudiovisualRecord, DownloadSourceResult
 from slugify import slugify
 
 
@@ -58,9 +58,8 @@ class MongoPerson(Person):
 
     @classmethod
     def check_collection(cls, db):
-        # TODO https://stackoverflow.com/a/31030886/7893881
         collection = db[MongoPerson.collection_name]
-        collection.create_index('name')
+        collection.create_index('name', 'text')
 
 
 class MongoAudiovisualRecord(AudiovisualRecord):
@@ -89,8 +88,8 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         yield 'deleted', self.deleted
         yield 'downloads_disabled', self.downloads_disabled
         yield 'scores', [self.serialize_scoring_source(_) for _ in self.scores]
-        yield 'downloads', [self.serialize_download_source(_) for _ in self.downloads]
         yield 'general_information_fetched', self.general_information_fetched
+        yield 'downloads_fetched', self.downloads_fetched
         yield 'is_a_film', self.is_a_film
 
     @classmethod
@@ -118,8 +117,8 @@ class MongoAudiovisualRecord(AudiovisualRecord):
             downloads_disabled=audiovisual_record.downloads_disabled,
 
             scores=[cls.serialize_scoring_source(_) for _ in audiovisual_record.scores],
-            downloads=[cls.serialize_download_source(_) for _ in audiovisual_record.downloads],
             general_information_fetched=audiovisual_record.general_information_fetched,
+            downloads_fetched=audiovisual_record.downloads_fetched,
             is_a_film=audiovisual_record.is_a_film
         )
 
@@ -134,18 +133,39 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         }
 
     @classmethod
-    def serialize_download_source(cls, download):
-        if type(download) == dict:
-            return download
-        return {
-            'last_check': download.last_check,
-            'source_name': download.source_name,
-            'name': download.name,
-            'quality': download.quality,
-            'link': download.link,
-        }
-
-    @classmethod
     def check_collection(cls, db):
         MongoGenre.check_collection(db)
         MongoPerson.check_collection(db)
+
+
+class MongoDownloadSourceResult(DownloadSourceResult):
+    _id: str = None
+
+    collection_name = 'download_source_results'
+
+    def __iter__(self):
+        yield '_id', self._id if hasattr(self, '_id') else None
+        yield 'last_check', self.last_check
+        yield 'source_name', self.source_name
+        yield 'name', self.name
+        yield 'link', self.link
+        yield 'audiovisual_record_ref', self.audiovisual_record_ref
+
+    @classmethod
+    def convert(cls, download_source_result):
+        download_source_result.audiovisual_record_ref = MongoAudiovisualRecord.convert(
+            download_source_result.audiovisual_record_ref
+        )
+        download_source_result.audiovisual_record_ref = download_source_result.audiovisual_record_ref._id
+        if isinstance(download_source_result, MongoDownloadSourceResult):
+            return download_source_result
+        if type(download_source_result) == dict:
+            return MongoDownloadSourceResult(**download_source_result)
+        return MongoDownloadSourceResult(
+            _id=getattr(download_source_result, '_id') if hasattr(download_source_result, '_id') else None,
+            last_check=download_source_result.last_check,
+            name=download_source_result.name,
+            source_name=download_source_result.source_name,
+            link=download_source_result.link,
+            audiovisual_record_ref=download_source_result.audiovisual_record_ref,
+        )
