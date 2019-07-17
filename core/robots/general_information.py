@@ -1,7 +1,6 @@
 from core.fetchers.services import get_all_general_information_sources
 from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
-from core.services import save_audiovisual_record
 from core.tools.exceptions import GeneralInformationException
 from core.tools.logs import log_exception
 
@@ -27,7 +26,7 @@ async def autocomplete_general_information_for_empty_audiovisual_records():
                 audiovisual_record.genres = general_information.genres
                 audiovisual_record.is_a_film = general_information.is_a_film
                 audiovisual_record.general_information_fetched = True
-                save_audiovisual_record(audiovisual_record)
+                audiovisual_record.save()
                 break
 
             except GeneralInformationException as e:
