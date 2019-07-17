@@ -12,7 +12,7 @@ def ratio_of_containing_similar_string(container_string, text_string, min_length
     if min_length is not None and length < min_length:
         length = min_length
     max_ratio = 0.0
-    while len(container_string[idx:idx + length]) > 0:
+    while len(container_string[idx:idx + length]) >= length:
         possible_similar_string = container_string[idx:idx + length]
         ratio = SequenceMatcher(None, possible_similar_string, text_string).ratio()
         if ratio > max_ratio:
