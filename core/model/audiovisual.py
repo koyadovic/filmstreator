@@ -217,6 +217,10 @@ class AudiovisualRecord(BaseModel):
     def __repr__(self):
         return self.__str__()
 
+    def save(self):
+        from core import services
+        return services.save_audiovisual_record(self)
+
 
 class DownloadSourceResult:
     last_check: datetime

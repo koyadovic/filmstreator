@@ -33,11 +33,11 @@ class Search:
 
     True if one of all conditions for whatever group of conditions is True.
 
-    search = (Search.Builder.new_search(AudiovisualRecord)
-                            .add_condition(Condition('reference', Condition.OPERATOR_EQUALS, 'UST12345US'))
-                            .add_or()
-                            .add_condition(Condition('reference', Condition.OPERATOR_EQUALS, 'LALALA'))
-                            .build())
+    results = (Search.Builder.new_search(AudiovisualRecord)
+                             .add_condition(Condition('reference', Condition.OPERATOR_EQUALS, 'ONE_REFERENCE'))
+                             .add_or()
+                             .add_condition(Condition('reference', Condition.OPERATOR_EQUALS, 'ANOTHER'))
+                             .search(sort_by='-reference'), paginate=True, page=3)
     """
     def __init__(self, klass):
         self.conditions = [[]]

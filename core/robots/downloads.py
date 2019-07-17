@@ -25,7 +25,7 @@ async def compile_download_links_from_audiovisual_records():
 
             services.save_download_source_results(results)
             audiovisual_record.downloads_fetched = True
-            services.save_audiovisual_record(audiovisual_record)
+            audiovisual_record.save()
 
 
 compile_download_links_from_audiovisual_records.interval = '1-minute'
