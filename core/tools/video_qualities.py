@@ -13,27 +13,22 @@ class VideoQualityInStringDetector:
 
     @property
     def quality(self):
+        min_length = self._get_min_length()
         max_ratio = 0.0
         selected_quality = ''
         for label, possibilities in self.qualities.items():
             for possibility in possibilities:
                 possibility = possibility.lower()
-                for word in self._string.split(' '):
-                    ratio = ratio_of_containing_similar_string(word, possibility)
-                    if ratio > max_ratio:
-                        max_ratio = ratio
-                        selected_quality = label
-        return selected_quality
-
-    @property
-    def quality2(self):
-        max_ratio = 0.0
-        selected_quality = ''
-        for label, possibilities in self.qualities.items():
-            for possibility in possibilities:
-                possibility = possibility.lower()
-                ratio = ratio_of_containing_similar_string(self._string, possibility)
+                ratio = ratio_of_containing_similar_string(self._string, possibility, min_length=min_length)
                 if ratio > max_ratio:
                     max_ratio = ratio
                     selected_quality = label
         return selected_quality
+
+    def _get_min_length(self):
+        min_length = 0
+        for label, possibilities in self.qualities.items():
+            for possibility in possibilities:
+                if len(possibility) > min_length:
+                    min_length = len(possibility)
+        return min_length
