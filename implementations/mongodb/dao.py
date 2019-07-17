@@ -14,6 +14,7 @@ class DAOMongoDB(DAOInterface):
         client = MongoClient()
         self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
         MongoAudiovisualRecord.check_collection(self._db)
+        MongoDownloadSourceResult.check_collection(self._db)
 
     def save_audiovisual_record(self, record: AudiovisualRecord):
         record = MongoAudiovisualRecord.convert(record)
