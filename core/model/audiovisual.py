@@ -227,6 +227,8 @@ class DownloadSourceResult:
     source_name: str
     name: str
     link: str
+    quality: str
+    language: str  # ISO 639-2 Code, three characters
     audiovisual_record_ref: AudiovisualRecord
 
     def __init__(self, **kwargs):
@@ -234,4 +236,6 @@ class DownloadSourceResult:
         self.source_name = kwargs.pop('source_name', '')
         self.name = kwargs.pop('name', '')
         self.link = kwargs.pop('link', '')
+        self.quality = kwargs.pop('quality', '')
+        self.language = kwargs.pop('language', '')
         self.audiovisual_record_ref = kwargs.pop('audiovisual_record_ref', '')

@@ -23,53 +23,89 @@ def ratio_of_containing_similar_string(container_string, text_string, min_length
 
 
 class VideoQualityInStringDetector:
-
-    qualities = {
-        'Cam': ['CAMRip', 'CAM'],
-        'TeleSync': ['TS', 'HDTS', 'TELESYNC', 'PDVD', 'PreDVDRip'],
-        'WorkPrint': ['WP', 'WORKPRINT'],
-        'Telecine': ['TC', 'HDTC', 'TELECINE'],
-        'PPVRip': ['PPV', 'PPVRip'],
-        'Screener': ['SCR', 'SCREENER', 'BDSCR'],
-        'DVDScreener': ['DVDSCREENER'],
-        'R5': ['R5', 'R5.LINE', 'R5.AC3.5.1.HQ'],
-        'DVDRip': ['DVDRip', 'DVDMux', 'DVD-Rip'],
-        'DVDR': ['DVDR', 'DVD-Full', 'Full-Rip', 'ISO rip', 'lossless rip', 'untouced rip', 'DVD-5', 'DVD-9'],
-        'HDTV/PDTV/DSRip': ['DSR', 'DSRip', 'SATRip', 'DTHRip', 'DVBRip', 'HDTV', 'PDTV', 'DTVRip', 'TVRip', 'HDTVRip'],
-        'VODRip': ['VODRip', 'VODR'],
-        'WEBDL': ['WEBDL', 'WEB DL', 'WEB-DL', 'HDRip', 'WEB-DLRip'],
-        'WEBRip': ['WEBRip', 'WEB Rip', 'WEB-Rip', 'WEB'],
-        'WEBCap': ['WEB-Cap', 'WEBCAP', 'WEB Cap'],
-        'HC-HDRip': ['HC', 'HDRip'],
-        'BluRayRip': ['BluRay', 'bdrip', 'brip', 'bdmv', 'bdr'],
-    }
+    """
+    Algorithm will sort by 'possibility' length
+    """
+    qualities = [
+        {'possibility': 'R5.AC3.5.1.HQ', 'tag': 'R5'},
+        {'possibility': 'untouched rip', 'tag': 'DVDR'},
+        {'possibility': 'lossless rip', 'tag': 'DVDR'},
+        {'possibility': 'DVDSCREENER', 'tag': 'DVDScreener'},
+        {'possibility': 'PreDVDRip', 'tag': 'TS'},
+        {'possibility': 'WORKPRINT', 'tag': 'WP'},
+        {'possibility': 'BluRayScr', 'tag': 'BluRayScreener'},
+        {'possibility': 'WEB-DLRip', 'tag': 'WEBDL'},
+        {'possibility': 'TELESYNC', 'tag': 'TS'},
+        {'possibility': 'TELECINE', 'tag': 'Telecine'},
+        {'possibility': 'SCREENER', 'tag': 'Screener'},
+        {'possibility': 'DVD-Full', 'tag': 'DVDR'},
+        {'possibility': 'Full-Rip', 'tag': 'DVDR'},
+        {'possibility': 'R5.LINE', 'tag': 'R5'},
+        {'possibility': 'DVD-Rip', 'tag': 'DVDRip'},
+        {'possibility': 'ISOrip', 'tag': 'DVDR'},
+        {'possibility': 'HDTVRip', 'tag': 'HDTV'},
+        {'possibility': 'WEBRip', 'tag': 'WEBRip'},
+        {'possibility': 'WEB-Rip', 'tag': 'WEBRip'},
+        {'possibility': 'WEB-Cap', 'tag': 'WEBCap'},
+        {'possibility': 'WEBCap', 'tag': 'WEBCap'},
+        {'possibility': 'CAMRip', 'tag': 'Cam'},
+        {'possibility': 'PPVRip', 'tag': 'PPVRip'},
+        {'possibility': 'DVDSCR', 'tag': 'DVDScreener'},
+        {'possibility': 'DVDRip', 'tag': 'DVDRip'},
+        {'possibility': 'DVDMux', 'tag': 'DVDRip'},
+        {'possibility': 'SATRip', 'tag': 'HDTV'},
+        {'possibility': 'DTHRip', 'tag': 'HDTV'},
+        {'possibility': 'DVBRip', 'tag': 'HDTV'},
+        {'possibility': 'DTVRip', 'tag': 'HDTV'},
+        {'possibility': 'VODRip', 'tag': 'VODRip'},
+        {'possibility': 'WEBDL', 'tag': 'WEBDL'},
+        {'possibility': 'WEB-DL', 'tag': 'WEBDL'},
+        {'possibility': 'WEBRip', 'tag': 'WEBRip'},
+        {'possibility': 'WEBCAP', 'tag': 'WEBCap'},
+        {'possibility': 'BluRay', 'tag': 'BluRayRip'},
+        {'possibility': 'BRSCR', 'tag': 'BluRayScreener'},
+        {'possibility': 'DVD-5', 'tag': 'DVDR'},
+        {'possibility': 'DVD-9', 'tag': 'DVDR'},
+        {'possibility': 'DSRip', 'tag': 'HDTV'},
+        {'possibility': 'TVRip', 'tag': 'HDTV'},
+        {'possibility': 'WEBDL', 'tag': 'WEBDL'},
+        {'possibility': 'HDRip', 'tag': 'HC-HDRip'},
+        {'possibility': 'bdrip', 'tag': 'BluRayRip'},
+        {'possibility': 'HDTS', 'tag': 'TS'},
+        {'possibility': 'PDVD', 'tag': 'TS'},
+        {'possibility': 'HDTC', 'tag': 'Telecine'},
+        {'possibility': 'DVDR', 'tag': 'DVDR'},
+        {'possibility': 'HDTV', 'tag': 'HDTV'},
+        {'possibility': 'PDTV', 'tag': 'HDTV'},
+        {'possibility': 'VODR', 'tag': 'VODRip'},
+        {'possibility': 'brip', 'tag': 'BluRayRip'},
+        {'possibility': 'bdmv', 'tag': 'BluRayRip'},
+        {'possibility': 'CAM', 'tag': 'Cam'},
+        {'possibility': 'PPV', 'tag': 'PPVRip'},
+        {'possibility': 'SCR', 'tag': 'Screener'},
+        {'possibility': 'DSR', 'tag': 'HDTV'},
+        {'possibility': 'WEB', 'tag': 'WEBRip'},
+        {'possibility': 'bdr', 'tag': 'BluRayRip'},
+        {'possibility': 'TS', 'tag': 'TS'},
+        {'possibility': 'WP', 'tag': 'WP'},
+        {'possibility': 'TC', 'tag': 'Telecine'},
+        {'possibility': 'R5', 'tag': 'R5'},
+        {'possibility': 'HC', 'tag': 'HC-HDRip'}
+    ]
 
     def __init__(self, string):
         self._string = string.lower()
 
     @property
     def quality(self):
-        min_length = self._get_min_length()
-        max_ratio = 0.0
-        selected_quality = ''
-        for label, possibilities in self.qualities.items():
-            for possibility in possibilities:
-                possibility = possibility.lower()
-                ratio = ratio_of_containing_similar_string(self._string, possibility, min_length=min_length)
-                if ratio > max_ratio:
-                    max_ratio = ratio
-                    selected_quality = label
-        if max_ratio < 0.5:
-            return 'Unknown'
-        return selected_quality
-
-    def _get_min_length(self):
-        min_length = 0
-        for label, possibilities in self.qualities.items():
-            for possibility in possibilities:
-                if len(possibility) > min_length:
-                    min_length = len(possibility)
-        return min_length
+        sorted_qualities = sorted(self.qualities, key=lambda e: len(e.get('possibility')), reverse=True)
+        for element in sorted_qualities:
+            possibility = element.get('possibility').lower()
+            tag = element.get('tag')
+            ratio = ratio_of_containing_similar_string(self._string, possibility, min_length=len(possibility))
+            if ratio > 0.7:
+                return tag
+        return 'Unknown'
 
 
 class RemoveAudiovisualRecordNameFromString:

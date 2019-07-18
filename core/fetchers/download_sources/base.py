@@ -13,6 +13,8 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
     # here you can put the base_url that will be used with relative urls
     base_url = None
 
+    language = None  # ISO 639-2 Code, three characters
+
     def __init__(self, audiovisual_record: AudiovisualRecord):
         self.audiovisual_record = audiovisual_record
 

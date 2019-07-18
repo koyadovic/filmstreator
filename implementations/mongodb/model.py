@@ -1,6 +1,8 @@
 from core.model.audiovisual import Genre, Person, AudiovisualRecord, DownloadSourceResult
 from slugify import slugify
 
+from core.model.configurations import Configuration
+
 
 class MongoGenre(Genre):
     collection_name = 'genres'
@@ -151,6 +153,8 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         yield 'source_name', self.source_name
         yield 'name', self.name
         yield 'link', self.link
+        yield 'quality', self.quality
+        yield 'language', self.language
         yield 'audiovisual_record_ref', self.audiovisual_record_ref
 
     @classmethod
@@ -169,6 +173,8 @@ class MongoDownloadSourceResult(DownloadSourceResult):
             name=download_source_result.name,
             source_name=download_source_result.source_name,
             link=download_source_result.link,
+            quality=download_source_result.quality,
+            language=download_source_result.language,
             audiovisual_record_ref=download_source_result.audiovisual_record_ref,
         )
 
@@ -176,3 +182,30 @@ class MongoDownloadSourceResult(DownloadSourceResult):
     def check_collection(cls, db):
         collection = db[cls.collection_name]
         collection.create_index('name', 'text')
+
+
+class MongoConfiguration(Configuration):
+    _id: str = None
+
+    collection_name = 'configurations'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._id = kwargs.pop('_id', None)
+
+    @classmethod
+    def convert(cls, configuration):
+        if isinstance(configuration, MongoConfiguration):
+            return configuration
+        if type(configuration) == dict:
+            return MongoConfiguration(**configuration)
+        return MongoConfiguration(
+            _id=getattr(configuration, '_id') if hasattr(configuration, '_id') else None,
+            key=configuration.key,
+            data=configuration.data,
+        )
+
+    @classmethod
+    def check_collection(cls, db):
+        collection = db[cls.collection_name]
+        collection.create_index('key')

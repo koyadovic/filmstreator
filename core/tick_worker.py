@@ -33,14 +33,14 @@ class Ticker:
 
     @classmethod
     def _lock_filename(cls, func):
-        return '/tmp/.' + func.__module__ + '.' + func.__name__ + '.lock'
+        return '/tmp/.filmstreator.' + func.__module__ + '.' + func.__name__ + '.lock'
 
     @classmethod
     def release_all_locks(cls):
         """
         When system start up all locks must be released
         """
-        for lock_file in glob.glob('/tmp/.*.lock'):
+        for lock_file in glob.glob('/tmp/.filmstreator.*.lock'):
             os.remove(lock_file)
 
     async def _get_applying_intervals(self, ts):
