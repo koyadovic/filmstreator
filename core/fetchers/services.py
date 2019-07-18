@@ -35,4 +35,6 @@ def get_all_download_sources():
         for klass in module.classes:
             if klass != AbstractDownloadSource and issubclass(klass, AbstractDownloadSource):
                 klasses.append(klass)
+
+    # TODO get configuration to change base_urls of download sources, if exist
     return klasses
