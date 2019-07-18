@@ -151,6 +151,8 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         yield 'source_name', self.source_name
         yield 'name', self.name
         yield 'link', self.link
+        yield 'quality', self.quality
+        yield 'language', self.language
         yield 'audiovisual_record_ref', self.audiovisual_record_ref
 
     @classmethod
@@ -169,6 +171,8 @@ class MongoDownloadSourceResult(DownloadSourceResult):
             name=download_source_result.name,
             source_name=download_source_result.source_name,
             link=download_source_result.link,
+            quality=download_source_result.quality,
+            language=download_source_result.language,
             audiovisual_record_ref=download_source_result.audiovisual_record_ref,
         )
 

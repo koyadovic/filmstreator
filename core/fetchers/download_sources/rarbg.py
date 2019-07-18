@@ -18,6 +18,8 @@ class RarBgDownloadSource(AbstractDownloadSource):
     # here you can put the base_url that will be used with relative urls
     base_url = 'https://rarbgmirror.org'
 
+    language = 'eng'
+
     def __init__(self, audiovisual_record: AudiovisualRecord):
         super().__init__(audiovisual_record)
         self._base_tree = None
@@ -38,7 +40,7 @@ class RarBgDownloadSource(AbstractDownloadSource):
 
             source_name = RarBgDownloadSource.source_name
             name = text
-            quality = quality_detector.quality  # TODO add it to model
+            quality = quality_detector.quality
             link = RarBgDownloadSource.base_url + href
             audiovisual_record_ref = self.audiovisual_record
 
@@ -46,6 +48,8 @@ class RarBgDownloadSource(AbstractDownloadSource):
                 source_name=source_name,
                 name=name,
                 link=link,
+                quality=quality,
+                language=RarBgDownloadSource.language,
                 audiovisual_record_ref=audiovisual_record_ref
             ))
 
