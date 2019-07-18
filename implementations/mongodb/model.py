@@ -31,7 +31,7 @@ class MongoGenre(Genre):
     @classmethod
     def check_collection(cls, db):
         collection = db[cls.collection_name]
-        collection.create_index('name', 'text')
+        collection.create_index([('name', 'text')])
 
 
 class MongoPerson(Person):
@@ -61,7 +61,7 @@ class MongoPerson(Person):
     @classmethod
     def check_collection(cls, db):
         collection = db[cls.collection_name]
-        collection.create_index('name', 'text')
+        collection.create_index([('name', 'text')])
 
 
 class MongoAudiovisualRecord(AudiovisualRecord):
@@ -139,7 +139,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         MongoGenre.check_collection(db)
         MongoPerson.check_collection(db)
         collection = db[cls.collection_name]
-        collection.create_index('name', 'text')
+        collection.create_index([('name', 'text')])
 
 
 class MongoDownloadSourceResult(DownloadSourceResult):
@@ -154,7 +154,7 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         yield 'name', self.name
         yield 'link', self.link
         yield 'quality', self.quality
-        yield 'language', self.language
+        yield 'lang', self.lang
         yield 'audiovisual_record_ref', self.audiovisual_record_ref
 
     @classmethod
@@ -174,14 +174,14 @@ class MongoDownloadSourceResult(DownloadSourceResult):
             source_name=download_source_result.source_name,
             link=download_source_result.link,
             quality=download_source_result.quality,
-            language=download_source_result.language,
+            lang=download_source_result.lang,
             audiovisual_record_ref=download_source_result.audiovisual_record_ref,
         )
 
     @classmethod
     def check_collection(cls, db):
         collection = db[cls.collection_name]
-        collection.create_index('name', 'text')
+        collection.create_index([('name', 'text')])
 
 
 class MongoConfiguration(Configuration):

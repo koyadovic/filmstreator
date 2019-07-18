@@ -39,6 +39,8 @@ class DAOMongoDB(DAOInterface):
         return record
 
     def save_download_source_results(self, results: List[MongoDownloadSourceResult]):
+        if len(results) == 0:
+            return
         many_insert = [dict(result) for result in results]
         collection = self._get_collection(MongoDownloadSourceResult)
         collection.insert(many_insert)

@@ -49,7 +49,7 @@ class RarBgDownloadSource(AbstractDownloadSource):
                 name=name,
                 link=link,
                 quality=quality,
-                language=RarBgDownloadSource.language,
+                lang=RarBgDownloadSource.language,
                 audiovisual_record_ref=audiovisual_record_ref
             ))
 
@@ -63,8 +63,9 @@ class RarBgDownloadSource(AbstractDownloadSource):
         name = self.audiovisual_record.name
         plus_encoded_name = urllib.parse.quote_plus(name)
 
-        response = requests.get(
+        response = self.requests_get(
             f'{RarBgDownloadSource.base_url}/torrents.php?search={plus_encoded_name}&order=seeders&by=DESC'
         )
         self._base_tree = html.fromstring(response.content)
+        print(response.content)
         return self._base_tree
