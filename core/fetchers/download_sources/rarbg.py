@@ -2,14 +2,15 @@ from core.fetchers.download_sources.base import AbstractDownloadSource
 from core.model.audiovisual import DownloadSourceResult, AudiovisualRecord
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
+from core.tools.timeouts import timeout
+
 from typing import List
 
 from urllib3.exceptions import MaxRetryError, ProxyError
-import urllib.parse
 from lxml import html
-import time
+import urllib.parse
+import asyncio
 
-from core.tools.timeouts import timeout
 
 
 class RarBgDownloadSource(AbstractDownloadSource):
@@ -25,8 +26,7 @@ class RarBgDownloadSource(AbstractDownloadSource):
     def __init__(self, audiovisual_record: AudiovisualRecord):
         super().__init__(audiovisual_record)
 
-    def get_source_results(self) -> List[DownloadSourceResult]:
-        download_results = []
+    async def get_source_results(self) -> List[DownloadSourceResult]:
         session = PhantomBrowsingSession()
 
         name = self.audiovisual_record.name
@@ -38,7 +38,7 @@ class RarBgDownloadSource(AbstractDownloadSource):
             try:
                 with timeout(30):
                     session.get(RarBgDownloadSource.base_url)
-                    time.sleep(2)
+                    await asyncio.sleep(2)
                     session.get(f'{RarBgDownloadSource.base_url}/torrents.php?search={plus_encoded_name}&order=seeders&by=DESC')
                     response = session.last_response
                     base_tree = html.fromstring(response.content)
@@ -51,6 +51,11 @@ class RarBgDownloadSource(AbstractDownloadSource):
                 print('Error, refreshing our identity ...')
                 session.refresh_identity()
 
+        download_results = self._translate(results)
+        return download_results
+
+    def _translate(self, results):
+        download_results = []
         for result in results:
             text = result.text
             if text is None or len(text) < 4:

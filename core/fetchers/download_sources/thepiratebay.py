@@ -9,7 +9,7 @@ class ThePirateBayDownloadSource(AbstractDownloadSource):
     base_url = 'https://loquesea.net'
     language = 'eng'
 
-    def get_source_results(self) -> List[DownloadSourceResult]:
+    async def get_source_results(self) -> List[DownloadSourceResult]:
         audiovisual_record = self.audiovisual_record
         # TODO
         return []

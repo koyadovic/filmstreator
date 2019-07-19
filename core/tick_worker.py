@@ -1,3 +1,4 @@
+import functools
 from datetime import datetime
 import asyncio
 import glob
@@ -6,6 +7,16 @@ import os
 from core.tools.logs import log_exception
 from core.tools.packages import PackageDiscover, ModuleDiscover
 from core import robots
+
+
+def execute_each(interval='1-minute'):
+    def wrapper(func):
+        func.interval = interval
+        @functools.wraps(func)
+        async def wrapped(*args):
+            return await func(*args)
+        return wrapped
+    return wrapper
 
 
 class Ticker:

@@ -5,8 +5,12 @@ from core import services
 
 from datetime import datetime, timezone, timedelta
 
+from core.tick_worker import execute_each
 
+
+@execute_each(interval='1-minute')
 async def compile_download_links_from_audiovisual_records():
+    print('compile_download_links_from_audiovisual_records')
     for source_class in get_all_download_sources():
         audiovisual_records = (
             Search
@@ -19,7 +23,7 @@ async def compile_download_links_from_audiovisual_records():
         )
         for audiovisual_record in audiovisual_records:
             download_source = source_class(audiovisual_record)
-            results = download_source.get_source_results()
+            results = await download_source.get_source_results()
 
             old_download_results = []
             if len(results) > 0:
@@ -43,22 +47,15 @@ async def compile_download_links_from_audiovisual_records():
                 result.delete()
 
 
-async def compile_expired_download_links():
-    n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=120)
-    affected_audiovisual_records = set()
-
-    download_results = (
-        Search
-        .Builder
-        .new_search(DownloadSourceResult)
-        .add_condition(Condition('last_check', Condition.OPERATOR_LESS_THAN, n_days_ago))
-        .search()
-    )
-
-
-"""
-Intervals
-"""
-
-compile_download_links_from_audiovisual_records.interval = '1-minute'
-compile_expired_download_links.interval = '5-minutes'
+# @coroutine_interval(interval='1-minute')
+# async def compile_expired_download_links():
+#     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=120)
+#     affected_audiovisual_records = set()
+#
+#     download_results = (
+#         Search
+#         .Builder
+#         .new_search(DownloadSourceResult)
+#         .add_condition(Condition('last_check', Condition.OPERATOR_LESS_THAN, n_days_ago))
+#         .search()
+#     )
