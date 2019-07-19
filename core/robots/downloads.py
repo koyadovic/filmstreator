@@ -10,7 +10,7 @@ from core.tick_worker import execute_each
 
 @execute_each(interval='1-minute')
 async def compile_download_links_from_audiovisual_records():
-    print('compile_download_links_from_audiovisual_records')
+    print('[ STARTED] compile_download_links_from_audiovisual_records')
     for source_class in get_all_download_sources():
         audiovisual_records = (
             Search
@@ -46,6 +46,7 @@ async def compile_download_links_from_audiovisual_records():
             for result in old_download_results:
                 result.delete()
 
+    print('[FINISHED] compile_download_links_from_audiovisual_records')
 
 # @coroutine_interval(interval='1-minute')
 # async def compile_expired_download_links():
