@@ -1,13 +1,16 @@
+from bson import ObjectId
 from pymongo import MongoClient
 from django.conf import settings
 from core.interfaces import SearchInterface
-from core.model.audiovisual import AudiovisualRecord, Person, Genre
+from core.model.audiovisual import AudiovisualRecord, Person, Genre, DownloadSourceResult
 from core.model.searches import Condition
-from implementations.mongodb.model import MongoAudiovisualRecord, MongoPerson, MongoGenre
+from core.tools.strings import ratio_of_containing_similar_string
+from implementations.mongodb.model import MongoAudiovisualRecord, MongoPerson, MongoGenre, MongoDownloadSourceResult
 
 
 CLASS_MAPPINGS = {
     AudiovisualRecord: MongoAudiovisualRecord,
+    DownloadSourceResult: MongoDownloadSourceResult,
     Person: MongoPerson,
     Genre: MongoGenre
 }
@@ -41,6 +44,26 @@ class SearchMongoDB(SearchInterface):
 
         if results.count() > 0:
             for result in results:
+                for k, v in result.items():
+                    if k == '_id':
+                        continue
+                    if type(v) == ObjectId:
+
+                        # this automate the translation of an object id into the referenced object
+                        # from another collection searching similarities between collection names
+                        # and the attribute name that contains the ObjectId
+                        collection_names = CLASS_MAPPINGS.values()
+                        max_ratio = 0.0
+                        selected_collection_name = None
+                        for collection_name in collection_names:
+                            ratio = ratio_of_containing_similar_string(collection_name, k)
+                            if ratio > max_ratio:
+                                max_ratio = ratio
+                                selected_collection_name = collection_name
+                        if max_ratio > 0.0:
+                            collection = self._db[selected_collection_name]
+                            result[k] = collection.find_one({'_id': v})
+
                 yield target_class(**result)
         else:
             return []
@@ -54,6 +77,9 @@ def _translate_search_to_mongodb_dict(search):
             field_path = condition.field_path.replace('__', '.')
             operator = condition.operator
             value = condition.value
+            # for references
+            if hasattr(value, '_id'):
+                value = getattr(value, '_id')
             if operator == Condition.OPERATOR_EQUALS:
                 dict_condition[field_path] = value
             else:

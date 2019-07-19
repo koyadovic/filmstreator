@@ -31,7 +31,7 @@ class MongoGenre(Genre):
     @classmethod
     def check_collection(cls, db):
         collection = db[cls.collection_name]
-        collection.create_index('name', 'text')
+        collection.create_index([('name', 'text')])
 
 
 class MongoPerson(Person):
@@ -61,7 +61,7 @@ class MongoPerson(Person):
     @classmethod
     def check_collection(cls, db):
         collection = db[cls.collection_name]
-        collection.create_index('name', 'text')
+        collection.create_index([('name', 'text')])
 
 
 class MongoAudiovisualRecord(AudiovisualRecord):
@@ -139,7 +139,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         MongoGenre.check_collection(db)
         MongoPerson.check_collection(db)
         collection = db[cls.collection_name]
-        collection.create_index('name', 'text')
+        collection.create_index([('name', 'text')])
 
 
 class MongoDownloadSourceResult(DownloadSourceResult):
@@ -148,21 +148,22 @@ class MongoDownloadSourceResult(DownloadSourceResult):
     collection_name = 'download_source_results'
 
     def __iter__(self):
-        yield '_id', self._id if hasattr(self, '_id') else None
+        if hasattr(self, '_id') and bool(getattr(self, '_id')):
+            yield '_id', self._id
         yield 'last_check', self.last_check
         yield 'source_name', self.source_name
         yield 'name', self.name
         yield 'link', self.link
         yield 'quality', self.quality
-        yield 'language', self.language
-        yield 'audiovisual_record_ref', self.audiovisual_record_ref
+        yield 'lang', self.lang
+        yield 'audiovisual_record', self.audiovisual_record
 
     @classmethod
     def convert(cls, download_source_result):
-        download_source_result.audiovisual_record_ref = MongoAudiovisualRecord.convert(
-            download_source_result.audiovisual_record_ref
+        download_source_result.audiovisual_record = MongoAudiovisualRecord.convert(
+            download_source_result.audiovisual_record
         )
-        download_source_result.audiovisual_record_ref = download_source_result.audiovisual_record_ref._id
+        download_source_result.audiovisual_record = download_source_result.audiovisual_record._id
         if isinstance(download_source_result, MongoDownloadSourceResult):
             return download_source_result
         if type(download_source_result) == dict:
@@ -174,14 +175,14 @@ class MongoDownloadSourceResult(DownloadSourceResult):
             source_name=download_source_result.source_name,
             link=download_source_result.link,
             quality=download_source_result.quality,
-            language=download_source_result.language,
-            audiovisual_record_ref=download_source_result.audiovisual_record_ref,
+            lang=download_source_result.lang,
+            audiovisual_record=download_source_result.audiovisual_record,
         )
 
     @classmethod
     def check_collection(cls, db):
         collection = db[cls.collection_name]
-        collection.create_index('name', 'text')
+        collection.create_index([('name', 'text')])
 
 
 class MongoConfiguration(Configuration):
@@ -209,3 +210,9 @@ class MongoConfiguration(Configuration):
     def check_collection(cls, db):
         collection = db[cls.collection_name]
         collection.create_index('key')
+
+    def __iter__(self):
+        if hasattr(self, '_id') and bool(getattr(self, '_id')):
+            yield '_id', self._id
+        yield 'key', self.key
+        yield 'data', self.data

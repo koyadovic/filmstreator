@@ -29,13 +29,16 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
     @property
     def year(self):
         try:
-            # //*[@id="title-overview-widget"]/div[1]/div[2]/div/div[2]/div[2]/div/a[3]/text()
             year_text_results = self.base_tree.xpath(
                 '//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[2]/div[2]/div/a[4]/text()'
             )
             if len(year_text_results) == 0:
                 year_text_results = self.base_tree.xpath(
                     '//*[@id="title-overview-widget"]/div[1]/div[2]/div/div[2]/div[2]/div/a[3]/text()'
+                )
+            if len(year_text_results) == 0:
+                year_text_results = self.base_tree.xpath(
+                    '//*[@id="titleYear"]/a/text()'
                 )
             year_text = year_text_results[0]
             result = re.search(r'.*(\d{4}).*', year_text)

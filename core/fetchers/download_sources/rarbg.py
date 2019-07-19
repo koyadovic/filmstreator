@@ -1,13 +1,15 @@
-from typing import List
-
 from core.fetchers.download_sources.base import AbstractDownloadSource
 from core.model.audiovisual import DownloadSourceResult, AudiovisualRecord
-
-import urllib.parse
-from lxml import html
-import requests
-
+from core.tools.browsing import PhantomBrowsingSession
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
+from core.tools.timeouts import timeout
+
+from typing import List
+
+from urllib3.exceptions import MaxRetryError, ProxyError
+from lxml import html
+import urllib.parse
+import asyncio
 
 
 class RarBgDownloadSource(AbstractDownloadSource):
@@ -22,12 +24,37 @@ class RarBgDownloadSource(AbstractDownloadSource):
 
     def __init__(self, audiovisual_record: AudiovisualRecord):
         super().__init__(audiovisual_record)
-        self._base_tree = None
 
-    def get_source_results(self) -> List[DownloadSourceResult]:
+    async def get_source_results(self) -> List[DownloadSourceResult]:
+        session = PhantomBrowsingSession()
+
+        name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'
+        plus_encoded_name = urllib.parse.quote_plus(name)
+
+        results = None
+        tryings = 0
+        while (results is None or len(results) == 0) and tryings < 50:
+            try:
+                with timeout(30):
+                    session.get(RarBgDownloadSource.base_url)
+                    await asyncio.sleep(2)
+                    session.get(f'{RarBgDownloadSource.base_url}/torrents.php?search={plus_encoded_name}&order=seeders&by=DESC')
+                    response = session.last_response
+                    base_tree = html.fromstring(response.content)
+                    results = base_tree.xpath('//table[@class="lista2t"]//tr[@class="lista2"]//a[1]')
+                    tryings += 1
+                    if len(results) == 0:
+                        print('Results are zero!, refreshing our identity')
+                        session.refresh_identity()
+            except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError):
+                print('Error, refreshing our identity ...')
+                session.refresh_identity()
+
+        download_results = self._translate(results)
+        return download_results
+
+    def _translate(self, results):
         download_results = []
-
-        results = self.base_tree.xpath('//table[@class="lista2t"]//tr[@class="lista2"]//a[1]')
         for result in results:
             text = result.text
             if text is None or len(text) < 4:
@@ -42,29 +69,15 @@ class RarBgDownloadSource(AbstractDownloadSource):
             name = text
             quality = quality_detector.quality
             link = RarBgDownloadSource.base_url + href
-            audiovisual_record_ref = self.audiovisual_record
+            audiovisual_record = self.audiovisual_record
 
             download_results.append(DownloadSourceResult(
                 source_name=source_name,
                 name=name,
                 link=link,
                 quality=quality,
-                language=RarBgDownloadSource.language,
-                audiovisual_record_ref=audiovisual_record_ref
+                lang=RarBgDownloadSource.language,
+                audiovisual_record=audiovisual_record
             ))
 
         return download_results
-
-    @property
-    def base_tree(self):
-        if self._base_tree is not None:
-            return self._base_tree
-
-        name = self.audiovisual_record.name
-        plus_encoded_name = urllib.parse.quote_plus(name)
-
-        response = requests.get(
-            f'{RarBgDownloadSource.base_url}/torrents.php?search={plus_encoded_name}&order=seeders&by=DESC'
-        )
-        self._base_tree = html.fromstring(response.content)
-        return self._base_tree
