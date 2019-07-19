@@ -12,7 +12,6 @@ import urllib.parse
 import asyncio
 
 
-
 class RarBgDownloadSource(AbstractDownloadSource):
     # specify a unique name for each source
     source_name = 'RARBG'
@@ -29,7 +28,7 @@ class RarBgDownloadSource(AbstractDownloadSource):
     async def get_source_results(self) -> List[DownloadSourceResult]:
         session = PhantomBrowsingSession()
 
-        name = self.audiovisual_record.name
+        name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'
         plus_encoded_name = urllib.parse.quote_plus(name)
 
         results = None
