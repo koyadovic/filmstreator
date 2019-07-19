@@ -65,7 +65,7 @@ class RarBgDownloadSource(AbstractDownloadSource):
             name = text
             quality = quality_detector.quality
             link = RarBgDownloadSource.base_url + href
-            audiovisual_record_ref = self.audiovisual_record
+            audiovisual_record = self.audiovisual_record
 
             download_results.append(DownloadSourceResult(
                 source_name=source_name,
@@ -73,7 +73,7 @@ class RarBgDownloadSource(AbstractDownloadSource):
                 link=link,
                 quality=quality,
                 lang=RarBgDownloadSource.language,
-                audiovisual_record_ref=audiovisual_record_ref
+                audiovisual_record=audiovisual_record
             ))
 
         return download_results

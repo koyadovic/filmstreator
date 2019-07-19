@@ -1,7 +1,7 @@
 from typing import List
 
 from core.interfaces import DAOInterface
-from core.model.audiovisual import AudiovisualRecord, Genre, Person
+from core.model.audiovisual import AudiovisualRecord, Genre, Person, DownloadSourceResult
 from pymongo import MongoClient
 from django.conf import settings
 
@@ -41,9 +41,27 @@ class DAOMongoDB(DAOInterface):
     def save_download_source_results(self, results: List[MongoDownloadSourceResult]):
         if len(results) == 0:
             return
+        for n, result in enumerate(results):
+            results[n] = MongoDownloadSourceResult.convert(result)
         many_insert = [dict(result) for result in results]
         collection = self._get_collection(MongoDownloadSourceResult)
         collection.insert(many_insert)
+
+    def delete_audiovisual_record(self, record: MongoAudiovisualRecord):
+        collection = self._get_collection(MongoAudiovisualRecord)
+        record_id = getattr(record, '_id', None)
+        if record_id is None:
+            raise Exception(f'record {record} does not have an _id')
+        collection.delete_one({'_id': record_id})
+        return None
+
+    def delete_download_source_result(self, result: MongoDownloadSourceResult):
+        collection = self._get_collection(MongoDownloadSourceResult)
+        result_id = getattr(result, '_id', None)
+        if result_id is None:
+            raise Exception(f'result {result} does not have an _id')
+        collection.delete_one({'_id': result_id})
+        return None
 
     """
     Configurations
@@ -66,6 +84,15 @@ class DAOMongoDB(DAOInterface):
         else:
             collection.update({'_id': _id}, dict_configuration)
         return configuration
+
+    def delete_configuration(self, configuration: Configuration):
+        configuration = MongoConfiguration.convert(configuration)
+        collection = self._get_collection(MongoConfiguration)
+        dict_configuration = dict(configuration)
+        _id = dict_configuration.pop('_id', None)
+        if _id:
+            collection.delete_one({'_id': _id})
+        return None
 
     """
     Private methods

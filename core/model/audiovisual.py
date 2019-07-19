@@ -221,6 +221,10 @@ class AudiovisualRecord(BaseModel):
         from core import services
         return services.save_audiovisual_record(self)
 
+    def delete(self):
+        from core import services
+        return services.delete_audiovisual_record(self)
+
 
 class DownloadSourceResult:
     last_check: datetime
@@ -229,7 +233,7 @@ class DownloadSourceResult:
     link: str
     quality: str
     lang: str  # ISO 639-2 Code, three characters
-    audiovisual_record_ref: AudiovisualRecord
+    audiovisual_record: AudiovisualRecord
 
     def __init__(self, **kwargs):
         self.last_check = kwargs.pop('last_check', datetime.utcnow().replace(tzinfo=timezone.utc))
@@ -238,4 +242,8 @@ class DownloadSourceResult:
         self.link = kwargs.pop('link', '')
         self.quality = kwargs.pop('quality', '')
         self.lang = kwargs.pop('lang', '')
-        self.audiovisual_record_ref = kwargs.pop('audiovisual_record_ref', '')
+        self.audiovisual_record = kwargs.pop('audiovisual_record', '')
+
+    def delete(self):
+        from core import services
+        return services.delete_download_source_result(self)

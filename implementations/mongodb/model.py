@@ -156,14 +156,14 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         yield 'link', self.link
         yield 'quality', self.quality
         yield 'lang', self.lang
-        yield 'audiovisual_record_ref', self.audiovisual_record_ref
+        yield 'audiovisual_record', self.audiovisual_record
 
     @classmethod
     def convert(cls, download_source_result):
-        download_source_result.audiovisual_record_ref = MongoAudiovisualRecord.convert(
-            download_source_result.audiovisual_record_ref
+        download_source_result.audiovisual_record = MongoAudiovisualRecord.convert(
+            download_source_result.audiovisual_record
         )
-        download_source_result.audiovisual_record_ref = download_source_result.audiovisual_record_ref._id
+        download_source_result.audiovisual_record = download_source_result.audiovisual_record._id
         if isinstance(download_source_result, MongoDownloadSourceResult):
             return download_source_result
         if type(download_source_result) == dict:
@@ -176,7 +176,7 @@ class MongoDownloadSourceResult(DownloadSourceResult):
             link=download_source_result.link,
             quality=download_source_result.quality,
             lang=download_source_result.lang,
-            audiovisual_record_ref=download_source_result.audiovisual_record_ref,
+            audiovisual_record=download_source_result.audiovisual_record,
         )
 
     @classmethod

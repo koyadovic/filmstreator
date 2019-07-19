@@ -1,6 +1,8 @@
 import random
 import requests
 
+from core.model.configurations import Configuration
+
 
 class PhantomBrowsingSession:
     def __init__(self):
@@ -53,8 +55,9 @@ class BrowsingIdentity:
             'ftp': proxy
         }
 
-
-# TODO extract thos two variables to configuration in database
+# TODO
+# user_agents_config = Configuration.get_configuration('user_agents')
+# proxies_config = Configuration.get_configuration('proxies')
 
 
 user_agents = """Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30
