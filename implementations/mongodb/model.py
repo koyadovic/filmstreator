@@ -210,3 +210,9 @@ class MongoConfiguration(Configuration):
     def check_collection(cls, db):
         collection = db[cls.collection_name]
         collection.create_index('key')
+
+    def __iter__(self):
+        if hasattr(self, '_id') and bool(getattr(self, '_id')):
+            yield '_id', self._id
+        yield 'key', self.key
+        yield 'data', self.data
