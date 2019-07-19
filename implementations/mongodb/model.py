@@ -148,7 +148,8 @@ class MongoDownloadSourceResult(DownloadSourceResult):
     collection_name = 'download_source_results'
 
     def __iter__(self):
-        yield '_id', self._id if hasattr(self, '_id') else None
+        if hasattr(self, '_id') and bool(getattr(self, '_id')):
+            yield '_id', self._id
         yield 'last_check', self.last_check
         yield 'source_name', self.source_name
         yield 'name', self.name
