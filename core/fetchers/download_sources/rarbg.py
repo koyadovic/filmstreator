@@ -1,6 +1,7 @@
 from core.fetchers.download_sources.base import AbstractDownloadSource
 from core.model.audiovisual import DownloadSourceResult, AudiovisualRecord
 from core.tools.browsing import PhantomBrowsingSession
+from core.tools.logs import log_message
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
 from core.tools.timeouts import timeout
 
@@ -51,6 +52,9 @@ class RarBgDownloadSource(AbstractDownloadSource):
                 await asyncio.sleep(2)
                 print('Error, refreshing our identity ...')
                 session.refresh_identity()
+
+        if tryings >= 50:
+            log_message(f'{tryings} failed tryings for {self.audiovisual_record.name} into {self.source_name}')
 
         download_results = self._translate(results)
         return download_results
