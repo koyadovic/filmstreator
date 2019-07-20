@@ -6,15 +6,18 @@ from core.tools import browsing_proxies
 
 
 class PhantomBrowsingSession:
-    def __init__(self):
+    def __init__(self, referer=None):
         self._session = None
         self._identity = None
         self.refresh_identity()
         self._last_response = None
+        self._referer = referer
 
     def get(self, url, headers=None):
         headers = headers or {}
         headers.update({'User-Agent': self._identity.user_agent})
+        if self._referer:
+            headers.update({'Referer': self._referer})
         print(f'GET -> {url}')
         response = self._session.get(url, proxies=self._identity.proxies, headers=headers)
         self._last_response = response

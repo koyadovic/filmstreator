@@ -26,6 +26,7 @@ async def compile_download_links_from_audiovisual_records():
     )
 
     for source_class in get_all_download_sources():
+        print(f'>>> Trying with {source_class.source_name}.')
         for audiovisual_record in audiovisual_records:
             await refresh_download_results_from_source(audiovisual_record, source_class)
             if audiovisual_record.created_date > from_dt:
@@ -44,7 +45,7 @@ async def compile_expired_download_links():
         .Builder
         .new_search(DownloadSourceResult)
         .add_condition(Condition('last_check', Condition.OPERATOR_LESS_THAN, n_days_ago))
-        .search(order_by='last_check')
+        .search(sort_by='last_check')
     )
     for download_result in download_results:
         source_class = get_download_source_by_name(download_result.source_name)

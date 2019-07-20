@@ -18,18 +18,18 @@ class ThePirateBayDownloadSource(AbstractDownloadSource):
     language = 'eng'
 
     async def get_source_results(self) -> List[DownloadSourceResult]:
-        session = PhantomBrowsingSession()
+        session = PhantomBrowsingSession(referer=ThePirateBayDownloadSource.base_url + '/')
 
         name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'
-        encoded_name = percent_encoding(name)
+        encoded_name = percent_encoding(name.lower())
 
         results = None
         tryings = 0
-        while (results is None or len(results) == 0) and tryings < 50:
+        while (results is None or len(results) == 0) and tryings < 10:
             try:
                 with timeout(30):
                     session.get(ThePirateBayDownloadSource.base_url)
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(6)
                     session.get(f'{ThePirateBayDownloadSource.base_url}/search/{encoded_name}/0/7/0')
                     response = session.last_response
                     base_tree = html.fromstring(response.content)
@@ -39,12 +39,12 @@ class ThePirateBayDownloadSource(AbstractDownloadSource):
                         await asyncio.sleep(2)
                         print('Results are zero!, refreshing our identity')
                         session.refresh_identity()
-            except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError):
+            except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError) as e:
                 await asyncio.sleep(2)
-                print('Error, refreshing our identity ...')
+                print(f'{e}: refreshing our identity ...')
                 session.refresh_identity()
 
-        if tryings >= 50:
+        if tryings >= 10:
             log_message(f'{tryings} failed tryings for {self.audiovisual_record.name} into {self.source_name}')
 
         download_results = self._translate(results)
