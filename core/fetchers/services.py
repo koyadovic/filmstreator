@@ -29,6 +29,13 @@ def get_all_scoring_sources():
     return klasses
 
 
+def get_download_source_by_name(source_name):
+    for source_klass in get_all_download_sources():
+        if source_klass.source_name == source_name:
+            return source_klass
+    raise DownloadSourceException(f'Source with name {source_name} does not exist')
+
+
 def get_all_download_sources():
     package = PackageDiscover(download_sources)
     klasses = []
@@ -39,13 +46,6 @@ def get_all_download_sources():
                 klasses.append(klass)
 
     return _update_base_urls(klasses)
-
-
-def get_download_source_by_name(source_name):
-    for source_klass in get_all_download_sources():
-        if source_klass.source_name == source_name:
-            return source_klass
-    raise DownloadSourceException(f'Source with name {source_name} does not exist')
 
 
 def _update_base_urls(klasses):

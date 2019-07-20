@@ -14,6 +14,15 @@ class Configuration:
         from core import services
         return services.get_configuration(key)
 
+    @classmethod
+    def get_or_create_configuration(cls, key):
+        from core import services
+        configuration = services.get_configuration(key)
+        if configuration is None:
+            configuration = Configuration(key=key, data={})
+            configuration.save()
+        return configuration
+
     def save(self):
         from core import services
         return services.save_configuration(self)
