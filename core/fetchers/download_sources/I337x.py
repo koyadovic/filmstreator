@@ -1,11 +1,3 @@
-import asyncio
-import urllib
-from typing import List
-
-from lxml import html
-from urllib3.exceptions import MaxRetryError, ProxyError
-import urllib.parse
-
 from core.fetchers.download_sources.base import AbstractDownloadSource
 from core.model.audiovisual import DownloadSourceResult
 from core.tools.browsing import PhantomBrowsingSession
@@ -14,10 +6,21 @@ from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQuali
 from core.tools.timeouts import timeout
 from core.tools.urls import percent_encoding
 
+from urllib3.exceptions import MaxRetryError, ProxyError
+from lxml import html
+from typing import List
 
-class ThePirateBayDownloadSource(AbstractDownloadSource):
-    source_name = 'ThePirateBay'
-    base_url = 'https://proxtpb.art'
+import asyncio
+
+
+class I337xDownloadSource(AbstractDownloadSource):
+    # specify a unique name for each source
+    source_name = '1337x'
+
+    # Store links as relative links because domains change frequently
+    # here you can put the base_url that will be used with relative urls
+    base_url = 'https://1337xto.to'
+
     language = 'eng'
 
     async def get_source_results(self) -> List[DownloadSourceResult]:
@@ -31,12 +34,12 @@ class ThePirateBayDownloadSource(AbstractDownloadSource):
         while (results is None or len(results) == 0) and tryings < 50:
             try:
                 with timeout(30):
-                    session.get(ThePirateBayDownloadSource.base_url)
+                    session.get(I337xDownloadSource.base_url)
                     await asyncio.sleep(2)
-                    session.get(f'{ThePirateBayDownloadSource.base_url}/search/{encoded_name}/0/7/0')
+                    session.get(f'{I337xDownloadSource.base_url}/search/{encoded_name}/1/')
                     response = session.last_response
                     base_tree = html.fromstring(response.content)
-                    results = base_tree.xpath('//div[@class="detName"]/a')
+                    results = base_tree.xpath('/html/body/main/div/div/div/div[2]/div[1]/table/tbody/tr/td[1]/a')
                     tryings += 1
                     if len(results) == 0:
                         await asyncio.sleep(2)
@@ -65,10 +68,10 @@ class ThePirateBayDownloadSource(AbstractDownloadSource):
             text_without_name = name_remover.replace_name_from_string(text)
             quality_detector = VideoQualityInStringDetector(text_without_name)
 
-            source_name = ThePirateBayDownloadSource.source_name
+            source_name = I337xDownloadSource.source_name
             name = text
             quality = quality_detector.quality
-            link = ThePirateBayDownloadSource.base_url + href
+            link = I337xDownloadSource.base_url + href
             audiovisual_record = self.audiovisual_record
 
             download_results.append(DownloadSourceResult(
@@ -76,7 +79,7 @@ class ThePirateBayDownloadSource(AbstractDownloadSource):
                 name=name,
                 link=link,
                 quality=quality,
-                lang=ThePirateBayDownloadSource.language,
+                lang=I337xDownloadSource.language,
                 audiovisual_record=audiovisual_record
             ))
 

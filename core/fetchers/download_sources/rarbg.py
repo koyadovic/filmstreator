@@ -23,9 +23,6 @@ class RarBgDownloadSource(AbstractDownloadSource):
 
     language = 'eng'
 
-    def __init__(self, audiovisual_record: AudiovisualRecord):
-        super().__init__(audiovisual_record)
-
     async def get_source_results(self) -> List[DownloadSourceResult]:
         session = PhantomBrowsingSession()
 

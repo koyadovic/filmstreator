@@ -66,6 +66,8 @@ async def refresh_download_results_from_source(audiovisual_record, source_class)
             .search()
         )
 
+    # TODO limit results to 3 per each source
+
     for n, result in enumerate(results):
         result.audiovisual_record = audiovisual_record
     services.save_download_source_results(results)
