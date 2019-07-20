@@ -145,6 +145,10 @@ class MongoDownloadSourceResult(DownloadSourceResult):
 
     collection_name = 'download_source_results'
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._id = kwargs.pop('_id', None)
+
     def __iter__(self):
         if hasattr(self, '_id') and bool(getattr(self, '_id')):
             yield '_id', self._id
@@ -154,14 +158,13 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         yield 'link', self.link
         yield 'quality', self.quality
         yield 'lang', self.lang
-        yield 'audiovisual_record', self.audiovisual_record
+        yield 'audiovisual_record', getattr(self.audiovisual_record, '_id')
 
     @classmethod
     def convert(cls, download_source_result):
         download_source_result.audiovisual_record = MongoAudiovisualRecord.convert(
             download_source_result.audiovisual_record
         )
-        download_source_result.audiovisual_record = download_source_result.audiovisual_record._id
         if isinstance(download_source_result, MongoDownloadSourceResult):
             return download_source_result
         if type(download_source_result) == dict:

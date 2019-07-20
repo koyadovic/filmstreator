@@ -12,7 +12,7 @@ from core.tick_worker import execute_each
 @execute_each(interval='1-minute')
 async def compile_download_links_from_audiovisual_records():
     print('[ STARTED] compile_download_links_from_audiovisual_records')
-    
+
     configuration, from_dt = _get_ts_configuration('last_download_fetched')
 
     audiovisual_records = (
