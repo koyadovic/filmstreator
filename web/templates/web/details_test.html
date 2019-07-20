@@ -20,6 +20,28 @@
     <p><span><strong>{{ score.source_name }}:</strong> {{ score.value }}</span></p>
 {% endfor %}
 
+
+{% if downloads %}
+<table>
+    <tr>
+        <th>Language</th><th>Quality</th><th>Source</th><th>Name</th>
+    </tr>
+    {% for download in downloads %}
+    <tr>
+        <td>{{ download.lang }}</td>
+        <td>{{ download.quality }}</td>
+        <td>{{ download.source_name }}</td>
+        <td><a href="{{ download.link }}">{{ download.name }}</a></td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4">Sorry, no downloads yet</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endif %}
+
 <a href="/">Volver</a>
 </body>
 </html>

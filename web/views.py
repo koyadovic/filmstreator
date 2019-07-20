@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from core.model.audiovisual import AudiovisualRecord
+from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
 from core.model.searches import Search, Condition
 from core.services import add_audiovisual_record_by_name
 
@@ -41,5 +41,12 @@ def details_test(request, slug=None):
     if len(audiovisual_records) == 0:
         return HttpResponse('Not found', status=404)
 
-    context = {'audiovisual_record': audiovisual_records[0]}
+    audiovisual_record = audiovisual_records[0]
+    downloads = (
+        Search.Builder
+              .new_search(DownloadSourceResult)
+              .add_condition(Condition('audiovisual_record', Condition.OPERATOR_EQUALS, audiovisual_record))
+              .search()
+    )
+    context = {'audiovisual_record': audiovisual_record, 'downloads': downloads}
     return render(request, 'web/details_test.html', context=context)
