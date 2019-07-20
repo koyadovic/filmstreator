@@ -44,9 +44,11 @@ class RarBgDownloadSource(AbstractDownloadSource):
                     results = base_tree.xpath('//table[@class="lista2t"]//tr[@class="lista2"]//a[1]')
                     tryings += 1
                     if len(results) == 0:
+                        await asyncio.sleep(2)
                         print('Results are zero!, refreshing our identity')
                         session.refresh_identity()
             except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError):
+                await asyncio.sleep(2)
                 print('Error, refreshing our identity ...')
                 session.refresh_identity()
 
