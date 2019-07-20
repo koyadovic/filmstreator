@@ -1,11 +1,3 @@
-import asyncio
-import urllib
-from typing import List
-
-from lxml import html
-from urllib3.exceptions import MaxRetryError, ProxyError
-import urllib.parse
-
 from core.fetchers.download_sources.base import AbstractDownloadSource
 from core.model.audiovisual import DownloadSourceResult
 from core.tools.browsing import PhantomBrowsingSession
@@ -13,6 +5,11 @@ from core.tools.logs import log_message
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
 from core.tools.timeouts import timeout
 from core.tools.urls import percent_encoding
+
+from urllib3.exceptions import MaxRetryError, ProxyError
+from typing import List
+from lxml import html
+import asyncio
 
 
 class ThePirateBayDownloadSource(AbstractDownloadSource):

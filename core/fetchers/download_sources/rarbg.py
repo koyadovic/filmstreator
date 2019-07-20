@@ -1,26 +1,21 @@
 from core.fetchers.download_sources.base import AbstractDownloadSource
-from core.model.audiovisual import DownloadSourceResult, AudiovisualRecord
+from core.model.audiovisual import DownloadSourceResult
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.logs import log_message
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
 from core.tools.timeouts import timeout
 
-from typing import List
-
 from urllib3.exceptions import MaxRetryError, ProxyError
+from typing import List
 from lxml import html
+
 import urllib.parse
 import asyncio
 
 
 class RarBgDownloadSource(AbstractDownloadSource):
-    # specify a unique name for each source
     source_name = 'RARBG'
-
-    # Store links as relative links because domains change frequently
-    # here you can put the base_url that will be used with relative urls
     base_url = 'https://rarbgmirror.org'
-
     language = 'eng'
 
     async def get_source_results(self) -> List[DownloadSourceResult]:

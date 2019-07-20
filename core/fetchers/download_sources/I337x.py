@@ -14,13 +14,8 @@ import asyncio
 
 
 class I337xDownloadSource(AbstractDownloadSource):
-    # specify a unique name for each source
     source_name = '1337x'
-
-    # Store links as relative links because domains change frequently
-    # here you can put the base_url that will be used with relative urls
     base_url = 'https://1337xto.to'
-
     language = 'eng'
 
     async def get_source_results(self) -> List[DownloadSourceResult]:
