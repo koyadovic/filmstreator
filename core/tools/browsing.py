@@ -13,13 +13,13 @@ class PhantomBrowsingSession:
         self._last_response = None
         self._referer = referer
 
-    def get(self, url, headers=None):
+    def get(self, url, headers=None, timeout=30):
         headers = headers or {}
         headers.update({'User-Agent': self._identity.user_agent})
         if self._referer:
             headers.update({'Referer': self._referer})
         print(f'GET -> {url}')
-        response = self._session.get(url, proxies=self._identity.proxies, headers=headers)
+        response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
         self._last_response = response
         return self
 
@@ -46,13 +46,11 @@ class BrowsingIdentity:
     def refresh_user_agent(self):
         all_user_agents = user_agents.split('\n')
         user_agent = all_user_agents[random.randint(0, len(all_user_agents))]
-        print(f'Selecting user agent {user_agent}')
         self.user_agent = user_agent
 
     def refresh_proxy(self):
         all_proxies = proxies_config.data
         proxy = all_proxies[random.randint(0, len(all_proxies))]
-        print(f'Selecting proxy {proxy}')
         self.proxies = {
             'http': proxy,
             'https': proxy,

@@ -19,5 +19,5 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
         self.audiovisual_record = audiovisual_record
 
     @abc.abstractmethod
-    async def get_source_results(self) -> List[DownloadSourceResult]:
+    def get_source_results(self) -> List[DownloadSourceResult]:
         raise NotImplementedError

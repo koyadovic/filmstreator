@@ -1,3 +1,5 @@
+import concurrent
+
 from core.fetchers.services import get_all_download_sources, get_download_source_by_name
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
 from core.model.configurations import Configuration
@@ -7,14 +9,13 @@ from core import services
 from datetime import datetime, timezone, timedelta
 
 from core.tick_worker import execute_each
+from concurrent.futures.thread import ThreadPoolExecutor
 
 
 @execute_each(interval='1-minute')
 async def compile_download_links_from_audiovisual_records():
     print('[ STARTED] compile_download_links_from_audiovisual_records')
-
     configuration, from_dt = _get_ts_configuration('last_download_fetched')
-
     audiovisual_records = (
         Search
         .Builder
@@ -25,19 +26,22 @@ async def compile_download_links_from_audiovisual_records():
         .search()
     )
 
-    for source_class in get_all_download_sources():
-        print(f'>>> Trying with {source_class.source_name}.')
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = []
         for audiovisual_record in audiovisual_records:
-            await refresh_download_results_from_source(audiovisual_record, source_class)
+            for source_class in get_all_download_sources():
+                future = executor.submit(_refresh_download_results_from_source, audiovisual_record, source_class)
+                futures.append(future)
             if audiovisual_record.created_date > from_dt:
                 from_dt = audiovisual_record.created_date
-                configuration.data['ts'] = from_dt.timestamp()
-                configuration.save()
+        configuration.data['ts'] = from_dt.timestamp()
+        configuration.save()
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
+        print('[FINISHED] compile_download_links_from_audiovisual_records')
 
-    print('[FINISHED] compile_download_links_from_audiovisual_records')
 
-
-@execute_each(interval='1-minute')
+#@execute_each(interval='1-minute')
 async def compile_expired_download_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=120)
     download_results = (
@@ -50,12 +54,12 @@ async def compile_expired_download_links():
     for download_result in download_results:
         source_class = get_download_source_by_name(download_result.source_name)
         audiovisual_record = download_result.audiovisual_record
-        await refresh_download_results_from_source(audiovisual_record, source_class)
+        _refresh_download_results_from_source(audiovisual_record, source_class)
 
 
-async def refresh_download_results_from_source(audiovisual_record, source_class):
+def _refresh_download_results_from_source(audiovisual_record, source_class):
     download_source = source_class(audiovisual_record)
-    results = await download_source.get_source_results()
+    results = download_source.get_source_results()
     old_download_results = []
     if len(results) > 0:
         old_download_results = (
@@ -66,8 +70,8 @@ async def refresh_download_results_from_source(audiovisual_record, source_class)
             .add_condition(Condition('source_name', Condition.OPERATOR_EQUALS, source_class.source_name))
             .search()
         )
-
-    # TODO limit results to 3 per each source
+        # limit results to 3 per each source
+        results = results[:3]
 
     for n, result in enumerate(results):
         result.audiovisual_record = audiovisual_record

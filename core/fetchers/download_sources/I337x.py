@@ -3,14 +3,12 @@ from core.model.audiovisual import DownloadSourceResult
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.logs import log_message
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
-from core.tools.timeouts import timeout
 from core.tools.urls import percent_encoding
 
 from urllib3.exceptions import MaxRetryError, ProxyError
 from lxml import html
 from typing import List
-
-import asyncio
+import time
 
 
 class I337xDownloadSource(AbstractDownloadSource):
@@ -18,41 +16,35 @@ class I337xDownloadSource(AbstractDownloadSource):
     base_url = 'https://www.1377x.to'
     language = 'eng'
 
-    async def get_source_results(self) -> List[DownloadSourceResult]:
+    def get_source_results(self) -> List[DownloadSourceResult]:
         session = PhantomBrowsingSession(referer=I337xDownloadSource.base_url + '/')
         name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'
         encoded_name = percent_encoding(name.lower())
         results = None
         tryings = 0
-        while (results is None or len(results) == 0) and tryings < 10:
+        while (results is None or len(results) == 0) and tryings < 5:
             try:
-                with timeout(30):
-                    session.get(I337xDownloadSource.base_url)
-                    url = f'{I337xDownloadSource.base_url}/search/{encoded_name}/1/'
-                    await asyncio.sleep(6)
-                    session.get(url)
-                    response = session.last_response
-                    if response.status_code != 200:
-                        log_message(f'{url} response status code is {response.status_code}. {response.text}')
-                        return []
+                url = f'{I337xDownloadSource.base_url}/search/{encoded_name}/1/'
+                session.get(url, timeout=30)
+                response = session.last_response
+                if response.status_code != 200:
+                    log_message(f'{url} response status code is {response.status_code}. {response.text}')
+                    return []
 
-                    base_tree = html.fromstring(response.content)
-                    results = base_tree.xpath('/html/body/main/div/div/div/div[2]/div[1]/table/tbody/tr/td[1]/a')
-                    tryings += 1
-                    if len(results) == 0:
-                        texts = base_tree.xpath('//div/div/div/div/p/text()')
-                        if len(texts) > 0:
-                            text = texts[0].lower()
-                            if 'no result' in text:
-                                print('No result found. Quiting')
-                                return []
-
-                        await asyncio.sleep(2)
-                        print('Results are zero!, refreshing our identity')
-                        session.refresh_identity()
+                base_tree = html.fromstring(response.content)
+                results = base_tree.xpath('/html/body/main/div/div/div/div[2]/div[1]/table/tbody/tr/td[1]/a')
+                tryings += 1
+                if len(results) == 0:
+                    texts = base_tree.xpath('//div/div/div/div/p/text()')
+                    if len(texts) > 0:
+                        text = texts[0].lower()
+                        if 'no result' in text:
+                            print('No result found. Quiting')
+                            return []
+                    print('Results are zero!, refreshing our identity')
+                    session.refresh_identity()
             except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError) as e:
-                await asyncio.sleep(2)
-                print(f'{e}: refreshing our identity ...')
+                print(f'Error: refreshing our identity ...')
                 session.refresh_identity()
 
         if tryings >= 10:

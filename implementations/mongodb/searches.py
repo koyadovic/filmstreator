@@ -44,6 +44,8 @@ class SearchMongoDB(SearchInterface):
         if paginate:
             results = results.skip(((page if page > 0 else 1) - 1) * page_size).limit(page_size)
 
+        search_results = []
+
         if results.count() > 0:
             for result in results:
                 for k, v in result.items():
@@ -67,9 +69,8 @@ class SearchMongoDB(SearchInterface):
                             collection = self._db[selected_collection_name]
                             result[k] = collection.find_one({'_id': v})
 
-                yield target_class(**result)
-        else:
-            return []
+                search_results.append(target_class(**result))
+        return search_results
 
 
 def _translate_search_to_mongodb_dict(search):

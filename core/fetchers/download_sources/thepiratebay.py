@@ -3,13 +3,12 @@ from core.model.audiovisual import DownloadSourceResult
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.logs import log_message
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
-from core.tools.timeouts import timeout
 from core.tools.urls import percent_encoding
 
 from urllib3.exceptions import MaxRetryError, ProxyError
 from typing import List
 from lxml import html
-import asyncio
+import time
 
 
 class ThePirateBayDownloadSource(AbstractDownloadSource):
@@ -17,7 +16,7 @@ class ThePirateBayDownloadSource(AbstractDownloadSource):
     base_url = 'https://proxtpb.art'
     language = 'eng'
 
-    async def get_source_results(self) -> List[DownloadSourceResult]:
+    def get_source_results(self) -> List[DownloadSourceResult]:
         session = PhantomBrowsingSession(referer=ThePirateBayDownloadSource.base_url + '/')
 
         name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'
@@ -25,23 +24,20 @@ class ThePirateBayDownloadSource(AbstractDownloadSource):
 
         results = None
         tryings = 0
-        while (results is None or len(results) == 0) and tryings < 10:
+        while (results is None or len(results) == 0) and tryings < 5:
             try:
-                with timeout(30):
-                    session.get(ThePirateBayDownloadSource.base_url)
-                    await asyncio.sleep(6)
-                    session.get(f'{ThePirateBayDownloadSource.base_url}/search/{encoded_name}/0/7/0')
-                    response = session.last_response
-                    base_tree = html.fromstring(response.content)
-                    results = base_tree.xpath('//div[@class="detName"]/a')
-                    tryings += 1
-                    if len(results) == 0:
-                        await asyncio.sleep(2)
-                        print('Results are zero!, refreshing our identity')
-                        session.refresh_identity()
+                # session.get(ThePirateBayDownloadSource.base_url, timeout=30)
+                # time.sleep(6)
+                session.get(f'{ThePirateBayDownloadSource.base_url}/search/{encoded_name}/0/7/0', timeout=30)
+                response = session.last_response
+                base_tree = html.fromstring(response.content)
+                results = base_tree.xpath('//div[@class="detName"]/a')
+                tryings += 1
+                if len(results) == 0:
+                    print('Results are zero!, refreshing our identity')
+                    session.refresh_identity()
             except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError) as e:
-                await asyncio.sleep(2)
-                print(f'{e}: refreshing our identity ...')
+                print(f'Error: refreshing our identity ...')
                 session.refresh_identity()
 
         if tryings >= 10:
