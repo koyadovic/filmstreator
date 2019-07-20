@@ -3,6 +3,7 @@ from core.fetchers.download_sources.base import AbstractDownloadSource
 from core.fetchers.general_information.base import AbstractGeneralInformation
 from core.fetchers.scoring_sources.base import AbstractScoringSource
 from core.model.configurations import Configuration
+from core.tools.exceptions import DownloadSourceException
 from core.tools.packages import PackageDiscover, ModuleDiscover
 
 
@@ -26,6 +27,13 @@ def get_all_scoring_sources():
             if klass != AbstractScoringSource and issubclass(klass, AbstractScoringSource):
                 klasses.append(klass)
     return klasses
+
+
+def get_download_source_by_name(source_name):
+    for source_klass in get_all_download_sources():
+        if source_klass.source_name == source_name:
+            return source_klass
+    raise DownloadSourceException(f'Source with name {source_name} does not exist')
 
 
 def get_all_download_sources():

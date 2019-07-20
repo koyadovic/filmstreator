@@ -1,7 +1,7 @@
 from typing import List
 
 from core.interfaces import DAOInterface
-from core.model.audiovisual import AudiovisualRecord, Genre, Person, DownloadSourceResult
+from core.model.audiovisual import AudiovisualRecord, Genre, Person
 from pymongo import MongoClient
 from django.conf import settings
 
