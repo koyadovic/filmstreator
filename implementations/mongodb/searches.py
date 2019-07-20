@@ -21,7 +21,7 @@ class SearchMongoDB(SearchInterface):
     # in the future we will use ElasticSearch
 
     def __init__(self):
-        client = MongoClient()
+        client = MongoClient(tz_aware=True)
         self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
 
     def search(self, search, sort_by=None, paginate=False, page_size=20, page=1):
@@ -36,11 +36,15 @@ class SearchMongoDB(SearchInterface):
 
         # sorting
         if sort_by is not None:
-            results = results.sort(_translate_sort_by_to_mongo_dict(sort_by))
+            mongo_sort_by = _translate_sort_by_to_mongo_dict(sort_by)
+            print(f'sort by: {sort_by}, mongo sort by: {mongo_sort_by}')
+            results = results.sort(mongo_sort_by)
 
         # pagination
         if paginate:
             results = results.skip(((page if page > 0 else 1) - 1) * page_size).limit(page_size)
+
+        search_results = []
 
         if results.count() > 0:
             for result in results:
@@ -55,8 +59,9 @@ class SearchMongoDB(SearchInterface):
                         collection_names = CLASS_MAPPINGS.values()
                         max_ratio = 0.0
                         selected_collection_name = None
-                        for collection_name in collection_names:
-                            ratio = ratio_of_containing_similar_string(collection_name, k)
+                        for collection_class in collection_names:
+                            collection_name = collection_class.collection_name
+                            ratio = ratio_of_containing_similar_string(collection_class.collection_name, k)
                             if ratio > max_ratio:
                                 max_ratio = ratio
                                 selected_collection_name = collection_name
@@ -64,9 +69,8 @@ class SearchMongoDB(SearchInterface):
                             collection = self._db[selected_collection_name]
                             result[k] = collection.find_one({'_id': v})
 
-                yield target_class(**result)
-        else:
-            return []
+                search_results.append(target_class(**result))
+        return search_results
 
 
 def _translate_search_to_mongodb_dict(search):
@@ -119,4 +123,4 @@ def _translate_sort_by_to_mongo_dict(sort_by=None):
     if sort_by[0] == '-':
         direction = -1
         field = field[1:]
-    return {field: direction}
+    return [(field, direction)]

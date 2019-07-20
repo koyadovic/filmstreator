@@ -1,41 +1,46 @@
-import time
-
 from core.fetchers.download_sources.base import AbstractDownloadSource
 from core.model.audiovisual import DownloadSourceResult
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.logs import log_message
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
+from core.tools.urls import percent_encoding
+
 from urllib3.exceptions import MaxRetryError, ProxyError
-from typing import List
 from lxml import html
+from typing import List
+import time
 
-import urllib.parse
 
-
-class RarBgDownloadSource(AbstractDownloadSource):
-    source_name = 'RARBG'
-    base_url = 'https://rarbgmirror.org'
+class I337xDownloadSource(AbstractDownloadSource):
+    source_name = '1337x'
+    base_url = 'https://www.1377x.to'
     language = 'eng'
 
     def get_source_results(self) -> List[DownloadSourceResult]:
-        session = PhantomBrowsingSession(referer=RarBgDownloadSource.base_url + '/')
-
+        session = PhantomBrowsingSession(referer=I337xDownloadSource.base_url + '/')
         name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'
-        plus_encoded_name = urllib.parse.quote_plus(name.lower())
-
+        encoded_name = percent_encoding(name.lower())
         results = None
         tryings = 0
         while (results is None or len(results) == 0) and tryings < 5:
             try:
-                # session.get(RarBgDownloadSource.base_url, timeout=30)
-                # time.sleep(6)
-                session.get(f'{RarBgDownloadSource.base_url}/torrents.php?search='
-                            f'{plus_encoded_name}&order=seeders&by=DESC', timeout=30)
+                url = f'{I337xDownloadSource.base_url}/search/{encoded_name}/1/'
+                session.get(url, timeout=30)
                 response = session.last_response
+                if response.status_code != 200:
+                    log_message(f'{url} response status code is {response.status_code}. {response.text}')
+                    return []
+
                 base_tree = html.fromstring(response.content)
-                results = base_tree.xpath('//table[@class="lista2t"]//tr[@class="lista2"]//a[1]')
+                results = base_tree.xpath('/html/body/main/div/div/div/div[2]/div[1]/table/tbody/tr/td[1]/a')
                 tryings += 1
                 if len(results) == 0:
+                    texts = base_tree.xpath('//div/div/div/div/p/text()')
+                    if len(texts) > 0:
+                        text = texts[0].lower()
+                        if 'no result' in text:
+                            print('No result found. Quiting')
+                            return []
                     print('Results are zero!, refreshing our identity')
                     session.refresh_identity()
             except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError) as e:
@@ -54,16 +59,16 @@ class RarBgDownloadSource(AbstractDownloadSource):
             text = result.text
             if text is None or len(text) < 4:
                 continue
-            href = result.get('href')
 
+            href = result.get('href')
             name_remover = RemoveAudiovisualRecordNameFromString(self.audiovisual_record.name)
             text_without_name = name_remover.replace_name_from_string(text)
             quality_detector = VideoQualityInStringDetector(text_without_name)
 
-            source_name = RarBgDownloadSource.source_name
+            source_name = I337xDownloadSource.source_name
             name = text
             quality = quality_detector.quality
-            link = RarBgDownloadSource.base_url + href
+            link = I337xDownloadSource.base_url + href
             audiovisual_record = self.audiovisual_record
 
             download_results.append(DownloadSourceResult(
@@ -71,7 +76,7 @@ class RarBgDownloadSource(AbstractDownloadSource):
                 name=name,
                 link=link,
                 quality=quality,
-                lang=RarBgDownloadSource.language,
+                lang=I337xDownloadSource.language,
                 audiovisual_record=audiovisual_record
             ))
 

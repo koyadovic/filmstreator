@@ -13,7 +13,7 @@ from implementations.mongodb.model import MongoAudiovisualRecord, MongoGenre, Mo
 class DAOMongoDB(DAOInterface):
     def __init__(self):
         super().__init__()
-        client = MongoClient()
+        client = MongoClient(tz_aware=True)
         self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
         MongoAudiovisualRecord.check_collection(self._db)
         MongoDownloadSourceResult.check_collection(self._db)

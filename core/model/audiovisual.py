@@ -213,8 +213,8 @@ class AudiovisualRecord(BaseModel):
         return services.save_audiovisual_record(self)
 
     def delete(self):
-        from core import services
-        return services.delete_audiovisual_record(self)
+        self.deleted = True
+        self.save()
 
 
 class DownloadSourceResult:
@@ -233,7 +233,7 @@ class DownloadSourceResult:
         self.link = kwargs.pop('link', '')
         self.quality = kwargs.pop('quality', '')
         self.lang = kwargs.pop('lang', '')
-        self.audiovisual_record = kwargs.pop('audiovisual_record', '')
+        self.audiovisual_record = kwargs.pop('audiovisual_record', None)
 
     def delete(self):
         from core import services
