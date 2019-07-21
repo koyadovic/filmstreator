@@ -9,6 +9,7 @@ import abc
 class AbstractNewAdditions(metaclass=abc.ABCMeta):
     all_names_xpath = None
     base_url = None
+    source_name = None
 
     def get(self, from_date: datetime, to_date: datetime) -> List[str]:
         headers = {'Accept-Language': 'en,es;q=0.9,pt;q=0.8'}

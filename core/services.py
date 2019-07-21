@@ -11,8 +11,8 @@ Audiovisual records
 """
 
 
-def add_audiovisual_record_by_name(name):
-    record = AudiovisualRecord(name=name)
+def add_audiovisual_record_by_name(name, **additional_attributes):
+    record = AudiovisualRecord(name=name, **additional_attributes)
     dao_implementation.save_audiovisual_record(record)
 
 
