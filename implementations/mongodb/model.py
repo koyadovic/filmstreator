@@ -93,6 +93,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         yield 'general_information_fetched', self.general_information_fetched
         yield 'is_a_film', self.is_a_film
         yield 'has_downloads', self.has_downloads
+        yield 'metadata', self.metadata
 
     @classmethod
     def convert(cls, audiovisual_record):
@@ -122,6 +123,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
             general_information_fetched=audiovisual_record.general_information_fetched,
             is_a_film=audiovisual_record.is_a_film,
             has_downloads=audiovisual_record.has_downloads,
+            metadata=audiovisual_record.metadata
         )
 
     @classmethod

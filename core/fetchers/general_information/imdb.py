@@ -11,6 +11,7 @@ import requests
 
 class IMDBGeneralInformation(AbstractGeneralInformation):
     base_url = 'https://www.imdb.com'
+    source_name = 'IMDB'
 
     def __init__(self, audiovisual_record: AudiovisualRecord):
         super().__init__(audiovisual_record)
@@ -98,14 +99,20 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
     def base_tree(self):
         if self._base_tree is not None:
             return self._base_tree
+        try:
+            detailed_page = self.audiovisual_record.metadata['detailed_page'][self.source_name]
+            href = IMDBGeneralInformation.base_url + detailed_page
+        except KeyError:
+            # first search for the detailed page link
+            name = self.audiovisual_record.name
+            name = percent_encoding(name)
+            response = requests.get(f'{IMDBGeneralInformation.base_url}/find?ref_=nv_sr_fn&q={name}&s=all')
+            tree = html.fromstring(response.content)
+            results = tree.xpath('//td[@class="result_text"]/a')
+            first_result_node = results[0]
+            # this is the detail page link
+            href = IMDBGeneralInformation.base_url + first_result_node.get('href')
 
-        name = self.audiovisual_record.name
-        name = percent_encoding(name)
-        response = requests.get(f'{IMDBGeneralInformation.base_url}/find?ref_=nv_sr_fn&q={name}&s=all')
-        tree = html.fromstring(response.content)
-        results = tree.xpath('//td[@class="result_text"]/a')
-        first_result_node = results[0]
-        href = IMDBGeneralInformation.base_url + first_result_node.get('href')
         response = requests.get(href)
         self._base_tree = html.fromstring(response.content)
 

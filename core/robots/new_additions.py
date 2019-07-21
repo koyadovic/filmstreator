@@ -43,24 +43,22 @@ def search_for_new_additions():
         if current_native_dt.strftime('%Y-%m-%d') in dts_done:
             continue
 
-        year = current_native_dt.strftime('%Y')
         from_str = current_native_dt.strftime('%Y-%m-%d')
         audiovisual_records_new = new_additions.get(
             current_native_dt,
             current_native_dt + timedelta(days=1)
         )
         print(f'Found: {audiovisual_records_new}')
-        for name in audiovisual_records_new:
-            print(f'Check if name {name} exists in database')
+        for audiovisual_record in audiovisual_records_new:
             results = (
                 Search.Builder
                 .new_search(AudiovisualRecord)
-                .add_condition(Condition('name', Condition.OPERATOR_EQUALS, name))
+                .add_condition(Condition('name', Condition.OPERATOR_EQUALS, audiovisual_record.name))
                 .search()
             )
             if len(results) == 0:
-                print(f'Not exist, adding {name}')
-                add_audiovisual_record_by_name(name, year=year)
+                print(f'Not exist, adding {audiovisual_record}')
+                audiovisual_record.save()
 
         dts_done.append(from_str)
         current_native_dt += timedelta(days=1)

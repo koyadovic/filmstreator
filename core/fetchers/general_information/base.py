@@ -3,6 +3,7 @@ import abc
 
 
 class AbstractGeneralInformation(metaclass=abc.ABCMeta):
+    source_name = None
 
     def __init__(self, audiovisual_record: AudiovisualRecord):
         self.audiovisual_record = audiovisual_record

@@ -5,6 +5,7 @@ from lxml import html
 
 class IMDBNewAdditions(AbstractNewAdditions):
     all_names_xpath = '//*[@id="main"]/div/div[3]/div/div/div[2]/div/div[1]/span/span[2]/a/text()'
+    all_detail_pages_xpath = '//*[@id="main"]/div/div[3]/div/div/div[2]/div/div[1]/span/span[2]/a/@href'
     base_url = 'https://www.imdb.com'
     source_name = 'IMDB'
 
