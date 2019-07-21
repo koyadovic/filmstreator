@@ -7,7 +7,7 @@ from core.tools.logs import log_exception
 
 
 @Ticker.execute_each(interval='1-minute')
-async def compile_scores_from_audiovisual_records():
+def compile_scores_from_audiovisual_records():
     for klass in get_all_scoring_sources():
         audiovisual_records = (
             Search.Builder

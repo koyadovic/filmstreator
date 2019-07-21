@@ -13,7 +13,7 @@ import concurrent
 
 
 @Ticker.execute_each(interval='1-minute')
-async def compile_download_links_from_audiovisual_records():
+def compile_download_links_from_audiovisual_records():
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for source_class in get_all_download_sources():
@@ -43,7 +43,7 @@ async def compile_download_links_from_audiovisual_records():
 
 
 @Ticker.execute_each(interval='1-minute')
-async def delete_404_links():
+def delete_404_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=60)
     download_results = (
         Search

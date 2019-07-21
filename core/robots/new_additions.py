@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 
 
 @Ticker.execute_each(interval='1-minute')
-async def search_for_new_additions():
+def search_for_new_additions():
     from core.fetchers.services import get_all_new_additions_sources
     try:
         klass = get_all_new_additions_sources()[0]
@@ -19,7 +19,7 @@ async def search_for_new_additions():
 
     # Configuration
     config_key = f'search_for_new_additions_{klass.source_name}'
-    configuration = Configuration.get_configuration(key=config_key)
+    configuration = _get_configuration(key=config_key)
     from_dt = configuration.data.get('from_dt', '')
     to_dt = configuration.data.get('to_dt', '')
     current_dt = configuration.data.get('current_dt', '')
@@ -45,10 +45,13 @@ async def search_for_new_additions():
 
         year = current_native_dt.strftime('%Y')
         from_str = current_native_dt.strftime('%Y-%m-%d')
-        to_str = (current_native_dt + timedelta(days=1)).strftime('%Y-%m-%d')
-
-        audiovisual_records_new = new_additions.get(from_str, to_str)
+        audiovisual_records_new = new_additions.get(
+            current_native_dt,
+            current_native_dt + timedelta(days=1)
+        )
+        print(f'Found: {audiovisual_records_new}')
         for name in audiovisual_records_new:
+            print(f'Check if name {name} exists in database')
             results = (
                 Search.Builder
                 .new_search(AudiovisualRecord)
@@ -56,6 +59,7 @@ async def search_for_new_additions():
                 .search()
             )
             if len(results) == 0:
+                print(f'Not exist, adding {name}')
                 add_audiovisual_record_by_name(name, year=year)
 
         dts_done.append(from_str)
@@ -63,3 +67,16 @@ async def search_for_new_additions():
         configuration.data['dts_done'] = dts_done
         configuration.data['current_dt'] = current_native_dt.strftime('%y-%m-%d')
         configuration.save()
+
+
+def _get_configuration(key=None):
+    configuration = Configuration.get_configuration(key=key)
+    if configuration is None:
+        configuration = Configuration(key=key, data={
+            'from_dt': '',
+            'to_dt': '',
+            'current_dt': '',
+            'dts_done': []
+        })
+        configuration.save()
+    return configuration

@@ -131,9 +131,21 @@ def _check_audiovisual_slug(dict_obj, collection):
     while is_slug_repeated:
         if n > 0:
             modified_slug = current_slug + f'-{n}'
-        slug_results = collection.find({'slug': modified_slug})
-        is_slug_repeated = slug_results.count() == 0
+        print(f'Checking slug {modified_slug}')
+        result = collection.find_one(
+            {
+                'slug': modified_slug,
+                '_id': {
+                    '$ne': dict_obj.get('_id')
+                }
+            }
+        )
+        is_slug_repeated = result is not None
         n += 1
 
     if modified_slug != current_slug:
+        print(f'Modified {modified_slug}')
         dict_obj['slug'] = modified_slug
+    else:
+        print(f'Slug {modified_slug} is okay')
+
