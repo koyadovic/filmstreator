@@ -75,18 +75,31 @@ def _refresh_download_results_from_source(audiovisual_record, source_class):
             .add_condition(Condition('source_name', Condition.OPERATOR_EQUALS, source_class.source_name))
             .search()
         )
-
-    # limit results to 3 per each source
-    results = results[:3]
-
-    for n, result in enumerate(results):
-        result.audiovisual_record = audiovisual_record
-    services.save_download_source_results(results)
-    audiovisual_record.save()
+        # limit results to 3 per each source
+        results = results[:3]
+        for result in results:
+            result.audiovisual_record = audiovisual_record
+        services.save_download_source_results(results)
 
     # remove all old download results
     for result in old_download_results:
         result.delete()
+
+    _check_has_downloads(audiovisual_record)
+
+
+def _check_has_downloads(audiovisual_record):
+    downloads = (
+        Search
+        .Builder
+        .new_search(DownloadSourceResult)
+        .add_condition(Condition('audiovisual_record', Condition.OPERATOR_EQUALS, audiovisual_record))
+        .search()
+    )
+    has_downloads = len(downloads) > 0
+    if audiovisual_record.has_downloads is not has_downloads:
+        audiovisual_record.has_downloads = has_downloads
+        audiovisual_record.save()
 
 
 def _get_ts_configuration(key):

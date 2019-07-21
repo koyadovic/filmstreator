@@ -1,5 +1,20 @@
 """
 https://www.imdb.com/search/title/?title_type=feature&release_date=2010-11-01,2010-11-02&count=250&view=simple
+
+
+// no results!!!
+//*[@id="main"]/div/div/div/span/text() == No results
+
+
+//*[@id="main"]/div/div[3]/div/div[1]/div[2]/div/div[1]/span/span[2]/a
+//*[@id="main"]/div/div[3]/div/div[7]/div[2]/div/div[1]/span/span[2]/a
+
+
+// nombres!!!!
+//*[@id="main"]/div/div[3]/div/div/div[2]/div/div[1]/span/span[2]/a/text()
+
+
+/search/title/?title_type=feature&release_date=1990-01-01,1990-12-31&user_rating=7.5,10.0&countries=us&view=simple&count=250
 """
 
 list_page = """<!DOCTYPE html>
