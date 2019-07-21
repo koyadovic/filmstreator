@@ -60,6 +60,7 @@ async def delete_404_links():
         session = PhantomBrowsingSession(referer='https://www.google.com/')
         max_checks = 10
         current_check = 0
+        audiovisual_record = dr.audiovisual_record
         while current_check < max_checks:
             try:
                 current_check += 1
@@ -67,6 +68,7 @@ async def delete_404_links():
                 response = session.last_response
                 if response.status_code > 299:
                     dr.delete()
+                    _check_has_downloads(audiovisual_record)
                 return
             except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError):
                 session.refresh_identity()
