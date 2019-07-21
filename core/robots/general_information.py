@@ -34,4 +34,5 @@ def autocomplete_general_information_for_empty_audiovisual_records():
 
             except GeneralInformationException as e:
                 log_exception(e)
+                audiovisual_record.delete()
                 continue
