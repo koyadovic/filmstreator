@@ -1,9 +1,17 @@
 import random
-import requests
+from urllib.parse import urlparse
 
-from urllib3.exceptions import MaxRetryError, ProxyError
+import requests
+from requests import ConnectTimeout
+from requests.exceptions import ProxyError
+
+from urllib3.exceptions import MaxRetryError
 from core.model.configurations import Configuration
 from core.tools import browsing_proxies
+from socket import getaddrinfo, gaierror
+
+from core.tools.exceptions import CoreException
+from core.tools.logs import log_exception
 
 
 class PhantomBrowsingSession:
@@ -16,23 +24,28 @@ class PhantomBrowsingSession:
 
         self.refresh_identity()
 
-    def get(self, url, headers=None, timeout=30, max_tries=10):
+    def get(self, url, headers=None, timeout=30):
+        PhantomBrowsingSession._check_domain(url)
         headers = headers or {}
         tryings = 0
-        while tryings < max_tries:
-            tryings += 1
+        max_tryings = 10
+        while tryings < max_tryings:
             headers.update({'User-Agent': self._identity.user_agent})
             if self._referer:
                 headers.update({'Referer': self._referer})
+
             try:
                 response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
-                print(f'GET -> {url}')
                 self._last_response = response
                 self._referer = url
                 return self
-            except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError):
+
+            except (ConnectTimeout, MaxRetryError, ProxyError):
                 self.refresh_identity()
-        raise PhantomBrowsingSession.MaxTryingsReached(f'Cannot retrieve {url}. Max tryings {max_tries} reached.')
+
+            except Exception as e:
+                tryings += 1
+                log_exception(e)
 
     @property
     def last_response(self):
@@ -43,7 +56,18 @@ class PhantomBrowsingSession:
         self._session = requests.Session()
         self._identity = BrowsingIdentity()
 
-    class MaxTryingsReached(Exception):
+    @classmethod
+    def _check_domain(cls, url):
+        domain = urlparse(url).netloc  # extract the domain from the url
+        try:
+            getaddrinfo(domain, 80)
+        except gaierror:
+            raise PhantomBrowsingSession.InvalidURLProvided(f'Domain {domain} of url {url} does not exist')
+
+    class MaxTryingsReached(CoreException):
+        pass
+
+    class InvalidURLProvided(CoreException):
         pass
 
 
