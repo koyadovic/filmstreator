@@ -1,35 +1,50 @@
 import random
 import requests
 
+from urllib3.exceptions import MaxRetryError, ProxyError
 from core.model.configurations import Configuration
 from core.tools import browsing_proxies
 
 
 class PhantomBrowsingSession:
     def __init__(self, referer=None):
+        self._referer = referer
+        self._initial_referer = self._referer
         self._session = None
         self._identity = None
-        self.refresh_identity()
         self._last_response = None
-        self._referer = referer
 
-    def get(self, url, headers=None, timeout=30):
+        self.refresh_identity()
+
+    def get(self, url, headers=None, timeout=30, max_tries=10):
         headers = headers or {}
-        headers.update({'User-Agent': self._identity.user_agent})
-        if self._referer:
-            headers.update({'Referer': self._referer})
-        print(f'GET -> {url}')
-        response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
-        self._last_response = response
-        return self
+        tryings = 0
+        while tryings < max_tries:
+            tryings += 1
+            headers.update({'User-Agent': self._identity.user_agent})
+            if self._referer:
+                headers.update({'Referer': self._referer})
+            try:
+                response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
+                print(f'GET -> {url}')
+                self._last_response = response
+                self._referer = url
+                return self
+            except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError):
+                self.refresh_identity()
+        raise PhantomBrowsingSession.MaxTryingsReached(f'Cannot retrieve {url}. Max tryings {max_tries} reached.')
 
     @property
     def last_response(self):
         return self._last_response
 
     def refresh_identity(self):
+        self._referer = self._initial_referer
         self._session = requests.Session()
         self._identity = BrowsingIdentity()
+
+    class MaxTryingsReached(Exception):
+        pass
 
 
 class BrowsingIdentity:
@@ -37,6 +52,10 @@ class BrowsingIdentity:
     user_agent = None
 
     def __init__(self):
+        self.proxies_config = Configuration.get_configuration('proxies')
+        if self.proxies_config is None:
+            self.proxies_config = Configuration(key='proxies', data=browsing_proxies.proxies.split('\n'))
+            self.proxies_config.save()
         self.refresh()
 
     def refresh(self):
@@ -49,19 +68,13 @@ class BrowsingIdentity:
         self.user_agent = user_agent
 
     def refresh_proxy(self):
-        all_proxies = proxies_config.data
+        all_proxies = self.proxies_config.data
         proxy = all_proxies[random.randint(0, len(all_proxies))]
         self.proxies = {
             'http': proxy,
             'https': proxy,
             'ftp': proxy
         }
-
-
-proxies_config = Configuration.get_configuration('proxies')
-if proxies_config is None:
-    proxies_config = Configuration(key='proxies', data=browsing_proxies.proxies.split('\n'))
-    proxies_config.save()
 
 
 user_agents = """Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30
