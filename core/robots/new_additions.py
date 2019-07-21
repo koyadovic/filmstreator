@@ -1,7 +1,10 @@
-from core.tick_worker import execute_each
+from core.tick_worker import Ticker
 
 
-@execute_each(interval='1-minute')
+@Ticker.execute_each(interval='1-minute')
 async def search_for_new_additions():
+    """
+
+    """
     # TODO
     pass

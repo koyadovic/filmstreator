@@ -1,12 +1,12 @@
 from core.fetchers.services import get_all_scoring_sources
 from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
-from core.tick_worker import execute_each
+from core.tick_worker import Ticker
 from core.tools.exceptions import ScoringSourceException
 from core.tools.logs import log_exception
 
 
-@execute_each(interval='1-minute')
+@Ticker.execute_each(interval='1-minute')
 async def compile_scores_from_audiovisual_records():
     print('compile_scores_from_audiovisual_records')
     for klass in get_all_scoring_sources():

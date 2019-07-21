@@ -9,16 +9,6 @@ from core.tools.packages import PackageDiscover, ModuleDiscover
 from core import robots
 
 
-def execute_each(interval='1-minute'):
-    def wrapper(func):
-        func.interval = interval
-        @functools.wraps(func)
-        async def wrapped(*args):
-            return await func(*args)
-        return wrapped
-    return wrapper
-
-
 class Ticker:
     INTERVALS = {
         '1-minute': {'seconds': 1 * 60, 'functions': []},
@@ -27,6 +17,16 @@ class Ticker:
         '60-minutes': {'seconds': 60 * 60, 'functions': []},
         '12-hours': {'seconds': 12 * 60 * 60, 'functions': []},
     }
+
+    @classmethod
+    def execute_each(cls, interval='1-minute'):
+        def wrapper(func):
+            func.interval = interval
+            @functools.wraps(func)
+            async def wrapped(*args):
+                return await func(*args)
+            return wrapped
+        return wrapper
 
     @classmethod
     def _can_acquire_lock(cls, func):

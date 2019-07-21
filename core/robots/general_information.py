@@ -1,12 +1,12 @@
 from core.fetchers.services import get_all_general_information_sources
 from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
-from core.tick_worker import execute_each
+from core.tick_worker import Ticker
 from core.tools.exceptions import GeneralInformationException
 from core.tools.logs import log_exception
 
 
-@execute_each(interval='1-minute')
+@Ticker.execute_each(interval='1-minute')
 async def autocomplete_general_information_for_empty_audiovisual_records():
     print('autocomplete_general_information_for_empty_audiovisual_records')
     audiovisual_records = (
