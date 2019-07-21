@@ -1,13 +1,15 @@
-from core.fetchers.services import get_all_download_sources, get_download_source_by_name
+from core.fetchers.services import get_all_download_sources
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
 from core.model.configurations import Configuration
 from core.model.searches import Search, Condition
-from core import services
 from core.tick_worker import Ticker
+from core.tools.browsing import PhantomBrowsingSession
+from core import services
 
 from datetime import datetime, timezone, timedelta
-
+from urllib3.exceptions import MaxRetryError, ProxyError
 from concurrent.futures.thread import ThreadPoolExecutor
+
 import concurrent
 
 
@@ -15,6 +17,7 @@ import concurrent
 async def compile_download_links_from_audiovisual_records():
     configuration = _get_ts_configuration('last_download_fetched')
     with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = []
         for source_class in get_all_download_sources():
             source_name = source_class.source_name
             ts = configuration.data.get(source_name, 0)
@@ -30,7 +33,6 @@ async def compile_download_links_from_audiovisual_records():
                 .search()
             )
 
-            futures = []
             for audiovisual_record in audiovisual_records:
                 future = executor.submit(_refresh_download_results_from_source, audiovisual_record, source_class)
                 futures.append(future)
@@ -44,7 +46,7 @@ async def compile_download_links_from_audiovisual_records():
 
 
 @Ticker.execute_each(interval='1-minute')
-async def compile_expired_download_links():
+async def delete_404_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=60)
     download_results = (
         Search
@@ -53,12 +55,30 @@ async def compile_expired_download_links():
         .add_condition(Condition('last_check', Condition.OPERATOR_LESS_THAN, n_days_ago))
         .search(sort_by='last_check')
     )
-    for download_result in download_results:
-        source_class = get_download_source_by_name(download_result.source_name)
-        audiovisual_record = download_result.audiovisual_record
-        # TODO si la película es de este año, tocará actualizar los enlaces más a menudo,
-        # TODO si la película es de hace años, es tontería. Quizá revisar links, por si alguno tiene un 404
-        _refresh_download_results_from_source(audiovisual_record, source_class)
+
+    def _check_download_result_existence(dr):
+        session = PhantomBrowsingSession(referer='https://www.google.com/')
+        max_checks = 10
+        current_check = 0
+        while current_check < max_checks:
+            try:
+                current_check += 1
+                session.get(dr.link)
+                response = session.last_response
+                if response.status_code > 299:
+                    dr.delete()
+                return
+            except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError):
+                session.refresh_identity()
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = []
+        for download_result in download_results:
+            future = executor.submit(_check_download_result_existence, download_result)
+            futures.append(future)
+        # wait until completed
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
 
 
 def _refresh_download_results_from_source(audiovisual_record, source_class):
