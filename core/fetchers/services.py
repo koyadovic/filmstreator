@@ -1,8 +1,10 @@
 from core.fetchers import download_sources, general_information, scoring_sources
 from core.fetchers.download_sources.base import AbstractDownloadSource
 from core.fetchers.general_information.base import AbstractGeneralInformation
+from core.fetchers.new_additions.base import AbstractNewAdditions
 from core.fetchers.scoring_sources.base import AbstractScoringSource
 from core.model.configurations import Configuration
+from core.robots import new_additions
 from core.tools.exceptions import DownloadSourceException
 from core.tools.packages import PackageDiscover, ModuleDiscover
 
@@ -46,6 +48,17 @@ def get_all_download_sources():
                 klasses.append(klass)
 
     return _update_base_urls(klasses)
+
+
+def get_all_new_additions_sources():
+    package = PackageDiscover(new_additions)
+    klasses = []
+    for submodule in package.modules:
+        module = ModuleDiscover(submodule)
+        for klass in module.classes:
+            if klass != AbstractNewAdditions and issubclass(klass, AbstractNewAdditions):
+                klasses.append(klass)
+    return klasses
 
 
 def _update_base_urls(klasses):

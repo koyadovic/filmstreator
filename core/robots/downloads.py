@@ -8,45 +8,38 @@ from core.tools.logs import log_exception
 from core import services
 
 from datetime import datetime, timezone, timedelta
-from urllib3.exceptions import MaxRetryError, ProxyError
 from concurrent.futures.thread import ThreadPoolExecutor
 import concurrent
 
 
 @Ticker.execute_each(interval='1-minute')
 async def compile_download_links_from_audiovisual_records():
-    configuration = _get_ts_configuration('last_download_fetched')
     with ThreadPoolExecutor(max_workers=10) as executor:
-        try:
-            futures = []
-            for source_class in get_all_download_sources():
-                source_name = source_class.source_name
-                ts = configuration.data.get(source_name, 0)
-                from_dt = datetime.utcfromtimestamp(ts).replace(tzinfo=timezone.utc)
+        futures = []
+        for source_class in get_all_download_sources():
+            source_name = source_class.source_name
+            configuration = _get_ts_configuration(f'last_download_fetched_{source_name}')
+            ts = configuration.data.get('ts', 0)
+            from_dt = datetime.utcfromtimestamp(ts).replace(tzinfo=timezone.utc)
 
-                audiovisual_records = (
-                    Search
-                    .Builder
-                    .new_search(AudiovisualRecord)
-                    .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
-                    .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, True))
-                    .add_condition(Condition('created_date', Condition.OPERATOR_GREAT_THAN, from_dt))
-                    .search()
+            audiovisual_records = (
+                Search
+                .Builder
+                .new_search(AudiovisualRecord)
+                .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
+                .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, True))
+                .add_condition(Condition('created_date', Condition.OPERATOR_GREAT_THAN, from_dt))
+                .search()
+            )
+
+            for audiovisual_record in audiovisual_records:
+                future = executor.submit(
+                    _refresh_download_results_from_source, audiovisual_record, source_class
                 )
+                futures.append(future)
 
-                for audiovisual_record in audiovisual_records:
-                    future = executor.submit(_refresh_download_results_from_source, audiovisual_record, source_class)
-                    futures.append(future)
-                    if audiovisual_record.created_date > from_dt:
-                        from_dt = audiovisual_record.created_date
-                configuration.data[source_name] = from_dt.timestamp()
-
-            for future in concurrent.futures.as_completed(futures):
-                future.result()
-        except Exception as e:
-            log_exception(e)
-            configuration.save()
-            raise e
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
 
 
 @Ticker.execute_each(interval='1-minute')
@@ -66,16 +59,13 @@ async def delete_404_links():
         current_check = 0
         audiovisual_record = dr.audiovisual_record
         while current_check < max_checks:
-            try:
-                current_check += 1
-                session.get(dr.link)
-                response = session.last_response
-                if response.status_code > 299:
-                    dr.delete()
-                    _check_has_downloads(audiovisual_record)
-                return
-            except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError):
-                session.refresh_identity()
+            current_check += 1
+            session.get(dr.link)
+            response = session.last_response
+            if response.status_code > 299:
+                dr.delete()
+                _check_has_downloads(audiovisual_record)
+            return
 
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
@@ -88,9 +78,9 @@ async def delete_404_links():
 
 
 def _refresh_download_results_from_source(audiovisual_record, source_class):
+    audiovisual_record_ts = audiovisual_record.created_date.timestamp()
     download_source = source_class(audiovisual_record)
     results = download_source.get_source_results()
-
     old_download_results = []
     if len(results) > 0:
         old_download_results = (
@@ -110,6 +100,12 @@ def _refresh_download_results_from_source(audiovisual_record, source_class):
     # remove all old download results
     for result in old_download_results:
         result.delete()
+
+    configuration = _get_ts_configuration(f'last_download_fetched_{source_class.source_name}')
+    ts = configuration.data.get('ts', 0)
+    if audiovisual_record_ts > ts:
+        configuration.data['ts'] = audiovisual_record_ts
+        configuration.save()
 
     _check_has_downloads(audiovisual_record)
 

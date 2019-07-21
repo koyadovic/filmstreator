@@ -15,18 +15,23 @@ from core.tools.logs import log_exception
 
 
 class PhantomBrowsingSession:
-    def __init__(self, referer=None):
+    def __init__(self, referer=None, headers=None):
         self._referer = referer
         self._initial_referer = self._referer
         self._session = None
         self._identity = None
         self._last_response = None
-
+        self._headers = headers or {}
         self.refresh_identity()
 
     def get(self, url, headers=None, timeout=30):
         PhantomBrowsingSession._check_domain(url)
+
+        initial_headers = self._headers
         headers = headers or {}
+        initial_headers.update(**headers)
+        headers = initial_headers
+
         tryings = 0
         max_tryings = 10
         while tryings < max_tryings:

@@ -11,7 +11,8 @@ class AbstractNewAdditions(metaclass=abc.ABCMeta):
     base_url = None
 
     def get(self, from_date: datetime, to_date: datetime) -> List[str]:
-        session = PhantomBrowsingSession(referer=self.base_url + '/')
+        headers = {'Accept-Language': 'en,es;q=0.9,pt;q=0.8'}
+        session = PhantomBrowsingSession(referer=self.base_url + '/', headers=headers)
         session.get(self.get_search_url(from_date, to_date), timeout=30)
         response = session.last_response
         if not self.results_found(response.content):

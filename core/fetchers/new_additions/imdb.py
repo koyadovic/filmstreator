@@ -36,7 +36,7 @@ class IMDBNewAdditions(AbstractNewAdditions):
         if len(texts) == 0:
             return True
         text = texts[0].lower()
-        return 'no' in text and 'result' in text
+        return not ('no' in text and 'result' in text)
 
     def get_search_url(self, from_date: datetime, to_date: datetime):
         date_format = '%Y-%m-%d'
