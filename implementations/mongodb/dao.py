@@ -1,3 +1,4 @@
+import re
 from typing import List
 
 from core.interfaces import DAOInterface
@@ -128,9 +129,14 @@ def _check_audiovisual_slug(dict_obj, collection):
     current_slug = dict_obj.get('slug')
     modified_slug = current_slug
     is_slug_repeated = True
+    if bool(dict_obj.get('_id')):
+        is_slug_repeated = False
     while is_slug_repeated:
         if n > 0:
-            modified_slug = current_slug + f'-{n}'
+            if '-' in current_slug:
+                modified_slug = re.sub(r'\-\d+$', f'-{n}', current_slug)
+            else:
+                modified_slug = current_slug + f'-{n}'
         print(f'Checking slug {modified_slug}')
         result = collection.find_one(
             {
