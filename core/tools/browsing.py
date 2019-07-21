@@ -64,9 +64,6 @@ class PhantomBrowsingSession:
         except gaierror:
             raise PhantomBrowsingSession.InvalidURLProvided(f'Domain {domain} of url {url} does not exist')
 
-    class MaxTryingsReached(CoreException):
-        pass
-
     class InvalidURLProvided(CoreException):
         pass
 

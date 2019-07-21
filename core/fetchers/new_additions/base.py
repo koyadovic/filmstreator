@@ -5,8 +5,6 @@ from typing import List
 from lxml import html
 import abc
 
-from core.tools.logs import log_exception
-
 
 class AbstractNewAdditions(metaclass=abc.ABCMeta):
     all_names_xpath = None
@@ -14,12 +12,7 @@ class AbstractNewAdditions(metaclass=abc.ABCMeta):
 
     def get(self, from_date: datetime, to_date: datetime) -> List[str]:
         session = PhantomBrowsingSession(referer=self.base_url + '/')
-        try:
-            session.get(self.get_search_url(from_date, to_date), max_tryings=5, timeout=15)
-        except PhantomBrowsingSession.MaxTryingsReached as e:
-            log_exception(e)
-            return []
-
+        session.get(self.get_search_url(from_date, to_date), timeout=30)
         response = session.last_response
         if not self.results_found(response.content):
             return []

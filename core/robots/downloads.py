@@ -49,7 +49,7 @@ async def compile_download_links_from_audiovisual_records():
             raise e
 
 
-# @Ticker.execute_each(interval='1-minute')
+@Ticker.execute_each(interval='1-minute')
 async def delete_404_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=60)
     download_results = (
