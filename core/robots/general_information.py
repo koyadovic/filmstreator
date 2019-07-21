@@ -6,7 +6,7 @@ from core.tools.exceptions import GeneralInformationException
 from core.tools.logs import log_exception
 
 
-@Ticker.execute_each(interval='1-minute')
+#@Ticker.execute_each(interval='1-minute')
 async def autocomplete_general_information_for_empty_audiovisual_records():
     print('autocomplete_general_information_for_empty_audiovisual_records')
     audiovisual_records = (

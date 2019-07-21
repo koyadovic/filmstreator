@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 
 import requests
 from requests import ConnectTimeout
-from requests.exceptions import ProxyError
+from requests.exceptions import ProxyError, ConnectionError
 
 from urllib3.exceptions import MaxRetryError
 from core.model.configurations import Configuration
@@ -40,7 +40,7 @@ class PhantomBrowsingSession:
                 self._referer = url
                 return self
 
-            except (ConnectTimeout, MaxRetryError, ProxyError):
+            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError):
                 self.refresh_identity()
 
             except Exception as e:

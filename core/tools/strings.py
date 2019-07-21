@@ -31,7 +31,6 @@ class VideoQualityInStringDetector:
         {'possibility': 'untouched rip', 'tag': 'DVDR'},
         {'possibility': 'lossless rip', 'tag': 'DVDR'},
         {'possibility': 'DVDSCREENER', 'tag': 'DVDScreener'},
-        {'possibility': 'PreDVDRip', 'tag': 'TS'},
         {'possibility': 'WORKPRINT', 'tag': 'WP'},
         {'possibility': 'BluRayScr', 'tag': 'BluRayScreener'},
         {'possibility': 'WEB-DLRip', 'tag': 'WEBDL'},
@@ -99,12 +98,13 @@ class VideoQualityInStringDetector:
     @property
     def quality(self):
         sorted_qualities = sorted(self.qualities, key=lambda e: len(e.get('possibility')), reverse=True)
-        for element in sorted_qualities:
-            possibility = element.get('possibility').lower()
-            tag = element.get('tag')
-            ratio = ratio_of_containing_similar_string(self._string, possibility, min_length=len(possibility))
-            if ratio > 0.7:
-                return tag
+        for cut_ratio in [1.0 - (i * 0.05) for i in range(0, 20)]:
+            for element in sorted_qualities:
+                possibility = element.get('possibility').lower()
+                tag = element.get('tag')
+                ratio = ratio_of_containing_similar_string(self._string, possibility, min_length=len(possibility))
+                if ratio > cut_ratio:
+                    return tag
         return 'Unknown'
 
 

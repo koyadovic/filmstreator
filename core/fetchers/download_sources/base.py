@@ -38,12 +38,12 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
         while results is None or len(results) == 0:
             try:
                 trying += 1
-                session.get(self.base_url + self.relative_search_string(), timeout=30, max_tryings=10)
+                session.get(self.base_url + self.relative_search_string(), timeout=30)
                 response = session.last_response
                 base_tree = html.fromstring(response.content)
                 results = base_tree.xpath(self.anchors_xpath)
                 if len(results) == 0:
-                    if trying > 2:
+                    if trying > 4:
                         return []
                     session.refresh_identity()
             except Exception as e:

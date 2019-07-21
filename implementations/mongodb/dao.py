@@ -132,7 +132,7 @@ def _check_audiovisual_slug(dict_obj, collection):
         if n > 0:
             modified_slug = current_slug + f'-{n}'
         slug_results = collection.find({'slug': modified_slug})
-        is_slug_repeated = len(slug_results) == 0
+        is_slug_repeated = slug_results.count() == 0
         n += 1
 
     if modified_slug != current_slug:
