@@ -1,35 +1,76 @@
 import random
-import requests
+from urllib.parse import urlparse
 
+import requests
+from requests import ConnectTimeout
+from requests.exceptions import ProxyError, ConnectionError
+
+from urllib3.exceptions import MaxRetryError
 from core.model.configurations import Configuration
 from core.tools import browsing_proxies
+from socket import getaddrinfo, gaierror
+
+from core.tools.exceptions import CoreException
+from core.tools.logs import log_exception
 
 
 class PhantomBrowsingSession:
-    def __init__(self, referer=None):
+    def __init__(self, referer=None, headers=None):
+        self._referer = referer
+        self._initial_referer = self._referer
         self._session = None
         self._identity = None
-        self.refresh_identity()
         self._last_response = None
-        self._referer = referer
+        self._headers = headers or {}
+        self.refresh_identity()
 
     def get(self, url, headers=None, timeout=30):
+        PhantomBrowsingSession._check_domain(url)
+
+        initial_headers = self._headers
         headers = headers or {}
-        headers.update({'User-Agent': self._identity.user_agent})
-        if self._referer:
-            headers.update({'Referer': self._referer})
-        print(f'GET -> {url}')
-        response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
-        self._last_response = response
-        return self
+        initial_headers.update(**headers)
+        headers = initial_headers
+
+        tryings = 0
+        max_tryings = 10
+        while tryings < max_tryings:
+            headers.update({'User-Agent': self._identity.user_agent})
+            if self._referer:
+                headers.update({'Referer': self._referer})
+
+            try:
+                response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
+                self._last_response = response
+                self._referer = url
+                return self
+
+            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError):
+                self.refresh_identity()
+
+            except Exception as e:
+                tryings += 1
+                log_exception(e)
 
     @property
     def last_response(self):
         return self._last_response
 
     def refresh_identity(self):
+        self._referer = self._initial_referer
         self._session = requests.Session()
         self._identity = BrowsingIdentity()
+
+    @classmethod
+    def _check_domain(cls, url):
+        domain = urlparse(url).netloc  # extract the domain from the url
+        try:
+            getaddrinfo(domain, 80)
+        except gaierror:
+            raise PhantomBrowsingSession.InvalidURLProvided(f'Domain {domain} of url {url} does not exist')
+
+    class InvalidURLProvided(CoreException):
+        pass
 
 
 class BrowsingIdentity:
@@ -37,6 +78,10 @@ class BrowsingIdentity:
     user_agent = None
 
     def __init__(self):
+        self.proxies_config = Configuration.get_configuration('proxies')
+        if self.proxies_config is None:
+            self.proxies_config = Configuration(key='proxies', data=browsing_proxies.proxies.split('\n'))
+            self.proxies_config.save()
         self.refresh()
 
     def refresh(self):
@@ -49,19 +94,13 @@ class BrowsingIdentity:
         self.user_agent = user_agent
 
     def refresh_proxy(self):
-        all_proxies = proxies_config.data
+        all_proxies = self.proxies_config.data
         proxy = all_proxies[random.randint(0, len(all_proxies))]
         self.proxies = {
             'http': proxy,
             'https': proxy,
             'ftp': proxy
         }
-
-
-proxies_config = Configuration.get_configuration('proxies')
-if proxies_config is None:
-    proxies_config = Configuration(key='proxies', data=browsing_proxies.proxies.split('\n'))
-    proxies_config.save()
 
 
 user_agents = """Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30

@@ -7,7 +7,7 @@ from typing import List
 import abc
 
 from core.tools.browsing import PhantomBrowsingSession
-from core.tools.logs import log_message
+from core.tools.logs import log_message, log_exception
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
 
 
@@ -34,24 +34,20 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
     def get_source_results(self) -> List[DownloadSourceResult]:
         session = PhantomBrowsingSession(referer=self.base_url + '/')
         results = None
-        tryings = 0
-        while (results is None or len(results) == 0) and tryings < 5:
+        trying = 0
+        while results is None or len(results) == 0:
             try:
+                trying += 1
                 session.get(self.base_url + self.relative_search_string(), timeout=30)
                 response = session.last_response
                 base_tree = html.fromstring(response.content)
                 results = base_tree.xpath(self.anchors_xpath)
-                tryings += 1
                 if len(results) == 0:
-                    print('Results are zero!, refreshing our identity')
+                    if trying > 4:
+                        return []
                     session.refresh_identity()
-            except (ConnectionResetError, OSError, TimeoutError, MaxRetryError, ProxyError) as e:
-                print(f'Error: refreshing our identity ...')
-                session.refresh_identity()
-
-        if tryings >= 10:
-            log_message(f'{tryings} failed tryings for {self.audiovisual_record.name} into {self.source_name}')
-
+            except Exception as e:
+                log_exception(e)
         download_results = self._translate(results)
         return download_results
 

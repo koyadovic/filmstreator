@@ -186,6 +186,15 @@ class AudiovisualRecord(BaseModel):
         self.updated_date = utc_now()
         self._is_a_film = is_a_film
 
+    @property
+    def has_downloads(self) -> bool:
+        return self._has_downloads
+
+    @has_downloads.setter
+    def has_downloads(self, has_downloads):
+        self.updated_date = utc_now()
+        self._has_downloads = has_downloads
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._name = kwargs.pop('name', '')
@@ -200,6 +209,7 @@ class AudiovisualRecord(BaseModel):
         self._scores = kwargs.pop('scores', list())
         self._general_information_fetched = kwargs.pop('general_information_fetched', False)
         self._is_a_film = kwargs.pop('is_a_film', None)
+        self._has_downloads = kwargs.pop('has_downloads', False)
 
     def __str__(self):
         return f'AudiovisualRecord {self.name} ({self.year})'

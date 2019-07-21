@@ -1,6 +1,8 @@
 from difflib import SequenceMatcher
 import re
 
+from core.tools.exceptions import CoreException
+
 
 def are_similar_strings(str1, str2):
     current_ratio = SequenceMatcher(None, str1, str2).ratio()
@@ -31,7 +33,6 @@ class VideoQualityInStringDetector:
         {'possibility': 'untouched rip', 'tag': 'DVDR'},
         {'possibility': 'lossless rip', 'tag': 'DVDR'},
         {'possibility': 'DVDSCREENER', 'tag': 'DVDScreener'},
-        {'possibility': 'PreDVDRip', 'tag': 'TS'},
         {'possibility': 'WORKPRINT', 'tag': 'WP'},
         {'possibility': 'BluRayScr', 'tag': 'BluRayScreener'},
         {'possibility': 'WEB-DLRip', 'tag': 'WEBDL'},
@@ -80,32 +81,48 @@ class VideoQualityInStringDetector:
         {'possibility': 'VODR', 'tag': 'VODRip'},
         {'possibility': 'brip', 'tag': 'BluRayRip'},
         {'possibility': 'bdmv', 'tag': 'BluRayRip'},
-        {'possibility': 'CAM', 'tag': 'Cam'},
-        {'possibility': 'PPV', 'tag': 'PPVRip'},
-        {'possibility': 'SCR', 'tag': 'Screener'},
-        {'possibility': 'DSR', 'tag': 'HDTV'},
-        {'possibility': 'WEB', 'tag': 'WEBRip'},
-        {'possibility': 'bdr', 'tag': 'BluRayRip'},
-        {'possibility': 'TS', 'tag': 'TS'},
-        {'possibility': 'WP', 'tag': 'WP'},
-        {'possibility': 'TC', 'tag': 'Telecine'},
-        {'possibility': 'R5', 'tag': 'R5'},
-        {'possibility': 'HC', 'tag': 'HC-HDRip'}
+        {'possibility': ' CAM ', 'tag': 'Cam'},
+        {'possibility': ' PPV ', 'tag': 'PPVRip'},
+        {'possibility': ' SCR ', 'tag': 'Screener'},
+        {'possibility': ' DSR ', 'tag': 'HDTV'},
+        {'possibility': ' WEB ', 'tag': 'WEBRip'},
+        {'possibility': ' bdr ', 'tag': 'BluRayRip'},
+        {'possibility': ' TS ', 'tag': 'TS'},
+        {'possibility': ' WP ', 'tag': 'WP'},
+        {'possibility': ' TC ', 'tag': 'Telecine'},
+        {'possibility': ' R5 ', 'tag': 'R5'},
+        {'possibility': 'soundtrack', 'tag': 'Audio'},
+        {'possibility': 'audio', 'tag': 'Audio'},
+        {'possibility': ' HC ', 'tag': 'HC-HDRip'}
     ]
 
     def __init__(self, string):
         self._string = string.lower()
+        self._quality_ratio = 0.0
 
     @property
     def quality(self):
         sorted_qualities = sorted(self.qualities, key=lambda e: len(e.get('possibility')), reverse=True)
-        for element in sorted_qualities:
-            possibility = element.get('possibility').lower()
-            tag = element.get('tag')
-            ratio = ratio_of_containing_similar_string(self._string, possibility, min_length=len(possibility))
-            if ratio > 0.7:
-                return tag
+        for cut_ratio in [1.0 - (i * 0.05) for i in range(0, 6)]:
+            for element in sorted_qualities:
+                possibility = element.get('possibility').lower()
+                tag = element.get('tag')
+                ratio = ratio_of_containing_similar_string(
+                    self._string, possibility, min_length=len(possibility)
+                )
+                if ratio > cut_ratio:
+                    self._quality_ratio = ratio
+                    return tag
         return 'Unknown'
+
+    def _expanded_possibility(self, possibility):
+        if len(possibility) >= 4:
+            return [possibility]
+        for char in [' ', '.', '_', '-']:
+            yield char + possibility + char
+
+    class InsufficientLengthPossibility(CoreException):
+        pass
 
 
 class RemoveAudiovisualRecordNameFromString:

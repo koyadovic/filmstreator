@@ -46,7 +46,7 @@ def details_test(request, slug=None):
         Search.Builder
               .new_search(DownloadSourceResult)
               .add_condition(Condition('audiovisual_record', Condition.OPERATOR_EQUALS, audiovisual_record))
-              .search()
+              .search(sort_by='quality')
     )
     context = {'audiovisual_record': audiovisual_record, 'downloads': downloads}
     return render(request, 'web/details_test.html', context=context)

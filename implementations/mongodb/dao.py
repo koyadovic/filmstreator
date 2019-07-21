@@ -32,6 +32,7 @@ class DAOMongoDB(DAOInterface):
         dict_obj = dict(record)
         collection = self._get_collection(MongoAudiovisualRecord)
         _id = dict_obj.pop('_id', None)
+        _check_audiovisual_slug(dict_obj, collection)
         if not _id:
             record._id = collection.insert_one(dict_obj)
         else:
@@ -120,3 +121,31 @@ class DAOMongoDB(DAOInterface):
 
     def _get_collection(self, cls):
         return self._db[cls.collection_name]
+
+
+def _check_audiovisual_slug(dict_obj, collection):
+    n = 0
+    current_slug = dict_obj.get('slug')
+    modified_slug = current_slug
+    is_slug_repeated = True
+    while is_slug_repeated:
+        if n > 0:
+            modified_slug = current_slug + f'-{n}'
+        print(f'Checking slug {modified_slug}')
+        result = collection.find_one(
+            {
+                'slug': modified_slug,
+                '_id': {
+                    '$ne': dict_obj.get('_id')
+                }
+            }
+        )
+        is_slug_repeated = result is not None
+        n += 1
+
+    if modified_slug != current_slug:
+        print(f'Modified {modified_slug}')
+        dict_obj['slug'] = modified_slug
+    else:
+        print(f'Slug {modified_slug} is okay')
+

@@ -1,10 +1,14 @@
-class GeneralInformationException(Exception):
+class CoreException(Exception):
     pass
 
 
-class DownloadSourceException(Exception):
+class GeneralInformationException(CoreException):
     pass
 
 
-class ScoringSourceException(Exception):
+class DownloadSourceException(CoreException):
+    pass
+
+
+class ScoringSourceException(CoreException):
     pass
