@@ -65,7 +65,7 @@ def search_for_new_additions():
         dts_done.append(from_str)
         current_native_dt += timedelta(days=1)
         configuration.data['dts_done'] = dts_done
-        configuration.data['current_dt'] = current_native_dt.strftime('%y-%m-%d')
+        configuration.data['current_dt'] = current_native_dt.strftime('%Y-%m-%d')
         configuration.save()
 
 
