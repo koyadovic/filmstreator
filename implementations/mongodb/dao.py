@@ -125,34 +125,20 @@ class DAOMongoDB(DAOInterface):
 
 
 def _check_audiovisual_slug(dict_obj, collection):
-    return
-    # n = 0
-    # current_slug = dict_obj.get('slug')
-    # modified_slug = current_slug
-    # is_slug_repeated = True
-    # if bool(dict_obj.get('_id')):
-    #     is_slug_repeated = False
-    # while is_slug_repeated:
-    #     if n > 0:
-    #         if '-' in current_slug:
-    #             modified_slug = re.sub(r'\-\d+$', f'-{n}', current_slug)
-    #         else:
-    #             modified_slug = current_slug + f'-{n}'
-    #     print(f'Checking slug {modified_slug}')
-    #     result = collection.find_one(
-    #         {
-    #             'slug': modified_slug,
-    #             '_id': {
-    #                 '$ne': dict_obj.get('_id')
-    #             }
-    #         }
-    #     )
-    #     is_slug_repeated = result is not None
-    #     n += 1
-    #
-    # if modified_slug != current_slug:
-    #     print(f'Modified {modified_slug}')
-    #     dict_obj['slug'] = modified_slug
-    # else:
-    #     print(f'Slug {modified_slug} is okay')
-    #
+    current_slug = dict_obj.get('slug')
+    modified_slug = current_slug
+    is_slug_repeated = True
+
+    n = 0
+    while is_slug_repeated:
+        if n == 0:
+            modified_slug = current_slug
+        else:
+            modified_slug = f'{current_slug}-{n}'
+        result = collection.find_one({'slug': modified_slug, '_id': {'$ne': dict_obj.get('_id')}})
+        if result is None:
+            is_slug_repeated = False
+        n += 1
+
+    if modified_slug != current_slug:
+        dict_obj['slug'] = modified_slug
