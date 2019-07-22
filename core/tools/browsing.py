@@ -89,7 +89,9 @@ class BrowsingIdentity:
                     'bad': []
                 }
             )
+            print(getattr(self.proxies_config, '_id', None))
             self.proxies_config.save()
+            print(getattr(self.proxies_config, '_id', None))
         self._cleanup_configuration()
         self._check_if_everything_its_okay()
         self.refresh()

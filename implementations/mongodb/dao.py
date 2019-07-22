@@ -35,7 +35,7 @@ class DAOMongoDB(DAOInterface):
         _id = dict_obj.pop('_id', None)
         _check_audiovisual_slug(dict_obj, collection)
         if not _id:
-            record._id = collection.insert_one(dict_obj)
+            record._id = collection.insert_one(dict_obj).inserted_id
         else:
             collection.update({'_id': _id}, dict_obj)
         return record
@@ -77,14 +77,15 @@ class DAOMongoDB(DAOInterface):
         return None
 
     def save_configuration(self, configuration: Configuration):
-        configuration = MongoConfiguration.convert(configuration)
+        mongo_configuration = MongoConfiguration.convert(configuration)
         collection = self._get_collection(MongoConfiguration)
-        dict_configuration = dict(configuration)
-        _id = dict_configuration.pop('_id', None)
+        dict_mongo_configuration = dict(mongo_configuration)
+        _id = dict_mongo_configuration.pop('_id', None)
         if not _id:
-            configuration._id = collection.insert_one(dict_configuration)
+            configuration._id = collection.insert_one(dict_mongo_configuration).inserted_id
         else:
-            collection.update({'_id': _id}, dict_configuration)
+            collection.update({'_id': _id}, dict_mongo_configuration)
+        configuration.data = mongo_configuration.data
         return configuration
 
     def delete_configuration(self, configuration: Configuration):
@@ -105,7 +106,7 @@ class DAOMongoDB(DAOInterface):
         collection = self._get_collection(MongoGenre)
         genre_dict = collection.find_one({'name': genre.name})
         if genre_dict is None:
-            genre._id = collection.insert_one(dict(genre))
+            genre._id = collection.insert_one(dict(genre)).inserted_id
             return genre
         else:
             return MongoGenre(**genre_dict)
@@ -115,7 +116,7 @@ class DAOMongoDB(DAOInterface):
         collection = self._get_collection(MongoPerson)
         person_dict = collection.find_one({'name': person.name})
         if person_dict is None:
-            person._id = collection.insert_one(dict(person))
+            person._id = collection.insert_one(dict(person)).inserted_id
             return person
         else:
             return MongoPerson(**person_dict)

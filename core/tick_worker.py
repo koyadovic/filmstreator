@@ -5,6 +5,7 @@ from datetime import datetime
 import glob
 import os
 
+from core.tools.browsing import BrowsingIdentity
 from core.tools.logs import log_exception
 from core.tools.packages import PackageDiscover, ModuleDiscover
 from core import robots
@@ -108,6 +109,7 @@ class Ticker:
 
 
 def start_ticker():
+    BrowsingIdentity()
     # on startup we release all locks
     Ticker.release_all_locks()
     ticker = Ticker()

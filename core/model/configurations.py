@@ -25,7 +25,7 @@ class Configuration:
 
     def save(self):
         from core import services
-        return services.save_configuration(self)
+        services.save_configuration(self)
 
     def delete(self):
         from core import services
