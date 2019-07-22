@@ -42,6 +42,45 @@ def compile_download_links_from_audiovisual_records():
 
 
 @Ticker.execute_each(interval='1-minute')
+def recent_films_without_good_downloads():
+    good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
+
+    n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
+
+    download_results = (
+        Search
+        .Builder
+        .new_search(DownloadSourceResult)
+        .add_condition(Condition('quality', Condition.OPERATOR_IN, good_qualities))
+        .search(sort_by='last_check')
+    )
+    audiovisual_records_to_exclude = [dr.audiovisual_record for dr in download_results]
+
+    # TODO optimize this
+    audiovisual_records = (
+        Search
+        .Builder
+        .new_search(AudiovisualRecord)
+        .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
+        .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, True))
+        .add_condition(Condition('year', Condition.OPERATOR_GREAT_OR_EQUAL_THAN, n_days_ago.strftime('%Y')))
+        .search()
+    )
+    audiovisual_records = [ar for ar in audiovisual_records if ar not in audiovisual_records_to_exclude]
+
+    with ThreadPoolExecutor(max_workers=30) as executor:
+        futures = []
+        for source_class in get_all_download_sources():
+            for audiovisual_record in audiovisual_records:
+                future = executor.submit(
+                    _refresh_download_results_from_source, audiovisual_record, source_class
+                )
+                futures.append(future)
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
+
+
+@Ticker.execute_each(interval='1-minute')
 def delete_404_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=60)
     download_results = (
