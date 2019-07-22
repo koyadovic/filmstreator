@@ -3,7 +3,6 @@ from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
 from core.tools.exceptions import ScoringSourceException
-from core.tools.logs import log_exception
 
 
 @Ticker.execute_each(interval='1-minute')
@@ -22,8 +21,7 @@ def compile_scores_from_audiovisual_records():
             source = klass(audiovisual_record)
             try:
                 scoring_source_instance = source.score
-            except ScoringSourceException as e:
-                log_exception(e)
-                continue
-            audiovisual_record.scores.append(scoring_source_instance)
-            audiovisual_record.save()
+                audiovisual_record.scores.append(scoring_source_instance)
+                audiovisual_record.save()
+            except ScoringSourceException:
+                audiovisual_record.delete()

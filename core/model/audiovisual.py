@@ -177,6 +177,9 @@ class AudiovisualRecord(BaseModel):
         self.updated_date = utc_now()
         self._general_information_fetched = general_information_fetched
 
+    # to store whatever is needed
+    metadata: dict
+
     @property
     def is_a_film(self) -> bool:
         return self._is_a_film
@@ -210,6 +213,7 @@ class AudiovisualRecord(BaseModel):
         self._general_information_fetched = kwargs.pop('general_information_fetched', False)
         self._is_a_film = kwargs.pop('is_a_film', None)
         self._has_downloads = kwargs.pop('has_downloads', False)
+        self.metadata = kwargs.pop('metadata', dict())
 
     def __str__(self):
         return f'AudiovisualRecord {self.name} ({self.year})'

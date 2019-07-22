@@ -15,14 +15,14 @@ def main_test(request):
               .new_search(AudiovisualRecord)
               .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
               .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, True))
-              .search()
+              .search(sort_by='name')
     )
     pending_audiovisual_records = (
         Search.Builder
               .new_search(AudiovisualRecord)
               .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
               .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, False))
-              .search()
+              .search(sort_by='name')
     )
     context = {'audiovisual_records': audiovisual_records, 'pending_audiovisual_records': pending_audiovisual_records}
     return render(request, 'web/list_test.html', context=context)

@@ -91,8 +91,11 @@ class VideoQualityInStringDetector:
         {'possibility': ' WP ', 'tag': 'WP'},
         {'possibility': ' TC ', 'tag': 'Telecine'},
         {'possibility': ' R5 ', 'tag': 'R5'},
+        {'possibility': '1080p', 'tag': 'HDTV'},
+        {'possibility': '720p', 'tag': 'HDTV'},
         {'possibility': 'soundtrack', 'tag': 'Audio'},
         {'possibility': 'audio', 'tag': 'Audio'},
+        {'possibility': 'mp3', 'tag': 'Audio'},
         {'possibility': ' HC ', 'tag': 'HC-HDRip'}
     ]
 

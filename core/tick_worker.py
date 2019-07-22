@@ -33,8 +33,10 @@ class Ticker:
     def _can_acquire_lock(cls, func):
         lock_file = cls._lock_filename(func)
         if os.path.exists(lock_file):
+            print(f'Cannot acquire lock {lock_file}')
             return False
         else:
+            print(f'Lock {lock_file} acquired')
             open(lock_file, 'w').close()
             return True
 
