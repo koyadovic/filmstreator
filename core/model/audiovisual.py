@@ -6,6 +6,14 @@ def utc_now():
     return datetime.utcnow().replace(tzinfo=timezone.utc)
 
 
+class EqualityMixin:
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        else:
+            return False
+
+
 class BaseModel:
     created_date: datetime
     updated_date: datetime
@@ -15,7 +23,7 @@ class BaseModel:
         self.updated_date = kwargs.pop('updated_date', utc_now())
 
 
-class Genre(BaseModel):
+class Genre(BaseModel, EqualityMixin):
     @property
     def name(self):
         return self._name
@@ -36,7 +44,7 @@ class Genre(BaseModel):
         return self.__str__()
 
 
-class Person(BaseModel):
+class Person(BaseModel, EqualityMixin):
     @property
     def name(self):
         return self._name
@@ -57,7 +65,7 @@ class Person(BaseModel):
         return self.__str__()
 
 
-class ScoringSource:
+class ScoringSource(EqualityMixin):
     last_check: datetime
     source_name: str
 
@@ -76,7 +84,7 @@ class ScoringSource:
         self._value = kwargs.pop('value')
 
 
-class AudiovisualRecord(BaseModel):
+class AudiovisualRecord(BaseModel, EqualityMixin):
 
     @property
     def name(self) -> str:
@@ -231,7 +239,7 @@ class AudiovisualRecord(BaseModel):
         self.save()
 
 
-class DownloadSourceResult:
+class DownloadSourceResult(EqualityMixin):
     last_check: datetime
     source_name: str
     name: str

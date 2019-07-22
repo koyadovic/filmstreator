@@ -58,15 +58,17 @@ class SearchMongoDB(SearchInterface):
                         collection_names = CLASS_MAPPINGS.values()
                         max_ratio = 0.0
                         selected_collection_name = None
+                        selected_collection_class = None
                         for collection_class in collection_names:
                             collection_name = collection_class.collection_name
                             ratio = ratio_of_containing_similar_string(collection_class.collection_name, k)
                             if ratio > max_ratio:
                                 max_ratio = ratio
                                 selected_collection_name = collection_name
+                                selected_collection_class = collection_class
                         if max_ratio > 0.0:
                             collection = self._db[selected_collection_name]
-                            result[k] = collection.find_one({'_id': v})
+                            result[k] = selected_collection_class(**collection.find_one({'_id': v}))
 
                 search_results.append(target_class(**result))
         return search_results

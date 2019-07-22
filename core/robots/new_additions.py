@@ -16,6 +16,9 @@ def search_for_new_additions():
         log_message('There is no addition source to get new films/series')
         return
 
+    today = datetime.utcnow()
+    two_months_ago = today - timedelta(days=60)
+
     # Configuration
     config_key = f'search_for_new_additions_{klass.source_name}'
     configuration = _get_configuration(key=config_key)
@@ -41,7 +44,7 @@ def search_for_new_additions():
 
     # main loop
     new_additions = klass()
-    while current_native_dt <= to_native_dt:
+    while current_native_dt <= to_native_dt and current_native_dt <= two_months_ago:
         if current_native_dt.strftime('%Y-%m-%d') in dts_done:
             continue
 

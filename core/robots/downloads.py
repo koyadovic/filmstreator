@@ -44,7 +44,6 @@ def compile_download_links_from_audiovisual_records():
 @Ticker.execute_each(interval='1-minute')
 def recent_films_without_good_downloads():
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
-
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
 
     download_results = (
@@ -52,11 +51,10 @@ def recent_films_without_good_downloads():
         .Builder
         .new_search(DownloadSourceResult)
         .add_condition(Condition('quality', Condition.OPERATOR_IN, good_qualities))
-        .search(sort_by='last_check')
+        .search()
     )
     audiovisual_records_to_exclude = [dr.audiovisual_record for dr in download_results]
 
-    # TODO optimize this
     audiovisual_records = (
         Search
         .Builder
