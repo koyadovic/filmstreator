@@ -41,6 +41,7 @@ class PhantomBrowsingSession:
             try:
                 response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
                 print(f'Retrieved {url} !!!')
+                self._identity.proxy_okay()
                 self._last_response = response
                 self._referer = url
                 return self
@@ -79,19 +80,7 @@ class BrowsingIdentity:
     user_agent = None
 
     def __init__(self):
-        self.proxies_config = Configuration.get_configuration('proxies')
-        if self.proxies_config is None:
-            self.proxies_config = Configuration(
-                key='proxies',
-                data={
-                    'proxies': browsing_proxies.proxies.split('\n'),
-                    'errors': {},
-                    'bad': []
-                }
-            )
-            print(getattr(self.proxies_config, '_id', None))
-            self.proxies_config.save()
-            print(getattr(self.proxies_config, '_id', None))
+        self._get_config()
         self._cleanup_configuration()
         self._check_if_everything_its_okay()
         self.refresh()
@@ -106,11 +95,12 @@ class BrowsingIdentity:
         self.user_agent = user_agent
 
     def refresh_proxy(self):
-        all_proxies = self.proxies_config.data.get('proxies', [])
+        config = BrowsingIdentity._get_config()
+        all_proxies = config.data.get('proxies', [])
         proxy = None
         while proxy is None:
             proxy = all_proxies[random.randint(0, len(all_proxies))]
-            if proxy in self.proxies_config.data['bad']:
+            if proxy in config.data['bad']:
                 proxy = None
         self.proxies = {
             'http': proxy,
@@ -120,36 +110,61 @@ class BrowsingIdentity:
 
     def some_connection_error(self):
         current_proxy = self.proxies['http']
-        if current_proxy not in self.proxies_config.data['errors']:
-            self.proxies_config.data['errors'][current_proxy] = 0
-        self.proxies_config.data['errors'][current_proxy] += 1
+        config = BrowsingIdentity._get_config()
+        if current_proxy not in config.data['errors']:
+            config.data['errors'][current_proxy] = 0
+        config.data['errors'][current_proxy] += 1
         if (
-            self.proxies_config.data['errors'][current_proxy] >= 3 and
-            current_proxy not in self.proxies_config.data['bad']
+            config.data['errors'][current_proxy] >= 3 and
+            current_proxy not in config.data['bad']
         ):
-            self.proxies_config.data['bad'].append(current_proxy)
-        self.proxies_config.save()
+            config.data['bad'].append(current_proxy)
+        config.save()
         self._check_if_everything_its_okay()
 
+    def proxy_okay(self):
+        current_proxy = self.proxies['http']
+        config = BrowsingIdentity._get_config()
+        if current_proxy in config.data['errors']:
+            config.data['errors'][current_proxy] = 0
+            config.save()
+
     def _cleanup_configuration(self):
-        self.proxies_config.data['bad'] = [b for b in self.proxies_config.data['bad'] if b in self.proxies_config.data['proxies']]
+        config = BrowsingIdentity._get_config()
+        config.data['bad'] = [b for b in config.data['bad'] if b in config.data['proxies']]
         to_delete = []
-        for k, v in self.proxies_config.data['errors'].items():
-            if k not in self.proxies_config.data['proxies']:
+        for k, v in config.data['errors'].items():
+            if k not in config.data['proxies']:
                 to_delete.append(k)
         for k in to_delete:
-            del self.proxies_config.data['errors'][k]
-        self.proxies_config.save()
+            del config.data['errors'][k]
+        config.save()
 
     def _check_if_everything_its_okay(self):
+        config = BrowsingIdentity._get_config()
         try:
-            data = self.proxies_config.data
+            data = config.data
             assert len(data['proxies']) > len(data['bad']), 'There is insufficient proxys to use'
         except AssertionError as e:
             raise BrowsingIdentity.BrowserIdentityException(e)
 
     class BrowserIdentityException(CoreException):
         pass
+
+    @classmethod
+    def _get_config(cls):
+        proxies_config = Configuration.get_configuration('proxies')
+        if proxies_config is None:
+            proxies_config = Configuration(
+                key='proxies',
+                data={
+                    'proxies': browsing_proxies.proxies.split('\n'),
+                    'errors': {},
+                    'bad': []
+                }
+            )
+            proxies_config.save()
+        return proxies_config
 
 
 user_agents = """Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30

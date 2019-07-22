@@ -86,7 +86,6 @@ class Ticker:
 
     def start(self):
         while True:
-            # TODO enhance ticker. Must wait the needed for the next second
             ts = int(datetime.utcnow().timestamp())
             self._execute_tasks(ts)
             time.sleep(1)
@@ -109,7 +108,6 @@ class Ticker:
 
 
 def start_ticker():
-    BrowsingIdentity()
     # on startup we release all locks
     Ticker.release_all_locks()
     ticker = Ticker()
