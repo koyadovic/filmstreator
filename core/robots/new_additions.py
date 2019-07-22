@@ -1,7 +1,6 @@
 from core.model.audiovisual import AudiovisualRecord
 from core.model.configurations import Configuration
 from core.model.searches import Search, Condition
-from core.services import add_audiovisual_record_by_name
 from core.tick_worker import Ticker
 from core.tools.logs import log_message
 
@@ -35,6 +34,9 @@ def search_for_new_additions():
     try:
         current_native_dt = datetime.strptime(current_dt, '%Y-%m-%d')
     except ValueError:
+        current_native_dt = from_native_dt
+
+    if not (from_native_dt <= current_native_dt <= to_native_dt):
         current_native_dt = from_native_dt
 
     # main loop

@@ -5,7 +5,7 @@ import requests
 from requests import ConnectTimeout
 from requests.exceptions import ProxyError, ConnectionError, ReadTimeout
 
-from urllib3.exceptions import MaxRetryError
+from urllib3.exceptions import MaxRetryError, NewConnectionError
 from core.model.configurations import Configuration
 from core.tools import browsing_proxies
 from socket import getaddrinfo, gaierror
@@ -47,7 +47,7 @@ class PhantomBrowsingSession:
                 self._referer = url
                 return self
 
-            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError, ReadTimeout):
+            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError, ReadTimeout, NewConnectionError):
                 self.refresh_identity()
 
             except Exception as e:
@@ -92,7 +92,7 @@ class BrowsingIdentity:
 
     def refresh_user_agent(self):
         all_user_agents = user_agents.split('\n')
-        user_agent = all_user_agents[random.randint(0, len(all_user_agents))]
+        user_agent = all_user_agents[random.randint(0, len(all_user_agents) - 1)]
         self.user_agent = user_agent
 
     def refresh_proxy(self):

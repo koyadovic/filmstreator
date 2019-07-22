@@ -4,7 +4,6 @@ from core.model.configurations import Configuration
 from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
 from core.tools.browsing import PhantomBrowsingSession
-from core.tools.logs import log_exception
 from core import services
 
 from datetime import datetime, timezone, timedelta
@@ -14,7 +13,7 @@ import concurrent
 
 @Ticker.execute_each(interval='1-minute')
 def compile_download_links_from_audiovisual_records():
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=30) as executor:
         futures = []
         for source_class in get_all_download_sources():
             source_name = source_class.source_name
@@ -67,7 +66,7 @@ def delete_404_links():
                 _check_has_downloads(audiovisual_record)
             return
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=30) as executor:
         futures = []
         for download_result in download_results:
             future = executor.submit(_check_download_result_existence, download_result)

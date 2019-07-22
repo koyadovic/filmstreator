@@ -37,7 +37,6 @@ class SearchMongoDB(SearchInterface):
         # sorting
         if sort_by is not None:
             mongo_sort_by = _translate_sort_by_to_mongo_dict(sort_by)
-            print(f'sort by: {sort_by}, mongo sort by: {mongo_sort_by}')
             results = results.sort(mongo_sort_by)
 
         # pagination
