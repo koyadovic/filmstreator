@@ -40,12 +40,16 @@ def search_for_new_additions():
         current_native_dt = from_native_dt
 
     if not (from_native_dt <= current_native_dt <= to_native_dt):
-        current_native_dt = from_native_dt
+        if current_native_dt > to_native_dt:
+            current_native_dt = to_native_dt
+        else:
+            current_native_dt = from_native_dt
 
     # main loop
     new_additions = klass()
     while current_native_dt <= to_native_dt and current_native_dt <= two_months_ago:
         if current_native_dt.strftime('%Y-%m-%d') in dts_done:
+            current_native_dt += timedelta(days=1)
             continue
 
         from_str = current_native_dt.strftime('%Y-%m-%d')
