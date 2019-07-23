@@ -8,7 +8,7 @@ from core.model.configurations import Configuration
 from core.model.searches import Search, Condition
 from core.services import add_audiovisual_record_by_name
 from core.robots import grouped_by_genres
-from web.serializers import GenreSerializer, PersonSerializer
+from web.serializers import GenreSerializer, PersonSerializer, AudiovisualRecordSerializer
 
 """
 Normal Views
@@ -60,7 +60,15 @@ API Restful
 @permission_classes([])
 def search(request):
     # TODO
-    pass
+    audiovisual_records = (
+        Search.Builder
+        .new_search(AudiovisualRecord)
+        .add_condition(Condition('deleted', Condition.EQUALS, False))
+        # .add_condition(Condition('name', Condition.EQUALS, 'lalala'))
+        .search(paginate=True, page_size=20, page=1)  # TODO define pagination data structure
+    )
+    serializer = AudiovisualRecordSerializer(audiovisual_records, many=True)
+    return Response(serializer.data)
 
 
 @api_view(http_method_names=['get'])
