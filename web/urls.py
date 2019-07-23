@@ -3,6 +3,9 @@ from web import views
 
 
 urlpatterns = [
-    path('', views.main_test),
-    path('<slug:slug>/', views.details_test),
+    path('api/v1/genres/', views.search),
+    path('api/v1/persons/', views.search),
+    path('api/v1/filter/', views.search),
+    path('', views.landing),
+    path('<slug:slug>/', views.details),
 ]
