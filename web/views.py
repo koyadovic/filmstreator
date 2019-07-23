@@ -25,7 +25,7 @@ def main_test(request):
               .search(sort_by='name')
     )
     context = {'audiovisual_records': audiovisual_records, 'pending_audiovisual_records': pending_audiovisual_records}
-    return render(request, 'web/list_test.html', context=context)
+    return render(request, 'web/landing.html', context=context)
 
 
 def details_test(request, slug=None):
