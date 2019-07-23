@@ -1,3 +1,5 @@
+import re
+
 from bson import ObjectId
 from pymongo import MongoClient
 from django.conf import settings
@@ -103,6 +105,10 @@ def _translate_search_to_mongodb_dict(search):
                     dict_condition[field_path]['$in'] = value
                 elif operator == Condition.NOT_IN:
                     dict_condition[field_path]['$nin'] = value
+                elif operator == Condition.CONTAINS:
+                    dict_condition[field_path] = re.compile(value)
+                elif operator == Condition.ICONTAINS:
+                    dict_condition[field_path] = re.compile(value, re.IGNORECASE)
         or_dict_elements.append(dict_condition)
 
     if len(or_dict_elements) == 1:

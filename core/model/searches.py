@@ -10,15 +10,23 @@ class Condition:
     GREAT_OR_EQUAL_THAN = 'gte'
     IN = 'in'
     NOT_IN = 'nin'
+    CONTAINS = 'contains'
+    ICONTAINS = 'icontains'  # case insensitive
 
     ALL_OPERATORS = (EQUALS, NON_EQUALS, LESS_THAN, LESS_OR_EQUAL_THAN,
-                     GREAT_THAN, GREAT_OR_EQUAL_THAN, IN, NOT_IN)
+                     GREAT_THAN, GREAT_OR_EQUAL_THAN, IN, NOT_IN, CONTAINS, ICONTAINS)
 
     def __init__(self, field_path, operator, value):
-        assert operator in Condition.ALL_OPERATORS, 'Invalid operator provided'
+        try:
+            assert operator in Condition.ALL_OPERATORS, 'Invalid operator provided'
+        except AssertionError as e:
+            raise Condition.InvalidOperator(e)
         self.field_path = field_path
         self.operator = operator
         self.value = value
+
+    class InvalidOperator(Exception):
+        pass
 
 
 class Search:

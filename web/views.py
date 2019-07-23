@@ -58,16 +58,19 @@ API Restful
 @api_view(http_method_names=['get'])
 @authentication_classes([])
 @permission_classes([])
-def search(request):
-    # TODO
-    audiovisual_records = (
-        Search.Builder
-        .new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        # .add_condition(Condition('name', Condition.EQUALS, 'lalala'))
-        .search(paginate=True, page_size=20, page=1)  # TODO define pagination data structure
-    )
-    serializer = AudiovisualRecordSerializer(audiovisual_records, many=True)
+def audiovisual(request):
+    get_params = dict(request.GET)
+    page = int(get_params.pop('page', '1'))
+    try:
+        conditions = _get_params_to_conditions(get_params)
+    except Condition.InvalidOperator:
+        return Response([])
+
+    search_builder = Search.Builder.new_search(AudiovisualRecord)
+    for condition in conditions:
+        search_builder.add_condition(condition)
+    results = search_builder.search(paginate=True, page_size=20, page=page)
+    serializer = AudiovisualRecordSerializer(results, many=True)
     return Response(serializer.data)
 
 
@@ -75,28 +78,34 @@ def search(request):
 @authentication_classes([])
 @permission_classes([])
 def genres(request):
-    search = request.GET.get('search')
-    # TODO contains and case insensitive
-    genres = (
-        Search.Builder.new_search(Genre)
-        .add_condition(Condition('name', Condition.EQUALS, search))
-        .search(sort_by='name')
-    )
-    return Response(GenreSerializer(genres, many=True).data)
+    params = dict(request.GET)
+    try:
+        conditions = _get_params_to_conditions(params)
+    except Condition.InvalidOperator:
+        return Response([])
+
+    search_builder = Search.Builder.new_search(Genre)
+    for condition in conditions:
+        search_builder.add_condition(condition)
+    genres = search_builder.search(sort_by='name')
+    serializer = GenreSerializer(genres, many=True)
+    return Response(serializer.data)
 
 
 @api_view(http_method_names=['get'])
 @authentication_classes([])
 @permission_classes([])
 def people(request):
-    search = request.GET.get('search')
-    # TODO contains and case insensitive
-    people = (
-        Search.Builder.new_search(Person)
-        .add_condition(Condition('name', Condition.EQUALS, search))
-        .search(sort_by='name')
-    )
-    return Response(PersonSerializer(people, many=True).data)
+    params = dict(request.GET)
+    try:
+        conditions = _get_params_to_conditions(params)
+    except Condition.InvalidOperator:
+        return Response([])
+    search_builder = Search.Builder.new_search(Person)
+    for condition in conditions:
+        search_builder.add_condition(condition)
+    results = search_builder.search(sort_by='name')
+    return Response(PersonSerializer(results, many=True).data)
 
 
 """
@@ -149,3 +158,17 @@ def details_test(request, slug=None):
     )
     context = {'audiovisual_record': audiovisual_record, 'downloads': downloads}
     return render(request, 'web/details_test.html', context=context)
+
+
+def _get_params_to_conditions(params):
+    conditions = []
+    for k, v in params.items():
+        value = v[0]
+        k_parts = k.split('__')
+        f_name = '__'.join(k_parts[:-1])
+        comparator = k_parts[-1]
+        if comparator in [Condition.IN, Condition.NOT_IN]:
+            value = value.split(',')
+        condition = Condition(f_name, comparator, value)
+        conditions.append(condition)
+    return conditions

@@ -29,19 +29,27 @@ class AudiovisualRecordSerializer(serializers.Serializer):
 
     def get_genres(self, obj):
         for genre in obj.genres:
-            yield genre.get('name')
+            yield {
+                'name': genre.get('name')
+            }
 
     def get_directors(self, obj):
         for person in obj.directors:
-            yield person.get('name')
+            yield {
+                'name': person.get('name')
+            }
 
     def get_writers(self, obj):
         for person in obj.writers:
-            yield person.get('name')
+            yield {
+                'name': person.get('name')
+            }
 
     def get_stars(self, obj):
         for person in obj.stars:
-            yield person.get('name')
+            yield {
+                'name': person.get('name')
+            }
 
     def get_scores(self, obj):
         for score in obj.scores:
