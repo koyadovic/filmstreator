@@ -1,13 +1,14 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.response import Response
 
-from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
+from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre, Person
 from core.model.configurations import Configuration
 from core.model.searches import Search, Condition
 from core.services import add_audiovisual_record_by_name
 from core.robots import grouped_by_genres
-
+from web.serializers import GenreSerializer, PersonSerializer
 
 """
 Normal Views
@@ -58,22 +59,36 @@ API Restful
 @authentication_classes([])
 @permission_classes([])
 def search(request):
+    # TODO
     pass
-
 
 
 @api_view(http_method_names=['get'])
 @authentication_classes([])
 @permission_classes([])
 def genres(request):
-    genres = Search.Builder.new_search(Genre).search(sort_by='name')
+    search = request.GET.get('search')
+    # TODO contains and case insensitive
+    genres = (
+        Search.Builder.new_search(Genre)
+        .add_condition(Condition('name', Condition.EQUALS, search))
+        .search(sort_by='name')
+    )
+    return Response(GenreSerializer(genres, many=True).data)
 
 
 @api_view(http_method_names=['get'])
 @authentication_classes([])
 @permission_classes([])
-def persons(request):
-    pass
+def people(request):
+    search = request.GET.get('search')
+    # TODO contains and case insensitive
+    people = (
+        Search.Builder.new_search(Person)
+        .add_condition(Condition('name', Condition.EQUALS, search))
+        .search(sort_by='name')
+    )
+    return Response(PersonSerializer(people, many=True).data)
 
 
 """

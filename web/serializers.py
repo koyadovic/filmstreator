@@ -2,20 +2,20 @@ from rest_framework import serializers
 
 
 class GenreSerializer(serializers.Serializer):
-    created_date = serializers.DateTimeField()
-    updated_date = serializers.DateTimeField()
+    # created_date = serializers.DateTimeField()
+    # updated_date = serializers.DateTimeField()
     name = serializers.CharField()
 
 
 class PersonSerializer(serializers.Serializer):
-    created_date = serializers.DateTimeField()
-    updated_date = serializers.DateTimeField()
+    # created_date = serializers.DateTimeField()
+    # updated_date = serializers.DateTimeField()
     name = serializers.CharField()
 
 
 class AudiovisualRecordSerializer(serializers.Serializer):
-    created_date = serializers.DateTimeField()
-    updated_date = serializers.DateTimeField()
+    # created_date = serializers.DateTimeField()
+    # updated_date = serializers.DateTimeField()
     name = serializers.CharField()
     genres = serializers.SerializerMethodField()
     year = serializers.CharField()
