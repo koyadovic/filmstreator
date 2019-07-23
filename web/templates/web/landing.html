@@ -5,13 +5,21 @@
 {% block body %}
 
 
-
-
 <div id="app">
-[[ name ]]
+<!-- As a link -->
+<b-navbar variant="faded" type="light">
+    <b-navbar-brand href="#">BootstrapVue</b-navbar-brand>
+</b-navbar>
 
-<search-panel post-title="lalala"></search-panel>
 
+<ul>
+    <li v-for="genre in landingGenres">
+        <h1>[[ genre.name ]]</h1>
+        <ul>
+            <li v-for="film in genre.films">[[ film.name ]]</li>
+        </ul>
+    </li>
+</ul>
 
 </div>
 
@@ -20,6 +28,7 @@
 {% endblock %}
 
 {% block body_extra_js %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
     <script src="{% static 'web/js/main.js' %}"></script>
 {% endblock %}

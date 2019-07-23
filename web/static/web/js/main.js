@@ -12,7 +12,9 @@ var GenresCarousel = {
 
 
 var data = {
-    name: 'Miguel'
+    name: 'Miguel',
+    searchResults: [],
+    landingGenres: [],
 };
 
 
@@ -22,9 +24,24 @@ var vm = new Vue({
     data: data,
 
     created: function () {
-        // `this` points to the vm instance
-        console.log('Loaded');
+        this.loadLandingData();
     },
+
+    methods: {
+        loadLandingData: function () {
+            axios.get('/api/v1/landing/').then(response => {
+                this.landingGenres = [];
+                let data = response.data;
+                for (let key in data) {
+                    let films = data[key];
+                    if (films.length > 0) {
+                        this.landingGenres.push({name: key, films: films});
+                    }
+                }
+            });
+        },
+    },
+
     components: {
         'search-panel': SearchPanel,
         'genres-carousel': GenresCarousel

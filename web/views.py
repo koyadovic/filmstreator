@@ -22,7 +22,7 @@ def landing(request):
         genres = configuration.data
     context = {'genres': genres}
     # TODO real template
-    return render(request, 'web/list_test.html', context=context)
+    return render(request, 'web/landing.html', context=context)
 
 
 def details(request, slug=None):
@@ -47,7 +47,7 @@ def details(request, slug=None):
     )
     context = {'audiovisual_record': audiovisual_record, 'downloads': downloads}
     # TODO real template
-    return render(request, 'web/details_test.html', context=context)
+    return render(request, 'web/details.html', context=context)
 
 
 """
@@ -106,6 +106,17 @@ def people(request):
         search_builder.add_condition(condition)
     results = search_builder.search(sort_by='name')
     return Response(PersonSerializer(results, many=True).data)
+
+
+@api_view(http_method_names=['get'])
+@authentication_classes([])
+@permission_classes([])
+def landing_genres(request):
+    configuration = Configuration.get_configuration(grouped_by_genres.CONFIG_KEY)
+    genres = {}
+    if configuration is not None:
+        genres = configuration.data
+    return Response(genres)
 
 
 """
