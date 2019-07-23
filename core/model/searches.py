@@ -2,17 +2,17 @@ from typing import List
 
 
 class Condition:
-    OPERATOR_EQUALS = 'eq'
-    OPERATOR_NON_EQUALS = 'neq'
-    OPERATOR_LESS_THAN = 'lt'
-    OPERATOR_GREAT_THAN = 'gt'
-    OPERATOR_LESS_OR_EQUAL_THAN = 'lte'
-    OPERATOR_GREAT_OR_EQUAL_THAN = 'gte'
-    OPERATOR_IN = 'in'
-    OPERATOR_NOT_IN = 'nin'
+    EQUALS = 'eq'
+    NON_EQUALS = 'neq'
+    LESS_THAN = 'lt'
+    GREAT_THAN = 'gt'
+    LESS_OR_EQUAL_THAN = 'lte'
+    GREAT_OR_EQUAL_THAN = 'gte'
+    IN = 'in'
+    NOT_IN = 'nin'
 
-    ALL_OPERATORS = (OPERATOR_EQUALS, OPERATOR_NON_EQUALS, OPERATOR_LESS_THAN, OPERATOR_LESS_OR_EQUAL_THAN,
-                     OPERATOR_GREAT_THAN, OPERATOR_GREAT_OR_EQUAL_THAN, OPERATOR_IN, OPERATOR_NOT_IN)
+    ALL_OPERATORS = (EQUALS, NON_EQUALS, LESS_THAN, LESS_OR_EQUAL_THAN,
+                     GREAT_THAN, GREAT_OR_EQUAL_THAN, IN, NOT_IN)
 
     def __init__(self, field_path, operator, value):
         assert operator in Condition.ALL_OPERATORS, 'Invalid operator provided'

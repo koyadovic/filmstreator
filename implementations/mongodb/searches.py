@@ -85,23 +85,23 @@ def _translate_search_to_mongodb_dict(search):
             # for references
             if hasattr(value, '_id'):
                 value = getattr(value, '_id')
-            if operator == Condition.OPERATOR_EQUALS:
+            if operator == Condition.EQUALS:
                 dict_condition[field_path] = value
             else:
                 dict_condition[field_path] = {}
-                if operator == Condition.OPERATOR_NON_EQUALS:
+                if operator == Condition.NON_EQUALS:
                     dict_condition[field_path]['$ne'] = value
-                elif operator == Condition.OPERATOR_LESS_THAN:
+                elif operator == Condition.LESS_THAN:
                     dict_condition[field_path]['$lt'] = value
-                elif operator == Condition.OPERATOR_GREAT_THAN:
+                elif operator == Condition.GREAT_THAN:
                     dict_condition[field_path]['$gt'] = value
-                elif operator == Condition.OPERATOR_LESS_OR_EQUAL_THAN:
+                elif operator == Condition.LESS_OR_EQUAL_THAN:
                     dict_condition[field_path]['$lte'] = value
-                elif operator == Condition.OPERATOR_GREAT_OR_EQUAL_THAN:
+                elif operator == Condition.GREAT_OR_EQUAL_THAN:
                     dict_condition[field_path]['$gte'] = value
-                elif operator == Condition.OPERATOR_IN:
+                elif operator == Condition.IN:
                     dict_condition[field_path]['$in'] = value
-                elif operator == Condition.OPERATOR_NOT_IN:
+                elif operator == Condition.NOT_IN:
                     dict_condition[field_path]['$nin'] = value
         or_dict_elements.append(dict_condition)
 

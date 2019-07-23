@@ -16,9 +16,9 @@ def compile_scores_from_audiovisual_records():
             audiovisual_records = (
                 Search.Builder
                       .new_search(AudiovisualRecord)
-                      .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
-                      .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, True))
-                      .add_condition(Condition('scores__source_name', Condition.OPERATOR_NOT_IN, [klass.source_name]))
+                      .add_condition(Condition('deleted', Condition.EQUALS, False))
+                      .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+                      .add_condition(Condition('scores__source_name', Condition.NOT_IN, [klass.source_name]))
                       .search()
             )
 

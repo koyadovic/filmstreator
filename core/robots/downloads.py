@@ -25,9 +25,9 @@ def compile_download_links_from_audiovisual_records():
                 Search
                 .Builder
                 .new_search(AudiovisualRecord)
-                .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
-                .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, True))
-                .add_condition(Condition('created_date', Condition.OPERATOR_GREAT_THAN, from_dt))
+                .add_condition(Condition('deleted', Condition.EQUALS, False))
+                .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+                .add_condition(Condition('created_date', Condition.GREAT_THAN, from_dt))
                 .search()
             )
 
@@ -50,7 +50,7 @@ def recent_films_without_good_downloads():
         Search
         .Builder
         .new_search(DownloadSourceResult)
-        .add_condition(Condition('quality', Condition.OPERATOR_IN, good_qualities))
+        .add_condition(Condition('quality', Condition.IN, good_qualities))
         .search()
     )
     audiovisual_records_to_exclude = [dr.audiovisual_record for dr in download_results]
@@ -59,9 +59,9 @@ def recent_films_without_good_downloads():
         Search
         .Builder
         .new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
-        .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, True))
-        .add_condition(Condition('year', Condition.OPERATOR_GREAT_OR_EQUAL_THAN, n_days_ago.strftime('%Y')))
+        .add_condition(Condition('deleted', Condition.EQUALS, False))
+        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+        .add_condition(Condition('year', Condition.GREAT_OR_EQUAL_THAN, n_days_ago.strftime('%Y')))
         .search()
     )
     audiovisual_records = [ar for ar in audiovisual_records if ar not in audiovisual_records_to_exclude]
@@ -85,7 +85,7 @@ def delete_404_links():
         Search
         .Builder
         .new_search(DownloadSourceResult)
-        .add_condition(Condition('last_check', Condition.OPERATOR_LESS_THAN, n_days_ago))
+        .add_condition(Condition('last_check', Condition.LESS_THAN, n_days_ago))
         .search(sort_by='last_check')
     )
 
@@ -123,8 +123,8 @@ def _refresh_download_results_from_source(audiovisual_record, source_class):
             Search
             .Builder
             .new_search(DownloadSourceResult)
-            .add_condition(Condition('audiovisual_record', Condition.OPERATOR_EQUALS, audiovisual_record))
-            .add_condition(Condition('source_name', Condition.OPERATOR_EQUALS, source_class.source_name))
+            .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
+            .add_condition(Condition('source_name', Condition.EQUALS, source_class.source_name))
             .search()
         )
         # limit results to 3 per each source
@@ -151,7 +151,7 @@ def _check_has_downloads(audiovisual_record):
         Search
         .Builder
         .new_search(DownloadSourceResult)
-        .add_condition(Condition('audiovisual_record', Condition.OPERATOR_EQUALS, audiovisual_record))
+        .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
         .search()
     )
     has_downloads = len(downloads) > 0
