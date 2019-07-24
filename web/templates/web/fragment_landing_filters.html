@@ -1,0 +1,30 @@
+<form action="/", method="GET">
+
+    <div class="input-group mb-2 mr-sm-2">
+        <div class="input-group-prepend">
+            <div class="input-group-text"><i class="fa fa-search"></i></div>
+        </div>
+        <input type="text" class="form-control" placeholder="Search" name="name__icontains">
+    </div>
+    <p>
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            More ...
+        </a>
+        <a class="btn btn-primary" href="/">
+            Clean
+        </a>
+    </p>
+    <div class="collapse" id="collapseExample">
+        <div class="row">
+            <div class="col">
+                <label>From year</label>
+                <input class="form-control" type="range" min="1980" max="2020">
+            </div>
+            <div class="col">
+                <label>To year</label>
+                <input class="form-control" type="range" min="1980" max="2020">
+            </div>
+        </div>
+
+    </div>
+</form>

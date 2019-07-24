@@ -73,4 +73,14 @@ class Search:
 
         def search(self, sort_by=None, paginate=False, page_size=20, page=1):
             from core import services
+            """
+            NOTE: if paginate is set to True, must result the following structure:
+            {
+                "current_page": i,
+                "total_pages": j,
+                "results": [
+                    // real results
+                ]
+            }
+            """
             return services.search(self._search, sort_by=sort_by, paginate=paginate, page_size=page_size, page=page)

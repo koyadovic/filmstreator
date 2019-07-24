@@ -16,13 +16,45 @@ Normal Views
 
 
 def landing(request):
+    get_params = dict(request.GET)
+    page = int(get_params.pop('page', '1')[0])
+
     configuration = Configuration.get_configuration(grouped_by_genres.CONFIG_KEY)
+
+    # compiled genres
     genres = {}
     if configuration is not None:
         genres = configuration.data
-    context = {'genres': genres}
-    # TODO real template
-    return render(request, 'web/landing.html', context=context)
+
+    # filtering by users
+    try:
+        conditions = _get_params_to_conditions(get_params)
+        search_builder = Search.Builder.new_search(AudiovisualRecord)
+        for condition in conditions:
+            search_builder.add_condition(condition)
+        search = search_builder.search(paginate=True, page_size=20, page=page)
+        """
+        {
+            'current_page': page,
+            'total_pages': math.ceil(n_items / float(page_size)),
+            'results': search_results
+        }
+        """
+        serializer = AudiovisualRecordSerializer(search.get('results', []), many=True)
+        search['results'] = serializer.data
+
+    except Condition.InvalidOperator:
+        search = {
+            'current_page': 1,
+            'total_pages': 1,
+            'results': []
+        }
+
+    context = {
+        'genres': genres,
+        'search': search
+    }
+    return render(request, 'web/landing_filters.html', context=context)
 
 
 def details(request, slug=None):
@@ -46,7 +78,6 @@ def details(request, slug=None):
         .search(sort_by='quality')
     )
     context = {'audiovisual_record': audiovisual_record, 'downloads': downloads}
-    # TODO real template
     return render(request, 'web/details.html', context=context)
 
 
@@ -69,6 +100,8 @@ def audiovisual(request):
     search_builder = Search.Builder.new_search(AudiovisualRecord)
     for condition in conditions:
         search_builder.add_condition(condition)
+
+    # TODO when paginate is True, in data returned must include current_page, total_pages and results
     results = search_builder.search(paginate=True, page_size=20, page=page)
     serializer = AudiovisualRecordSerializer(results, many=True)
     return Response(serializer.data)

@@ -1,0 +1,16 @@
+
+<div class="card mb-3" style="width: 20rem; height: 30rem">
+  {% if ai.images.0 %}
+  <img class="card-img-top lazy" style="height: 200px; object-fit: contain;" src="" data-src="{{ ai.images.0 }}" alt="Card image cap">
+  {% endif %}
+  <div class="card-img-overlay">
+    <h5 class="card-title">{{ ai.name }} ({{ ai.year }})</h5>
+    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+    <p class="card-text">
+      {% for genre in ai.genres %}
+      <small class="text-muted">{{ genre.name }}</small>
+      {% endfor %}
+    </p>
+    <a href="/{{ ai.slug }}/" class="btn btn-primary">Details</a>
+  </div>
+</div>

@@ -17,6 +17,7 @@ class AudiovisualRecordSerializer(serializers.Serializer):
     # created_date = serializers.DateTimeField()
     # updated_date = serializers.DateTimeField()
     name = serializers.CharField()
+    slug = serializers.CharField()
     genres = serializers.SerializerMethodField()
     year = serializers.CharField()
 

@@ -1,3 +1,4 @@
+import math
 import re
 
 from bson import ObjectId
@@ -47,7 +48,8 @@ class SearchMongoDB(SearchInterface):
 
         search_results = []
 
-        if results.count() > 0:
+        n_items = results.count()
+        if n_items > 0:
             for result in results:
                 for k, v in result.items():
                     if k == '_id':
@@ -73,7 +75,25 @@ class SearchMongoDB(SearchInterface):
                             result[k] = selected_collection_class(**collection.find_one({'_id': v}))
 
                 search_results.append(target_class(**result))
-        return search_results
+
+        """
+        NOTE: if paginate is set to True, must result the following structure:
+        {
+            "current_page": i,
+            "total_pages": j,
+            "results": [
+                // real results
+            ]
+        }
+        """
+        if paginate:
+            return {
+                'current_page': page,
+                'total_pages': math.ceil(n_items / float(page_size)),
+                'results': search_results
+            }
+        else:
+            return search_results
 
 
 def _translate_search_to_mongodb_dict(search):
