@@ -1,14 +1,8 @@
-{% extends "web/base.html" %}
+{% extends "web/base_with_menu_and_footer.html" %}
 {% load static %}
 {% block title %}Filmstreator{% endblock %}
 
-{% block body %}
-
-<nav class="navbar navbar-dark bg-dark top-navbar">
-    <a class="navbar-brand" href="/">Filmstreator</a>
-</nav>
-
-<div class="container">
+{% block content %}
 
     <!--
     Yall example
@@ -55,10 +49,10 @@
               <span class="sr-only">Next</span>
             </a>
           </div>
-</div>
-
+    </div>
 
 {% endblock %}
+
 
 {% block body_extra_js %}
     <script src="{% static 'web/js/landing.js' %}"></script>
