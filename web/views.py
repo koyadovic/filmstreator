@@ -68,7 +68,8 @@ def details(request, slug=None):
     )
     audiovisual_records = list(audiovisual_records)
     if len(audiovisual_records) == 0:
-        return HttpResponse('Not found', status=404)
+        1/0
+        return render(request, '404.html', status=404)
 
     audiovisual_record = audiovisual_records[0]
     downloads = (
@@ -79,6 +80,14 @@ def details(request, slug=None):
     )
     context = {'audiovisual_record': audiovisual_record, 'downloads': downloads}
     return render(request, 'web/details.html', context=context)
+
+
+def page404(request, exception):
+    return render(request, 'web/404.html')
+
+
+def page500(request):
+    return render(request, 'web/500.html')
 
 
 """
@@ -191,7 +200,7 @@ def details_test(request, slug=None):
     )
     audiovisual_records = list(audiovisual_records)
     if len(audiovisual_records) == 0:
-        return HttpResponse('Not found', status=404)
+        return render(request, '404.html', status=404)
 
     audiovisual_record = audiovisual_records[0]
     downloads = (

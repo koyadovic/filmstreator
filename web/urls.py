@@ -9,6 +9,9 @@ urlpatterns = [
     path('api/v1/audiovisual/', views.audiovisual),
     path('api/v1/landing/', views.landing_genres),
 
+    path('404/', views.page404),
+    path('500/', views.page500),
+
     # regular pages
     path('<slug:slug>/', views.details),
     path('', views.landing),
