@@ -78,6 +78,8 @@ class Search:
             {
                 "current_page": i,
                 "total_pages": j,
+                "next_page" i + 1,  # only add this two if there is next or previous pages
+                "previous_page" i - 1, 
                 "results": [
                     // real results
                 ]

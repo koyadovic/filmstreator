@@ -3,20 +3,15 @@
 {% block title %}Filmstreator{% endblock %}
 
 {% block content %}
-
     {% include 'web/fragment_landing_filters.html' %}
+    {% include 'web/fragment_page_navigation.html' %}
 
+    <!-- results -->
+    {% for audiovisual_item in search.results %}
+        {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
+    {% endfor %}
 
-    <!--
-    Yall example
-    <img class="lazy" src="placeholder.jpg" data-src="image-to-lazy-load.jpg" alt="Alternative text to describe image.">
-    -->
-
-{{ search.current_page }} / {{ search.total_pages }}
-{% for audiovisual_item in search.results %}
-    {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
-{% endfor %}
-
+    {% include 'web/fragment_page_navigation.html' %}
 
 {% endblock %}
 

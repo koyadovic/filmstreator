@@ -87,11 +87,19 @@ class SearchMongoDB(SearchInterface):
         }
         """
         if paginate:
-            return {
+            total_pages = math.ceil(n_items / float(page_size))
+            returned = {
                 'current_page': page,
-                'total_pages': math.ceil(n_items / float(page_size)),
+                'total_pages': total_pages,
                 'results': search_results
             }
+            if page > 1:
+                returned['previous_page'] = page - 1
+            if page < total_pages:
+                returned['next_page'] = page + 1
+
+            print(returned)
+            return returned
         else:
             return search_results
 
