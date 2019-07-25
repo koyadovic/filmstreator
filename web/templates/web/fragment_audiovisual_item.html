@@ -1,4 +1,4 @@
-
+<!--
 <div class="card mb-3" style="width: 20rem; height: 30rem">
   {% if ai.images.0 %}
   <img class="card-img-top lazy" style="height: 200px; object-fit: contain;" src="" data-src="{{ ai.images.0 }}" alt="Card image cap">
@@ -11,6 +11,25 @@
       <small class="text-muted">{{ genre.name }}</small>
       {% endfor %}
     </p>
+    <a href="/{{ ai.slug }}/" class="btn btn-primary">Details</a>
+  </div>
+</div>
+-->
+
+
+<div class="card">
+  <div class="card-header">
+    {{ ai.name }} ({{ ai.year }})
+  </div>
+  <div class="card-body">
+      {% if ai.images.0 %}
+    <img class="lazy" style="height: 200px; object-fit: contain;float:right;" src="" data-src="{{ ai.images.0 }}" alt="Card image cap">
+      {% endif %}
+    <h5 class="card-title">{{ ai.name }}</h5>
+    <p class="card-text"><small>Genres: {% for genre in ai.genres %}<span class="text-muted">{{ genre }}</span>{% endfor %}</small></p>
+    <p class="card-text"><small>Directors: {% for person in ai.directors %}<span class="text-muted">{{ person.name }}, </span>{% endfor %}</small></p>
+    <p class="card-text"><small>Writers: {% for person in ai.writers %}<span class="text-muted">{{ person.name }}, </span>{% endfor %}</small></p>
+    <p class="card-text"><small>Stars: {% for person in ai.stars %}<span class="text-muted">{{ person.name }}, </span>{% endfor %}</small></p>
     <a href="/{{ ai.slug }}/" class="btn btn-primary">Details</a>
   </div>
 </div>
