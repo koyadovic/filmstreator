@@ -68,8 +68,7 @@ def details(request, slug=None):
     )
     audiovisual_records = list(audiovisual_records)
     if len(audiovisual_records) == 0:
-        1/0
-        return render(request, '404.html', status=404)
+        return render(request, 'web/404.html', status=404)
 
     audiovisual_record = audiovisual_records[0]
     downloads = (
@@ -83,11 +82,11 @@ def details(request, slug=None):
 
 
 def page404(request, exception):
-    return render(request, 'web/404.html')
+    return render(request, 'web/404.html', status=400)
 
 
 def page500(request):
-    return render(request, 'web/500.html')
+    return render(request, 'web/500.html', status=500)
 
 
 """
@@ -159,58 +158,6 @@ def landing_genres(request):
     if configuration is not None:
         genres = configuration.data
     return Response(genres)
-
-
-"""
-For tests
-"""
-
-
-def main_test(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        add_audiovisual_record_by_name(name)
-
-    audiovisual_records = (
-        Search.Builder
-              .new_search(AudiovisualRecord)
-              .add_condition(Condition('deleted', Condition.EQUALS, False))
-              .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-              .search(sort_by='name')
-    )
-    pending_audiovisual_records = (
-        Search.Builder
-              .new_search(AudiovisualRecord)
-              .add_condition(Condition('deleted', Condition.EQUALS, False))
-              .add_condition(Condition('general_information_fetched', Condition.EQUALS, False))
-              .search(sort_by='name')
-    )
-    context = {'audiovisual_records': audiovisual_records, 'pending_audiovisual_records': pending_audiovisual_records}
-    return render(request, 'web/landing.html', context=context)
-
-
-def details_test(request, slug=None):
-    audiovisual_records = (
-        Search.Builder
-              .new_search(AudiovisualRecord)
-              .add_condition(Condition('deleted', Condition.EQUALS, False))
-              .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-              .add_condition(Condition('slug', Condition.EQUALS, slug))
-              .search()
-    )
-    audiovisual_records = list(audiovisual_records)
-    if len(audiovisual_records) == 0:
-        return render(request, '404.html', status=404)
-
-    audiovisual_record = audiovisual_records[0]
-    downloads = (
-        Search.Builder
-        .new_search(DownloadSourceResult)
-        .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
-        .search(sort_by='quality')
-    )
-    context = {'audiovisual_record': audiovisual_record, 'downloads': downloads}
-    return render(request, 'web/details_test.html', context=context)
 
 
 def _get_params_to_conditions(params):
