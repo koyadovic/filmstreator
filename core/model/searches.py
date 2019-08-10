@@ -28,6 +28,9 @@ class Condition:
     class InvalidOperator(Exception):
         pass
 
+    def __str__(self):
+        return f'{self.field_path} {self.operator} {self.value}'
+
 
 class Search:
     target_class = None  # AudiovisualRecord, Person, Genre

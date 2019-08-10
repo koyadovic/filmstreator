@@ -1,3 +1,5 @@
+import re
+
 from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -17,7 +19,20 @@ Normal Views
 
 def landing(request):
     get_params = dict(request.GET)
-    page = int(get_params.pop('page', '1')[0])
+
+    erroneous_page = False
+    try:
+        page = int(get_params.pop('page', '1')[0])
+        if page < 1:
+            page = 1
+            erroneous_page = True
+    except ValueError:
+        page = 1
+        erroneous_page = True
+    # raw_uri is what we will use to build next and previous uris
+    raw_uri = request.get_raw_uri()
+    if erroneous_page:
+        raw_uri = re.sub('[&?]page=[^&]+', '', raw_uri)
 
     configuration = Configuration.get_configuration(grouped_by_genres.CONFIG_KEY)
 
@@ -51,6 +66,15 @@ def landing(request):
             'total_pages': 1,
             'results': []
         }
+
+    # here we translate next page number and previous page number into urls
+    if 'previous_page' in search:
+        search['previous_page'] = raw_uri.replace(f'page={search["current_page"]}', f'page={search["previous_page"]}')
+    if 'next_page' in search:
+        if f'page={search["current_page"]}' in raw_uri:
+            search['next_page'] = raw_uri.replace(f'page={search["current_page"]}', f'page={search["next_page"]}')
+        else:
+            search['next_page'] = raw_uri + f'&page={search["next_page"]}'
 
     context = {
         'genres': genres,
@@ -165,6 +189,8 @@ def landing_genres(request):
 def _get_params_to_conditions(params):
     conditions = []
     for k, v in params.items():
+        if k in ['formtype', 'page']:
+            continue
         value = v[0]
         k_parts = k.split('__')
         f_name = '__'.join(k_parts[:-1])

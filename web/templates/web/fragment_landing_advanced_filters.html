@@ -1,6 +1,9 @@
 <div class="collapse advanced-filters" id="collapseSearch">
     <div class="container">
         <form action="/" method="GET" autocomplete="off">
+
+            <input type="hidden" name="formtype" value="advanced">
+
             <div class="row">
                 <div class="col text-right">
                     <i style="color: white;" class="fa fa-window-close" id="hide-advanced-search" aria-hidden="true" data-toggle="collapse" href="#collapseSearch" role="button" aria-expanded="false" aria-controls="collapseSearch"></i>
@@ -13,7 +16,8 @@
                         <div class="input-group-prepend">
                             <div class="input-group-text"><i class="fa fa-search"></i></div>
                         </div>
-                        <input type="text" class="form-control" placeholder="Search" name="name__icontains">
+                        <input type="text" class="form-control" placeholder="Search" name="name__icontains"
+                        value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.name__icontains }}{% endif %}">
                     </div>
                 </div>
             </div>
@@ -21,11 +25,13 @@
             <div class="row">
                 <div class="col numeric-input-range">
                     <label>From year</label>
-                    <input name="year__gte" class="form-control" type="range" min="1980" max="2020">
+                    <input name="year__gte" class="form-control" type="range" min="1980" max="{% now 'Y' %}"
+                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.year__gte }}{% endif %}">
                 </div>
                 <div class="col numeric-input-range">
                     <label>To year</label>
-                    <input name="year__lte" class="form-control" type="range" min="1980" max="2020">
+                    <input name="year__lte" class="form-control" type="range" min="1980" max="{% now 'Y' %}"
+                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.year__lte }}{% endif %}">
                 </div>
             </div>
 

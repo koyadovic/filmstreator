@@ -2,10 +2,10 @@
 <div class="text-center" style="margin-bottom: 1em;">
     <!-- Page navigation -->
     {% if search.previous_page %}
-    <a class="btn btn-primary" href="/?page={{ search.previous_page }}">Previous</a>
+        <a class="btn btn-primary" href="{{ search.previous_page }}">Previous</a>
     {% endif %}
 
-    {% if search.next_page > 0 %}
-    <a class="btn btn-primary" href="/?page={{ search.next_page }}">Next</a>
+    {% if search.next_page %}
+        <a class="btn btn-primary" href="{{ search.next_page }}">Next</a>
     {% endif %}
 </div>
