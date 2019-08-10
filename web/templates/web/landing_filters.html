@@ -3,6 +3,22 @@
 {% block title %}Filmstreator{% endblock %}
 
 {% block content %}
+
+    <div class="card text-center">
+        <div class="card-header">¿Qué tipo de genero buscas?</div>
+    </div>
+    <div class="responsive" data-slick='{"slidesToShow": 3, "slidesToScroll": 3}'>
+          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/terror.jpg' %}"><h2 class="cent">Terror</h2></div>
+          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/aventuras.jpg' %}"><h2 class="cent">Aventuras</h2></div>
+          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/familiar.jpg' %}"><h2 class="cent" >Familiar</h2></div>
+          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/comedia.jpg' %}"><h2 class="cent">Comedia</h2></div>
+          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/drama.jpg' %}"><h2 class="cent">Drama</h2></div>
+          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/ciencia.jpg' %}"><h2 class="cent">Ciencia-Ficción</h2></div>
+          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/thriller.jpg' %}"><h2 class="cent">Thriller</h2></div>
+          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/fantastico.jpg' %}"><h2 class="cent">Fantástico</h2></div>
+          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/romantico.jpg' %}"><h2 class="cent">Romántico</h2></div>
+    </div>
+
     {% include 'web/fragment_page_navigation.html' %}
 
     <!-- results -->
