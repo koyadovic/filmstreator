@@ -29,32 +29,20 @@ class AudiovisualRecordSerializer(serializers.Serializer):
     scores = serializers.SerializerMethodField()
 
     def get_genres(self, obj):
-        for genre in obj.genres:
-            yield {
-                'name': genre.get('name')
-            }
+        return [{'name': genre.get('name')} for genre in obj.genres]
 
     def get_directors(self, obj):
-        for person in obj.directors:
-            yield {
-                'name': person.get('name')
-            }
+        return [{'name': person.get('name')} for person in obj.directors]
 
     def get_writers(self, obj):
-        for person in obj.writers:
-            yield {
-                'name': person.get('name')
-            }
+        return [{'name': person.get('name')} for person in obj.writers]
 
     def get_stars(self, obj):
-        for person in obj.stars:
-            yield {
-                'name': person.get('name')
-            }
+        return [{'name': person.get('name')} for person in obj.stars]
 
     def get_scores(self, obj):
-        for score in obj.scores:
-            yield {
-                'source_name': score.get('source_name'),
-                'value': score.get('value'),
-            }
+        return [{
+            'source_name': score.get('source_name'),
+            'value': score.get('value'),
+        } for score in obj.scores]
+

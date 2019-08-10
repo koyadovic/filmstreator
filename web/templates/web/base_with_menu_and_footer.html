@@ -6,7 +6,22 @@
 
 <nav class="navbar navbar-dark bg-dark top-navbar top-nav">
     <a class="navbar-brand" href="/">Filmstreator</a>
+    {% include 'web/fragment_landing_filters.html' %}
 </nav>
+
+<div class="collapse" id="collapseExample" style="background: aqua">
+    <div class="row">
+        <div class="col">
+            <label>From year</label>
+            <input class="form-control" type="range" min="1980" max="2020">
+        </div>
+        <div class="col">
+            <label>To year</label>
+            <input class="form-control" type="range" min="1980" max="2020">
+        </div>
+    </div>
+</div>
+
 
 <div class="container">
 
