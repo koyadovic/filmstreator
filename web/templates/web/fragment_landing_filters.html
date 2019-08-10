@@ -1,12 +1,13 @@
-<form action="/" method="GET" autocomplete="off" class="form-inline my-2 my-lg-0">
+<form action="/" method="GET" autocomplete="off" class="form-inline my-2 my-lg-0"
+    style="height: 46px;">
 
-    <div class="input-group mb-2 mr-sm-2">
+    <div class="input-group mb-2 mr-sm-2" id="basic-search-form">
         <div class="input-group-prepend">
             <div class="input-group-text"><i class="fa fa-search"></i></div>
         </div>
         <input type="text" class="form-control" placeholder="Search" name="name__icontains">
 
-        <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+        <a id="show-advanced-search" class="btn btn-primary" data-toggle="collapse" href="#collapseSearch" role="button" aria-expanded="false" aria-controls="collapseSearch">
             More ...
         </a>
         <a class="btn btn-primary" href="/">
@@ -14,6 +15,5 @@
         </a>
 
     </div>
-
 </form>
 

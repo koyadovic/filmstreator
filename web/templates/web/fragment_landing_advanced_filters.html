@@ -1,0 +1,40 @@
+<div class="collapse advanced-filters" id="collapseSearch">
+    <div class="container">
+        <form action="/" method="GET" autocomplete="off">
+            <div class="row">
+                <div class="col text-right">
+                    <i style="color: white;" class="fa fa-window-close" id="hide-advanced-search" aria-hidden="true" data-toggle="collapse" href="#collapseSearch" role="button" aria-expanded="false" aria-controls="collapseSearch"></i>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="input-group mb-2 mr-sm-2" id="basic-search-form">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fa fa-search"></i></div>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Search" name="name__icontains">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col numeric-input-range">
+                    <label>From year</label>
+                    <input name="year__gte" class="form-control" type="range" min="1980" max="2020">
+                </div>
+                <div class="col numeric-input-range">
+                    <label>To year</label>
+                    <input name="year__lte" class="form-control" type="range" min="1980" max="2020">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col text-center">
+                    <button class="btn btn-primary">Search</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

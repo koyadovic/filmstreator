@@ -1,32 +1,20 @@
-<!--
-<div class="card mb-3" style="width: 20rem; height: 30rem">
-  {% if ai.images.0 %}
-  <img class="card-img-top lazy" style="height: 200px; object-fit: contain;" src="" data-src="{{ ai.images.0 }}" alt="Card image cap">
-  {% endif %}
-  <div class="card-body">
-    <h5 class="card-title">{{ ai.name }} ({{ ai.year }})</h5>
-    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-    <p class="card-text">
-      {% for genre in ai.genres %}
-      <small class="text-muted">{{ genre.name }}</small>
-      {% endfor %}
-    </p>
-    <a href="/{{ ai.slug }}/" class="btn btn-primary">Details</a>
-  </div>
-</div>
--->
-
+{% load static %}
 
 <div class="card">
   <div class="card-body">
-      {% if ai.images.0 %}
-    <img class="lazy" style="height: 200px; object-fit: contain;float:right;" src="" data-src="{{ ai.images.0 }}" alt="Card image cap">
-      {% endif %}
-    <h5 class="card-title">{{ ai.name }} ({{ ai.year }})</h5>
+
+  {% if ai.images.0 %}
+    <img class="lazy" style="width: 138px;height: 200px; object-fit: contain;float:right;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"
+         src="" data-src="{{ ai.images.0 }}" alt="Card image cap">
+  {% else %}
+      <div
+          style="width: 138px; height: 200px; float:right; border: 1px solid black; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"></div>
+  {% endif %}
+
+    <h5 class="card-title"><a href="/{{ ai.slug }}/">{{ ai.name }} ({{ ai.year }})</a></h5>
     <p class="card-text"><small>Genres: {% for genre in ai.genres %}<span>{{ genre.name }}</span>{% endfor %}</small></p>
     <p class="card-text"><small>Directors: {% for person in ai.directors %}<span>{{ person.name }}, </span>{% endfor %}</small></p>
     <p class="card-text"><small>Writers: {% for person in ai.writers %}<span>{{ person.name }}, </span>{% endfor %}</small></p>
     <p class="card-text"><small>Stars: {% for person in ai.stars %}<span>{{ person.name }}, </span>{% endfor %}</small></p>
-    <a href="/{{ ai.slug }}/" class="btn btn-primary">Details</a>
   </div>
 </div>

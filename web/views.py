@@ -32,6 +32,8 @@ def landing(request):
         search_builder = Search.Builder.new_search(AudiovisualRecord)
         for condition in conditions:
             search_builder.add_condition(condition)
+
+        search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
         search = search_builder.search(paginate=True, page_size=20, page=page)
         """
         {

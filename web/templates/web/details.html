@@ -1,6 +1,47 @@
 {% extends "web/base_with_menu_and_footer.html" %}
 {% load static %}
+{% load miscellaneous %}
 {% block title %}Filmstreator - {{ audiovisual_record.name }}{% endblock %}
 
 {% block content %}
+
+    <!--
+        self._name = kwargs.pop('name', '')
+        self._genres = kwargs.pop('genres', list())
+        self._year = kwargs.pop('year', 0)
+        self._directors = kwargs.pop('directors', list())
+        self._writers = kwargs.pop('writers', list())
+        self._stars = kwargs.pop('stars', list())
+        self._images = kwargs.pop('images', list())
+        self._deleted = kwargs.pop('deleted', False)
+        self._downloads_disabled = kwargs.pop('downloads_disabled', False)
+        self._scores = kwargs.pop('scores', list())
+        self._general_information_fetched = kwargs.pop('general_information_fetched', False)
+        self._is_a_film = kwargs.pop('is_a_film', None)
+        self._has_downloads = kwargs.pop('has_downloads', False)
+        self.metadata = kwargs.pop('metadata', dict())
+    -->
+
+    {% if audiovisual_record.name.50 %}
+        <h1 style="color: #343a40; font-weight: 800">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }})</h1>
+    {% else %}
+        <h1 style="color: #343a40; font-weight: 800">{{ audiovisual_record.name }} ({{ audiovisual_record.year }})</h1>
+    {% endif %}
+
+    <img style="float: right;" src="{{ audiovisual_record.images.0 }}">
+
+    <h5>Genres:</h5>
+    <p>{{ audiovisual_record.genres | map:"name" | join:", " }}.</p>
+
+    <h5>Directors:</h5>
+    <p>{{ audiovisual_record.directors | map:"name" | join:", " }}.</p>
+
+    <h5>Writers:</h5>
+    <p>{{ audiovisual_record.writers | map:"name" | join:", " }}.</p>
+
+    <h5>Stars:</h5>
+    <p>{{ audiovisual_record.stars | map:"name" | join:", " }}.</p>
+
+    <a href="javascript:history.back()" class="btn btn-primary">Go Back</a>
+
 {% endblock %}

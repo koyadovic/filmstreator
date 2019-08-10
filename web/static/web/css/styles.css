@@ -135,3 +135,25 @@ footer {
     height: 650px;
     width: 100%;
 }
+
+
+
+/* */
+
+.advanced-filters {
+    color: white;
+    background: #343a40;
+    width: 100%;
+}
+
+.advanced-filters * {
+    color: white;
+}
+
+.advanced-filters input, .advanced-filters i {
+    color: black !important;
+}
+
+.advanced-filters i#hide-advanced-search {
+    color: white !important;
+}
