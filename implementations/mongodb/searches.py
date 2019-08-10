@@ -116,7 +116,8 @@ def _translate_search_to_mongodb_dict(search):
             if operator == Condition.EQUALS:
                 dict_condition[field_path] = value
             else:
-                dict_condition[field_path] = {}
+                if field_path not in dict_condition:
+                    dict_condition[field_path] = {}
                 if operator == Condition.NON_EQUALS:
                     dict_condition[field_path]['$ne'] = value
                 elif operator == Condition.LESS_THAN:

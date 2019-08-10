@@ -14,19 +14,23 @@
     {% else %}
 
     {% for genre_name, audiovisual_records in genres.items %}
-        <div class="card text-center">
-            <div class="card-header"><h1><a href="/?formtype=advanced&genres__name__eq={{ genre_name }}">{{ genre_name }}</a></h1></div>
-        </div>
-        <div class="responsive" data-slick='{"slidesToShow": 5, "slidesToScroll": 5}'>
-            {% for ar in audiovisual_records %}
-            <div class="cont">
-                <a href="/{{ ar.slug }}/">
-                    <img class="lazy imghe hvr-grow" src="" data-src="{{ ar.images.0 }}">
-                    <h2 class="cent">{{ ar.name }}</h2>
-                </a>
+        {% if audiovisual_records %}
+
+            <div class="card text-center">
+                <div class="card-header"><h1><a href="/?formtype=advanced&genres__name__eq={{ genre_name }}">{{ genre_name }}</a></h1></div>
             </div>
-            {% endfor %}
-        </div>
+            <div class="responsive" data-slick='{"slidesToShow": 5, "slidesToScroll": 5}'>
+                {% for ar in audiovisual_records %}
+                <div class="cont">
+                    <a href="/{{ ar.slug }}/">
+                        <img class="lazy imghe hvr-grow" src="" data-src="{{ ar.images.0 }}">
+                        <h2 class="cent">{{ ar.name }}</h2>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+
+        {% endif %}
     {% endfor %}
 
     {% endif %}
