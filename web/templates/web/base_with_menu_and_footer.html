@@ -11,11 +11,11 @@
 
 <div class="collapse" id="collapseExample" style="background: aqua">
     <div class="row">
-        <div class="col">
+        <div class="col numeric-input-range">
             <label>From year</label>
             <input class="form-control" type="range" min="1980" max="2020">
         </div>
-        <div class="col">
+        <div class="col numeric-input-range">
             <label>To year</label>
             <input class="form-control" type="range" min="1980" max="2020">
         </div>
@@ -33,4 +33,26 @@
 <br>
 {% include 'web/fragment_footer.html' %}
 
+{% endblock %}
+
+{% block body_extra_js %}
+    {{ block.super }}
+    <script>
+    $(function() {
+        $(".numeric-input-range > input").each(function() {
+            updateLabelOnNumericRange($(this).get(0));
+        });
+    });
+
+    $(".numeric-input-range > input").on('input', function(ev) {
+        updateLabelOnNumericRange(ev.currentTarget);
+    });
+
+    function updateLabelOnNumericRange(inp) {
+        var label = inp.parentElement.getElementsByTagName('label')[0];
+        var value = inp.value;
+        var oldText = label.innerText;
+        label.innerText = /\d+/.test(oldText) ? oldText.replace(/\d+/, value) : oldText + " " + value;
+    }
+    </script>
 {% endblock %}
