@@ -97,8 +97,6 @@ class SearchMongoDB(SearchInterface):
                 returned['previous_page'] = page - 1
             if page < total_pages:
                 returned['next_page'] = page + 1
-
-            print(returned)
             return returned
         else:
             return search_results

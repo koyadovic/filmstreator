@@ -198,5 +198,6 @@ def _get_params_to_conditions(params):
         if comparator in [Condition.IN, Condition.NOT_IN]:
             value = value.split(',')
         condition = Condition(f_name, comparator, value)
+        print(condition)
         conditions.append(condition)
     return conditions

@@ -4,30 +4,32 @@
 
 {% block content %}
 
-    <div class="card text-center">
-        <div class="card-header">¿Qué tipo de genero buscas?</div>
-    </div>
-    <div class="responsive" data-slick='{"slidesToShow": 3, "slidesToScroll": 3}'>
-          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/terror.jpg' %}"><h2 class="cent">Terror</h2></div>
-          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/aventuras.jpg' %}"><h2 class="cent">Aventuras</h2></div>
-          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/familiar.jpg' %}"><h2 class="cent" >Familiar</h2></div>
-          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/comedia.jpg' %}"><h2 class="cent">Comedia</h2></div>
-          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/drama.jpg' %}"><h2 class="cent">Drama</h2></div>
-          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/ciencia.jpg' %}"><h2 class="cent">Ciencia-Ficción</h2></div>
-          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/thriller.jpg' %}"><h2 class="cent">Thriller</h2></div>
-          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/fantastico.jpg' %}"><h2 class="cent">Fantástico</h2></div>
-          <div class="cont"><img class="imghe hvr-grow" src="{% static 'web/img/romantico.jpg' %}"><h2 class="cent">Romántico</h2></div>
-    </div>
-
+    {% if request.GET.formtype %}
     {% include 'web/fragment_page_navigation.html' %}
-
     <!-- results -->
     {% for audiovisual_item in search.results %}
         {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
     {% endfor %}
-
     {% include 'web/fragment_page_navigation.html' %}
+    {% else %}
 
+    {% for genre_name, audiovisual_records in genres.items %}
+        <div class="card text-center">
+            <div class="card-header"><h1><a href="/?formtype=advanced&genres__name__eq={{ genre_name }}">{{ genre_name }}</a></h1></div>
+        </div>
+        <div class="responsive" data-slick='{"slidesToShow": 5, "slidesToScroll": 5}'>
+            {% for ar in audiovisual_records %}
+            <div class="cont">
+                <a href="/{{ ar.slug }}/">
+                    <img class="lazy imghe hvr-grow" src="" data-src="{{ ar.images.0 }}">
+                    <h2 class="cent">{{ ar.name }}</h2>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    {% endif %}
 {% endblock %}
 
 
