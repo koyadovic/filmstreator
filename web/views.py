@@ -195,7 +195,9 @@ def _get_params_to_conditions(params):
     for k, v in params.items():
         if k in ['formtype', 'page']:
             continue
-        value = v[0]
+
+        value = v[0]  # TODO translate values to data type expected
+
         k_parts = k.split('__')
         f_name = '__'.join(k_parts[:-1])
         comparator = k_parts[-1]
