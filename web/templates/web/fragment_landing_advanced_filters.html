@@ -38,13 +38,13 @@
             <div class="row">
                 <div class="col numeric-input-range">
                     <label>From score</label>
-                    <input name="scores__value__gte" class="form-control" type="range" min="0" max="10"
-                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.scores__value__gte }}{% else %}0{% endif %}">
+                    <input name="global_score__gte" class="form-control" type="range" min="0" max="10" step="0.1"
+                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.global_score__gte }}{% else %}0{% endif %}">
                 </div>
                 <div class="col numeric-input-range">
                     <label>To score</label>
-                    <input name="scores__value__lte" class="form-control" type="range" min="0" max="10"
-                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.scores__value__lte }}{% else %}10{% endif %}">
+                    <input name="global_score__lte" class="form-control" type="range" min="0" max="10" step="0.1"
+                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.global_score__lte }}{% else %}10{% endif %}">
                 </div>
             </div>
 

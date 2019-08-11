@@ -35,6 +35,7 @@ class SearchMongoDB(SearchInterface):
         # filtering
         collection = self._db[target_class.collection_name]
         mongodb_search = _translate_search_to_mongodb_dict(search)
+        print(mongodb_search)
         results = collection.find(mongodb_search)
 
         # sorting

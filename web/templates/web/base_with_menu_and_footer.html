@@ -54,7 +54,7 @@
         var label = inp.parentElement.getElementsByTagName('label')[0];
         var value = inp.value;
         var oldText = label.innerText;
-        label.innerText = /\d+/.test(oldText) ? oldText.replace(/\d+/, value) : oldText + " " + value;
+        label.innerText = /[\d\.]+/.test(oldText) ? oldText.replace(/[\d\.]+/, value) : oldText + " " + value;
     }
     </script>
 {% endblock %}
