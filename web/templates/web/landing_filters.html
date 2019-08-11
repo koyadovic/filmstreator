@@ -2,6 +2,15 @@
 {% load static %}
 {% block title %}Filmstreator{% endblock %}
 
+    {% block head_extra %}
+
+    {% if request.GET.formtype %}
+    <meta name="description" content="Filmstreator search result page">
+    {% else %}
+    <meta name="description" content="All genres with the best">
+    {% endif %}
+    {% endblock %}
+
 {% block content %}
 
     {% if request.GET.formtype %}

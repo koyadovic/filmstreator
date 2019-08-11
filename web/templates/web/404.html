@@ -2,8 +2,11 @@
 {% load static %}
 {% block title %}Filmstreator - Not found{% endblock %}
 
-{% block content %}
+    {% block head_extra %}
+    <meta name="description" content="Not found page, sorry!">
+    {% endblock %}
 
+{% block content %}
 
 <div class="text-center centered">
     <i class="big-icon far fa-sad-cry"></i>
@@ -11,6 +14,5 @@
     <h2>Not found</h2>
     <p>Retrieved page was not found</p>
 </div>
-
 
 {% endblock %}
