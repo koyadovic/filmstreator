@@ -26,12 +26,25 @@
                 <div class="col numeric-input-range">
                     <label>From year</label>
                     <input name="year__gte" class="form-control" type="range" min="1980" max="{% now 'Y' %}"
-                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.year__gte }}{% endif %}">
+                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.year__gte }}{% else %}1980{% endif %}">
                 </div>
                 <div class="col numeric-input-range">
                     <label>To year</label>
                     <input name="year__lte" class="form-control" type="range" min="1980" max="{% now 'Y' %}"
-                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.year__lte }}{% endif %}">
+                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.year__lte }}{% else %}{% now 'Y' %}{% endif %}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col numeric-input-range">
+                    <label>From score</label>
+                    <input name="scores__value__gte" class="form-control" type="range" min="0" max="10"
+                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.scores__value__gte }}{% else %}0{% endif %}">
+                </div>
+                <div class="col numeric-input-range">
+                    <label>To score</label>
+                    <input name="scores__value__lte" class="form-control" type="range" min="0" max="10"
+                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.scores__value__lte }}{% else %}10{% endif %}">
                 </div>
             </div>
 

@@ -177,6 +177,15 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
         self._scores = scores
 
     @property
+    def global_score(self) -> float:
+        return self._global_score
+
+    @global_score.setter
+    def global_score(self, global_score):
+        self.updated_date = utc_now()
+        self._global_score = global_score
+
+    @property
     def general_information_fetched(self) -> bool:
         return self._general_information_fetched
 
@@ -218,6 +227,7 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
         self._deleted = kwargs.pop('deleted', False)
         self._downloads_disabled = kwargs.pop('downloads_disabled', False)
         self._scores = kwargs.pop('scores', list())
+        self._global_score = kwargs.pop('global_score', 0.0)
         self._general_information_fetched = kwargs.pop('general_information_fetched', False)
         self._is_a_film = kwargs.pop('is_a_film', None)
         self._has_downloads = kwargs.pop('has_downloads', False)
@@ -231,6 +241,8 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
 
     def save(self):
         self.updated_date = utc_now()
+        all_scores = [score['value'] for score in self.scores]
+        self.global_score = 0.0 if len(all_scores) == 0 else sum(all_scores) / len(all_scores)
         from core import services
         return services.save_audiovisual_record(self)
 

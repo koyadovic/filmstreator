@@ -90,6 +90,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         yield 'deleted', self.deleted
         yield 'downloads_disabled', self.downloads_disabled
         yield 'scores', [self.serialize_scoring_source(_) for _ in self.scores]
+        yield 'global_score', self.global_score
         yield 'general_information_fetched', self.general_information_fetched
         yield 'is_a_film', self.is_a_film
         yield 'has_downloads', self.has_downloads
@@ -120,6 +121,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
             downloads_disabled=audiovisual_record.downloads_disabled,
 
             scores=[cls.serialize_scoring_source(_) for _ in audiovisual_record.scores],
+            global_score=audiovisual_record.global_score,
             general_information_fetched=audiovisual_record.general_information_fetched,
             is_a_film=audiovisual_record.is_a_film,
             has_downloads=audiovisual_record.has_downloads,
