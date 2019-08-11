@@ -1,16 +1,14 @@
-import re
-
-from django.http import HttpResponse
-from django.shortcuts import render
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.response import Response
-
-from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre, Person
+from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
 from core.model.configurations import Configuration
 from core.model.searches import Search, Condition
-from core.services import add_audiovisual_record_by_name
 from core.robots import grouped_by_genres
-from web.serializers import GenreSerializer, PersonSerializer, AudiovisualRecordSerializer
+
+from web.serializers import AudiovisualRecordSerializer
+
+from django.shortcuts import render
+
+import re
+
 
 """
 Normal Views
@@ -19,21 +17,7 @@ Normal Views
 
 def landing(request):
     get_params = dict(request.GET)
-
-    erroneous_page = False
-    try:
-        page = int(get_params.pop('page', '1')[0])
-        if page < 1:
-            page = 1
-            erroneous_page = True
-    except ValueError:
-        page = 1
-        erroneous_page = True
-    # raw_uri is what we will use to build next and previous uris
-    raw_uri = request.get_raw_uri()
-    if erroneous_page:
-        raw_uri = re.sub('[&?]page=[^&]+', '', raw_uri)
-
+    page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
     configuration = Configuration.get_configuration(grouped_by_genres.CONFIG_KEY)
 
     # compiled genres
@@ -68,13 +52,7 @@ def landing(request):
         }
 
     # here we translate next page number and previous page number into urls
-    if 'previous_page' in search:
-        search['previous_page'] = raw_uri.replace(f'page={search["current_page"]}', f'page={search["previous_page"]}')
-    if 'next_page' in search:
-        if f'page={search["current_page"]}' in raw_uri:
-            search['next_page'] = raw_uri.replace(f'page={search["current_page"]}', f'page={search["next_page"]}')
-        else:
-            search['next_page'] = raw_uri + f'&page={search["next_page"]}'
+    _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
 
     context = {
         'genres': genres,
@@ -120,74 +98,36 @@ def page500(request):
 
 
 """
-API Restful
+Utilities
 """
 
 
-@api_view(http_method_names=['get'])
-@authentication_classes([])
-@permission_classes([])
-def audiovisual(request):
+def _check_if_erroneous_page_and_get_page_and_right_uri(request):
     get_params = dict(request.GET)
-    page = int(get_params.pop('page', '1'))
+    erroneous_page = False
     try:
-        conditions = _get_params_to_conditions(get_params)
-    except Condition.InvalidOperator:
-        return Response([])
-
-    search_builder = Search.Builder.new_search(AudiovisualRecord)
-    for condition in conditions:
-        search_builder.add_condition(condition)
-
-    # TODO when paginate is True, in data returned must include current_page, total_pages and results
-    results = search_builder.search(paginate=True, page_size=20, page=page)
-    serializer = AudiovisualRecordSerializer(results, many=True)
-    return Response(serializer.data)
-
-
-@api_view(http_method_names=['get'])
-@authentication_classes([])
-@permission_classes([])
-def genres(request):
-    params = dict(request.GET)
-    try:
-        conditions = _get_params_to_conditions(params)
-    except Condition.InvalidOperator:
-        return Response([])
-
-    search_builder = Search.Builder.new_search(Genre)
-    for condition in conditions:
-        search_builder.add_condition(condition)
-    genres = search_builder.search(sort_by='name')
-    serializer = GenreSerializer(genres, many=True)
-    return Response(serializer.data)
+        page = int(get_params.pop('page', '1')[0])
+        if page < 1:
+            page = 1
+            erroneous_page = True
+    except ValueError:
+        page = 1
+        erroneous_page = True
+    # raw_uri is what we will use to build next and previous uris
+    raw_uri = request.get_raw_uri()
+    if erroneous_page:
+        raw_uri = re.sub('[&?]page=[^&]+', '', raw_uri)
+    return page, raw_uri
 
 
-@api_view(http_method_names=['get'])
-@authentication_classes([])
-@permission_classes([])
-def people(request):
-    params = dict(request.GET)
-    try:
-        conditions = _get_params_to_conditions(params)
-    except Condition.InvalidOperator:
-        return Response([])
-    search_builder = Search.Builder.new_search(Person)
-    for condition in conditions:
-        search_builder.add_condition(condition)
-    results = search_builder.search(sort_by='name')
-    return Response(PersonSerializer(results, many=True).data)
-
-
-@api_view(http_method_names=['get'])
-@authentication_classes([])
-@permission_classes([])
-def landing_genres(request):
-    configuration = Configuration.get_configuration(grouped_by_genres.CONFIG_KEY)
-    genres = {}
-    if configuration is not None:
-        genres = configuration.data
-    return Response(genres)
+def _add_previous_and_next_navigation_uris_to_search(raw_uri, search):
+    if 'previous_page' in search:
+        search['previous_page'] = raw_uri.replace(f'page={search["current_page"]}', f'page={search["previous_page"]}')
+    if 'next_page' in search:
+        if f'page={search["current_page"]}' in raw_uri:
+            search['next_page'] = raw_uri.replace(f'page={search["current_page"]}', f'page={search["next_page"]}')
+        else:
+            search['next_page'] = raw_uri + f'&page={search["next_page"]}'
 
 
 def _get_params_to_conditions(params):
@@ -211,8 +151,78 @@ def _get_params_to_conditions(params):
 
 
 def _translate_value_datatype(f_name, value):
-    # TODO translate values to data type expected
     print('translate', f_name, value)
     if f_name in ['global_score']:
         value = float(value)
     return value
+
+
+"""
+API Restful
+"""
+
+
+# @api_view(http_method_names=['get'])
+# @authentication_classes([])
+# @permission_classes([])
+# def audiovisual(request):
+#     get_params = dict(request.GET)
+#     page = int(get_params.pop('page', '1'))
+#     try:
+#         conditions = _get_params_to_conditions(get_params)
+#     except Condition.InvalidOperator:
+#         return Response([])
+#
+#     search_builder = Search.Builder.new_search(AudiovisualRecord)
+#     for condition in conditions:
+#         search_builder.add_condition(condition)
+#
+#     # TODO when paginate is True, in data returned must include current_page, total_pages and results
+#     results = search_builder.search(paginate=True, page_size=20, page=page)
+#     serializer = AudiovisualRecordSerializer(results, many=True)
+#     return Response(serializer.data)
+#
+#
+# @api_view(http_method_names=['get'])
+# @authentication_classes([])
+# @permission_classes([])
+# def genres(request):
+#     params = dict(request.GET)
+#     try:
+#         conditions = _get_params_to_conditions(params)
+#     except Condition.InvalidOperator:
+#         return Response([])
+#
+#     search_builder = Search.Builder.new_search(Genre)
+#     for condition in conditions:
+#         search_builder.add_condition(condition)
+#     genres = search_builder.search(sort_by='name')
+#     serializer = GenreSerializer(genres, many=True)
+#     return Response(serializer.data)
+#
+#
+# @api_view(http_method_names=['get'])
+# @authentication_classes([])
+# @permission_classes([])
+# def people(request):
+#     params = dict(request.GET)
+#     try:
+#         conditions = _get_params_to_conditions(params)
+#     except Condition.InvalidOperator:
+#         return Response([])
+#     search_builder = Search.Builder.new_search(Person)
+#     for condition in conditions:
+#         search_builder.add_condition(condition)
+#     results = search_builder.search(sort_by='name')
+#     return Response(PersonSerializer(results, many=True).data)
+#
+#
+# @api_view(http_method_names=['get'])
+# @authentication_classes([])
+# @permission_classes([])
+# def landing_genres(request):
+#     configuration = Configuration.get_configuration(grouped_by_genres.CONFIG_KEY)
+#     genres = {}
+#     if configuration is not None:
+#         genres = configuration.data
+#     return Response(genres)
