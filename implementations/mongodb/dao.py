@@ -32,8 +32,10 @@ class DAOMongoDB(DAOInterface):
             record.stars[n] = self._save_if_not_exists_person(star)
         dict_obj = dict(record)
         collection = self._get_collection(MongoAudiovisualRecord)
-        _id = dict_obj.pop('_id', None)
+
+        _id = dict_obj.get('_id', None)
         _check_audiovisual_slug(dict_obj, collection)
+        dict_obj.pop('_id')
         if not _id:
             record._id = collection.insert_one(dict_obj).inserted_id
         else:
@@ -128,17 +130,21 @@ class DAOMongoDB(DAOInterface):
 def _check_audiovisual_slug(dict_obj, collection):
     current_slug = dict_obj.get('slug')
     modified_slug = current_slug
-    is_slug_repeated = True
+    slug_is_repeated = True
 
     n = 0
-    while is_slug_repeated:
+    while slug_is_repeated:
         if n == 0:
             modified_slug = current_slug
         else:
-            modified_slug = f'{current_slug}-{n}'
+            if re.search(r'-\d+$', current_slug):
+                modified_slug = re.sub(r'-\d+$', f'-{n}', current_slug)
+            else:
+                modified_slug = f'{current_slug}-{n}'
+
         result = collection.find_one({'slug': modified_slug, '_id': {'$ne': dict_obj.get('_id')}})
         if result is None:
-            is_slug_repeated = False
+            slug_is_repeated = False
         n += 1
 
     if modified_slug != current_slug:
