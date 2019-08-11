@@ -107,6 +107,10 @@ def details(request, slug=None):
     return render(request, 'web/details.html', context=context)
 
 
+def dmca(request):
+    return render(request, 'web/dmca.html')
+
+
 def page404(request, exception):
     return render(request, 'web/404.html', status=400)
 

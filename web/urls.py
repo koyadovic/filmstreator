@@ -9,6 +9,7 @@ urlpatterns = [
     path('api/v1/audiovisual/', views.audiovisual),
     path('api/v1/landing/', views.landing_genres),
 
+    path('dmca/', views.dmca),
     path('404/', views.page404),
     path('500/', views.page500),
 
