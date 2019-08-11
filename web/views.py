@@ -196,14 +196,23 @@ def _get_params_to_conditions(params):
         if k in ['formtype', 'page']:
             continue
 
-        value = v[0]  # TODO translate values to data type expected
-
+        value = v[0]
         k_parts = k.split('__')
         f_name = '__'.join(k_parts[:-1])
         comparator = k_parts[-1]
         if comparator in [Condition.IN, Condition.NOT_IN]:
             value = value.split(',')
+
+        value = _translate_value_datatype(f_name, value)
         condition = Condition(f_name, comparator, value)
         print(condition)
         conditions.append(condition)
     return conditions
+
+
+def _translate_value_datatype(f_name, value):
+    # TODO translate values to data type expected
+    print('translate', f_name, value)
+    if f_name in ['global_score']:
+        value = float(value)
+    return value
