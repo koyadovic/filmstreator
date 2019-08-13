@@ -1,9 +1,10 @@
-from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
+from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
 from core.model.configurations import Configuration
 from core.model.searches import Search, Condition
 from core.robots import grouped_by_genres
+from core.tools.strings import VideoQualityInStringDetector
 
-from web.serializers import AudiovisualRecordSerializer
+from web.serializers import AudiovisualRecordSerializer, GenreSerializer
 
 from django.shortcuts import render
 
@@ -56,12 +57,21 @@ def landing(request):
 
     context = {
         'genres': genres,
-        'search': search
+        'search': search,
+        'filter_params': {k: v[0] for k, v in get_params.items()},
+        'genres_names': _get_genres(),
+        'qualities': VideoQualityInStringDetector.our_qualities
     }
     return render(request, 'web/landing_filters.html', context=context)
 
 
 def details(request, slug=None):
+    referer_uri = request.META['HTTP_REFERER']
+    try:
+        get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
+    except IndexError:
+        get_params = {}
+
     audiovisual_records = (
         Search.Builder
         .new_search(AudiovisualRecord)
@@ -81,7 +91,13 @@ def details(request, slug=None):
         .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
         .search(sort_by='quality')
     )
-    context = {'audiovisual_record': audiovisual_record, 'downloads': downloads}
+    context = {
+        'audiovisual_record': audiovisual_record,
+        'downloads': downloads,
+        'filter_params': get_params,
+        'genres_names': _get_genres(),
+        'qualities': VideoQualityInStringDetector.our_qualities
+    }
     return render(request, 'web/details.html', context=context)
 
 
@@ -226,3 +242,9 @@ API Restful
 #     if configuration is not None:
 #         genres = configuration.data
 #     return Response(genres)
+
+def _get_genres():
+    search_builder = Search.Builder.new_search(Genre)
+    genres = search_builder.search(sort_by='name')
+    serializer = GenreSerializer(genres, many=True)
+    return [e['name'] for e in serializer.data]

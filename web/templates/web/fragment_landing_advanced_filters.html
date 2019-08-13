@@ -17,21 +17,21 @@
                             <div class="input-group-text"><i class="fa fa-search"></i></div>
                         </div>
                         <input type="text" class="form-control" placeholder="Search" name="name__icontains"
-                        value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.name__icontains }}{% endif %}">
+                        value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.name__icontains }}{% endif %}">
                     </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col numeric-input-range">
-                    <label>From year</label>
+                    <label>From year {{ filter_params.formtype }}</label>
                     <input name="year__gte" class="form-control" type="range" min="1980" max="{% now 'Y' %}"
-                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.year__gte }}{% else %}1980{% endif %}">
+                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.year__gte }}{% else %}1980{% endif %}">
                 </div>
                 <div class="col numeric-input-range">
                     <label>To year</label>
                     <input name="year__lte" class="form-control" type="range" min="1980" max="{% now 'Y' %}"
-                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.year__lte }}{% else %}{% now 'Y' %}{% endif %}">
+                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.year__lte }}{% else %}{% now 'Y' %}{% endif %}">
                 </div>
             </div>
 
@@ -39,12 +39,24 @@
                 <div class="col numeric-input-range">
                     <label>From score</label>
                     <input name="global_score__gte" class="form-control" type="range" min="0" max="10" step="0.1"
-                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.global_score__gte }}{% else %}0{% endif %}">
+                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.global_score__gte }}{% else %}0{% endif %}">
                 </div>
                 <div class="col numeric-input-range">
                     <label>To score</label>
                     <input name="global_score__lte" class="form-control" type="range" min="0" max="10" step="0.1"
-                    value="{% if request.GET.formtype == 'advanced' %}{{ request.GET.global_score__lte }}{% else %}10{% endif %}">
+                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.global_score__lte }}{% else %}10{% endif %}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <select class="form-control" name="genres__name__in">
+                        {% for genre_name in genres_names %}
+                            <option value="{{ genre_name }}"{% if genre_name in filter_params.genres__name__in %} selected{% endif %}>
+                                {{ genre_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
 
