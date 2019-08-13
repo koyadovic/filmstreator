@@ -19,9 +19,9 @@ element.style {
 }
 -->
     {% if audiovisual_record.name.50 %}
-        <h1 style="color: white; font-weight: 800; background-image: linear-gradient(to right, #343a40, white); padding: 10px;">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }})</h1>
+        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }})</h1>
     {% else %}
-        <h1 style="color: white; font-weight: 800; background-image: linear-gradient(to right, #343a40, white); padding: 10px;">{{ audiovisual_record.name }} ({{ audiovisual_record.year }})</h1>
+        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name }} ({{ audiovisual_record.year }})</h1>
     {% endif %}
 
     <img style="float: right;" src="{{ audiovisual_record.images.0 }}" alt="Main cover of {{ audiovisual_record.name }}">
@@ -46,9 +46,9 @@ element.style {
     {% endfor %}
 
     <div class="float-restore"></div>
-    <br>
+    <hr>
     <table class="table table-hover table-borderless">
-    <thead class="thead-dark">
+    <thead>
         <tr>
             <td><b>Quality</b></td><td><b>Source Language</b></td><td><b>Source</b></td><td><b>Name</b></td>
         </tr>

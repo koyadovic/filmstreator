@@ -6,6 +6,16 @@
 
 <nav class="notbody navbar navbar-dark bg-dark top-navbar top-nav">
     <a class="text_with_2px_border navbar-brand" href="/">Filmstreator</a>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Genres
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            {% for genre_name in genres_names %}
+          <a style="color: black;" class="dropdown-item" href="/?formtype=advanced&genres__name__in={{ genre_name }}">{{ genre_name }}</a>
+            {% endfor %}
+        </div>
+  </li>
     {% include 'web/fragment_landing_filters.html' %}
     {% include 'web/fragment_landing_advanced_filters.html' %}
 </nav>

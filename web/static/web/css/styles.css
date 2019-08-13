@@ -250,3 +250,7 @@ a:hover {
     color: #343a40 !important;
     font-size: 1.5em;
 }
+
+li {
+    list-style-type: none;
+}
