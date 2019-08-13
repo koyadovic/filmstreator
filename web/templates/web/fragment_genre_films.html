@@ -1,0 +1,17 @@
+{% if audiovisual_records %}
+
+    <div class="text-center">
+        <div><h4><a href="/?formtype=advanced&genres__name__eq={{ genre_name }}">{{ genre_name }}</a></h4></div>
+    </div>
+    <div class="responsive" data-slick='{"slidesToShow": 5, "slidesToScroll": 5}'>
+        {% for ar in audiovisual_records %}
+        <div class="cont">
+            <a href="/{{ ar.slug }}/">
+                <img class="imghe hvr-grow" src="" data-lazy="{{ ar.images.0 }}" alt="{{ ar.name }}">
+                <h6 class="cent">{{ ar.name }}</h6>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+{% endif %}

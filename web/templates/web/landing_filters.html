@@ -22,25 +22,9 @@
     {% include 'web/fragment_page_navigation.html' %}
     {% else %}
 
-    {% for genre_name, audiovisual_records in genres.items %}
-        {% if audiovisual_records %}
-
-            <div class="card text-center">
-                <div class="card-header"><h4><a href="/?formtype=advanced&genres__name__eq={{ genre_name }}">{{ genre_name }}</a></h4></div>
-            </div>
-            <div class="responsive" data-slick='{"slidesToShow": 5, "slidesToScroll": 5}'>
-                {% for ar in audiovisual_records %}
-                <div class="cont">
-                    <a href="/{{ ar.slug }}/">
-                        <img class="lazy imghe hvr-grow" src="" data-src="{{ ar.images.0 }}" alt="Main cover of {{ ar.name }}">
-                        <h6 class="cent">{{ ar.name }}</h6>
-                    </a>
-                </div>
-                {% endfor %}
-            </div>
-
-        {% endif %}
-    {% endfor %}
+{#    {% for genre_name, audiovisual_records in genres.items %}#}
+{#        {% include 'web/fragment_genre_films.html' with genre_name=genre_name audiovisual_records=audiovisual_records %}#}
+{#    {% endfor %}#}
 
     {% endif %}
 {% endblock %}

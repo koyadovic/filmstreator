@@ -1,20 +1,17 @@
 {% load static %}
+{% load miscellaneous %}
 
 <div class="card">
   <div class="card-body">
 
   {% if ai.images.0 %}
-    <img class="lazy" style="width: 138px;height: 200px; object-fit: contain;float:right;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"
+    <img class="lazy" style="width: 46px;height: 66px; object-fit: contain;float:right;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"
          alt="Main cover of {{ ai.name }}" src="" data-src="{{ ai.images.0 }}">
   {% else %}
       <div
-          style="width: 138px; height: 200px; float:right; border: 1px solid black; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"></div>
+          style="width: 46px; height: 66px; float:right; border: 1px solid black; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"></div>
   {% endif %}
-
     <h5 class="card-title"><a href="/{{ ai.slug }}/">{{ ai.name }} ({{ ai.year }})</a></h5>
-    <p class="card-text"><small>Genres: {% for genre in ai.genres %}<span>{{ genre.name }}</span>{% endfor %}</small></p>
-    <p class="card-text"><small>Directors: {% for person in ai.directors %}<span>{{ person.name }}, </span>{% endfor %}</small></p>
-    <p class="card-text"><small>Writers: {% for person in ai.writers %}<span>{{ person.name }}, </span>{% endfor %}</small></p>
-    <p class="card-text"><small>Stars: {% for person in ai.stars %}<span>{{ person.name }}, </span>{% endfor %}</small></p>
+    <p class="card-text"><small>Genres: {{ ai.genres | map:"name" | join:", " }}.</small></p>
   </div>
 </div>

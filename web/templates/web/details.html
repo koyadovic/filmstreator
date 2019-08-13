@@ -9,27 +9,34 @@
 
 
 {% block content %}
+<!--
 
+element.style {
+    color: white;
+    font-weight: 800;
+    background-image: linear-gradient(to right, #343a40, white);
+    padding: 10px;
+}
+-->
     {% if audiovisual_record.name.50 %}
-        <h1 style="color: #343a40; font-weight: 800">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }})</h1>
+        <h1 style="color: white; font-weight: 800; background-image: linear-gradient(to right, #343a40, white); padding: 10px;">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }})</h1>
     {% else %}
-        <h1 style="color: #343a40; font-weight: 800">{{ audiovisual_record.name }} ({{ audiovisual_record.year }})</h1>
+        <h1 style="color: white; font-weight: 800; background-image: linear-gradient(to right, #343a40, white); padding: 10px;">{{ audiovisual_record.name }} ({{ audiovisual_record.year }})</h1>
     {% endif %}
-    <hr>
 
     <img style="float: right;" src="{{ audiovisual_record.images.0 }}" alt="Main cover of {{ audiovisual_record.name }}">
 
     <h5>Genres:</h5>
-    <p>{{ audiovisual_record.genres | map:"name" | join:", " }}.</p>
+    <p><b>{{ audiovisual_record.genres | map:"name" | join:", " }}.</b></p>
 
     <h5>Directors:</h5>
-    <p>{{ audiovisual_record.directors | map:"name" | join:", " }}.</p>
+    <p><b>{{ audiovisual_record.directors | map:"name" | join:", " }}.</b></p>
 
     <h5>Writers:</h5>
-    <p>{{ audiovisual_record.writers | map:"name" | join:", " }}.</p>
+    <p><b>{{ audiovisual_record.writers | map:"name" | join:", " }}.</b></p>
 
     <h5>Stars:</h5>
-    <p>{{ audiovisual_record.stars | map:"name" | join:", " }}.</p>
+    <p><b>{{ audiovisual_record.stars | map:"name" | join:", " }}.</b></p>
 
     {% for score in audiovisual_record.scores %}
         <div class="scoring-source">
@@ -40,20 +47,20 @@
 
     <div class="float-restore"></div>
     <br>
-    <table class="table">
-    <thead>
+    <table class="table table-hover table-borderless">
+    <thead class="thead-dark">
         <tr>
-            <td>Quality</td><td>Language</td><td>Source</td><td>Name</td>
+            <td><b>Quality</b></td><td><b>Source Language</b></td><td><b>Source</b></td><td><b>Name</b></td>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="table-hover">
 
     {% for download in downloads %}
-        <tr>
+        <tr onclick="window.open('{{ download.link }}', target='_blank');">
             <td>{{ download.quality }}</td>
             <td><img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></td>
             <td>{{ download.source_name }}</td>
-            <td><a href="{{ download.link }}">{{ download.name }}</a></td>
+            <td>{{ download.name }}</td>
         </tr>
     {% endfor %}
     </tbody>

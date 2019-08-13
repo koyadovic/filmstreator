@@ -4,14 +4,11 @@
 
 {% block body %}
 
-<nav class="navbar navbar-dark bg-dark top-navbar top-nav">
-    <a class="navbar-brand" href="/">Filmstreator</a>
+<nav class="notbody navbar navbar-dark bg-dark top-navbar top-nav">
+    <a class="text_with_2px_border navbar-brand" href="/">Filmstreator</a>
     {% include 'web/fragment_landing_filters.html' %}
-
     {% include 'web/fragment_landing_advanced_filters.html' %}
 </nav>
-
-
 
 <div class="container">
     {% block content %}{% endblock %}
@@ -20,7 +17,6 @@
 <!-- footer -->
 <br>
 {% include 'web/fragment_footer.html' %}
-
 {% endblock %}
 
 {% block body_extra_js %}
@@ -30,12 +26,10 @@
     $(function() {
         // show and hide logic for form search
         $("#show-advanced-search").on("click", function() {
-            console.log('Show advanced search!');
             $("#basic-search-form").fadeOut("slow", function () {
             });
         });
         $("#hide-advanced-search").on("click", function() {
-            console.log('Hide advanced search!');
             $("#basic-search-form").fadeIn("slow", function () {
             });
         });

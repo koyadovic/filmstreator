@@ -61,8 +61,10 @@ footer {
 }
 
 .imghe {
+    /*
     height: 250px;
     width: 380px;
+    */
 }
 
 .iconsdesing {
@@ -89,6 +91,7 @@ footer {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    border-radius: 5px;
 }
 
 .positioncen {
@@ -112,8 +115,6 @@ footer {
 }
 
 .card {
-    /* background-color: #0D0D0D; */
-    color: #014FA4;
 }
 
 .slick-dots li button {
@@ -180,4 +181,72 @@ footer {
 
 .float-restore {
     clear: left;
+}
+
+
+a {
+    font-weight: 800;
+    color: #5c6166;
+}
+
+a:visited {
+    color: #5c6166;
+}
+
+a:hover {
+    color: #85888c;
+    text-decoration: none;
+}
+
+.notbody a {
+    font-weight: 800;
+    color: white;
+}
+
+.notbody a:visited {
+}
+
+.notbody a:hover {
+    color: #ccc;
+    text-decoration: none;
+}
+
+
+.filmstreator-logo {
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white !important;
+    color: #343a40 !important;
+    font-size: 1.5em;
+}
+
+.text_with_2px_border
+{
+    text-shadow:
+        /* first layer at 1px */
+        -1px -1px 0px #fff,
+         0px -1px 0px #fff,
+         1px -1px 0px #fff,
+        -1px  0px 0px #fff,
+         1px  0px 0px #fff,
+        -1px  1px 0px #fff,
+         0px  1px 0px #fff,
+         1px  1px 0px #fff,
+        /* second layer at 2px */
+        -2px -2px 0px #fff,
+        -1px -2px 0px #fff,
+         0px -2px 0px #fff,
+         1px -2px 0px #fff,
+         2px -2px 0px #fff,
+         2px -1px 0px #fff,
+         2px  0px 0px #fff,
+         2px  1px 0px #fff,
+         2px  2px 0px #fff,
+         1px  2px 0px #fff,
+         0px  2px 0px #fff,
+        -1px  2px 0px #fff,
+        -2px  2px 0px #fff,
+        -2px  1px 0px #fff,
+        -2px  0px 0px #fff,
+        -2px -1px 0px #fff !important;
+    color: #343a40 !important;
+    font-size: 1.5em;
 }
