@@ -1,6 +1,8 @@
 import re
 from typing import List
 
+from slugify import slugify
+
 from core.interfaces import DAOInterface
 from core.model.audiovisual import AudiovisualRecord, Genre, Person
 from pymongo import MongoClient
@@ -131,6 +133,9 @@ def _check_audiovisual_slug(dict_obj, collection):
     current_slug = dict_obj.get('slug')
     modified_slug = current_slug
     slug_is_repeated = True
+
+    if current_slug is None:
+        current_slug = slugify(dict_obj.get('name'))
 
     n = 0
     while slug_is_repeated:
