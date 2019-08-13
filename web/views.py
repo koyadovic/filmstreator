@@ -1,3 +1,7 @@
+from datetime import timedelta
+
+from django.utils import timezone
+
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
 from core.model.configurations import Configuration
 from core.model.searches import Search, Condition
@@ -66,6 +70,7 @@ def landing(request):
 
 
 def details(request, slug=None):
+    now = timezone.now()
     referer_uri = request.META['HTTP_REFERER']
     try:
         get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
@@ -85,6 +90,18 @@ def details(request, slug=None):
         return render(request, 'web/404.html', status=404)
 
     audiovisual_record = audiovisual_records[0]
+
+    # related_records = (
+    #     Search.Builder
+    #     .new_search(AudiovisualRecord)
+    #     .add_condition(Condition('deleted', Condition.EQUALS, False))
+    #     .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+    #     .add_condition(Condition('genres__name', Condition.IN, [g['name'] for g in audiovisual_record.genres]))
+    #     .add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
+    #     .search(sort_by='-global_score', page_size=5, page=1, paginate=True)
+    # )['results']
+    related_records = []
+
     downloads = (
         Search.Builder
         .new_search(DownloadSourceResult)
@@ -96,7 +113,8 @@ def details(request, slug=None):
         'downloads': downloads,
         'filter_params': get_params,
         'genres_names': _get_genres(),
-        'qualities': VideoQualityInStringDetector.our_qualities
+        'qualities': VideoQualityInStringDetector.our_qualities,
+        'related_records': related_records
     }
     return render(request, 'web/details.html', context=context)
 

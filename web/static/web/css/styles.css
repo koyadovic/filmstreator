@@ -157,3 +157,27 @@ footer {
 .advanced-filters i#hide-advanced-search {
     color: white !important;
 }
+
+
+.scoring-source {
+    float: left;
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.scoring-source .scoring-source-value {
+    position: absolute;
+    bottom: -8px;
+    right: 2px;
+    text-shadow: 2px 2px 4px #000000;
+    font-weight: 800;
+}
+
+.scoring-source .scoring-source-logo {
+    height: 2em;
+}
+
+.float-restore {
+    clear: left;
+}
