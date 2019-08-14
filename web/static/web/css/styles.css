@@ -1,0 +1,294 @@
+* {
+    font-family: 'Roboto';
+}
+
+.top-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+body {
+    margin-top: 60px;
+    margin-bottom: 5em;
+    overflow-x: hidden;
+    background: #eee;
+}
+
+
+nav.top-nav {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 2;
+}
+
+.container {
+    z-index: 0;
+}
+
+.container * {
+    z-index: 0;
+}
+
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.centered {
+    position: fixed;
+    width: 800px;
+    top: 50%;
+    left: 50%;
+    /* bring your own prefixes */
+    transform: translate(-50%, -50%);
+}
+
+.big-icon {
+    font-size: 6em;
+    color: black;
+    margin: 20px;
+}
+
+/* new styles */
+
+.iconos {
+    height: 100px;
+    width: 100px;
+    text-align: center;
+    margin-bottom: 2%;
+}
+
+.imghe {
+    /*
+    height: 250px;
+    width: 380px;
+    */
+}
+
+.iconsdesing {
+    text-align: center;
+    color: white;
+    padding: 2%;
+
+}
+
+.line {
+    height: 4px;
+    background: rgba(76,76,76,1);
+}
+
+.space {
+    height: 60px;
+}
+
+.cent {
+    background: white;
+    opacity: 0.8;
+    padding: 2%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 5px;
+}
+
+.positioncen {
+    color: black;
+    background:white;
+    opacity: 0.5;
+    padding: 2%;
+    position: absolute;
+    top: 40%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.cont {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+}
+
+.card {
+}
+
+.slick-dots li button {
+    background: white !important;
+}
+
+.footer {
+    background:#0C0C0C;
+    color:white;
+    font-size: 12px;
+}
+
+.textcol {
+    padding: 2%;
+}
+
+.posicion {
+    opacity: 0.2;
+    height: 650px;
+    width: 100%;
+}
+
+
+
+/* */
+
+.advanced-filters {
+    color: white;
+    background: #343a40;
+    width: 100%;
+}
+
+.advanced-filters * {
+    color: white;
+}
+
+.advanced-filters input, .advanced-filters i, .advanced-filters select, .advanced-filters option {
+    color: black !important;
+}
+
+.advanced-filters i#hide-advanced-search {
+    color: white !important;
+}
+
+.scoring-source.scoring-source-small .scoring-source-logo {
+    height: 1.5em;
+}
+.scoring-source.scoring-source-small .scoring-source-value {
+    position: absolute;
+    bottom: -8px;
+    right: 2px;
+    text-shadow: 2px 2px 4px #000000;
+    font-weight: 800;
+    font-size: 80%;
+}
+
+.scoring-source {
+    float: left;
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.scoring-source .scoring-source-value {
+    position: absolute;
+    bottom: -8px;
+    right: 2px;
+    text-shadow: 2px 2px 4px #000000;
+    font-weight: 800;
+}
+
+.scoring-source .scoring-source-logo {
+    height: 2em;
+}
+
+.float-restore {
+    clear: left;
+}
+
+
+a {
+    font-weight: 800;
+    color: #5c6166;
+}
+
+a:visited {
+    color: #5c6166;
+}
+
+a:hover {
+    color: #85888c;
+    text-decoration: none;
+}
+
+.notbody a {
+    font-weight: 800;
+    color: white;
+}
+
+.notbody a:visited {
+}
+
+.notbody a:hover {
+    color: #ccc;
+    text-decoration: none;
+}
+
+
+.filmstreator-logo {
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white !important;
+    color: #343a40 !important;
+    font-size: 1.5em;
+}
+
+.text_with_2px_border
+{
+    text-shadow:
+        /* first layer at 1px */
+        -1px -1px 0px #fff,
+         0px -1px 0px #fff,
+         1px -1px 0px #fff,
+        -1px  0px 0px #fff,
+         1px  0px 0px #fff,
+        -1px  1px 0px #fff,
+         0px  1px 0px #fff,
+         1px  1px 0px #fff,
+        /* second layer at 2px */
+        -2px -2px 0px #fff,
+        -1px -2px 0px #fff,
+         0px -2px 0px #fff,
+         1px -2px 0px #fff,
+         2px -2px 0px #fff,
+         2px -1px 0px #fff,
+         2px  0px 0px #fff,
+         2px  1px 0px #fff,
+         2px  2px 0px #fff,
+         1px  2px 0px #fff,
+         0px  2px 0px #fff,
+        -1px  2px 0px #fff,
+        -2px  2px 0px #fff,
+        -2px  1px 0px #fff,
+        -2px  0px 0px #fff,
+        -2px -1px 0px #fff !important;
+    color: #343a40 !important;
+    font-size: 1.5em;
+}
+
+li {
+    list-style-type: none;
+}
+
+
+.readable-text {
+    text-shadow:
+        0.05em 0 black,
+        0 0.05em black,
+        -0.05em 0 black,
+        0 -0.05em black,
+        -0.05em -0.05em black,
+        -0.05em 0.05em black,
+        0.05em -0.05em black,
+        0.05em 0.05em black;
+}
+
+nav .active {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.second-nav {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 1;
+    background: #f7f7f7;
+    margin-bottom: 20px;
+}

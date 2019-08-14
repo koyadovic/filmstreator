@@ -1,0 +1,30 @@
+{% extends "web/base_with_menu_and_footer.html" %}
+{% load static %}
+{% block title %}Filmstreator - {{ current_genre }}{% endblock %}
+
+    {% block head_extra %}
+    <meta name="description" content="Filmstreator all {{ current_genre }} films">
+    {% endblock %}
+
+{% block content %}
+
+    <h1 class="text-center">Best films about {{ current_genre }} genre</h1>
+    <hr>
+    <!-- results -->
+    <div class="text-center">
+    {% for audiovisual_item in search.results %}
+        {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
+    {% empty %}
+        <p>Sorry but there is nothing to show here ...</p>
+    {% endfor %}
+    </div>
+    <hr>
+    {% include 'web/fragment_page_navigation.html' %}
+
+{% endblock %}
+
+
+{% block body_extra_js %}
+    {{ block.super }}
+    <script src="{% static 'web/js/landing.js' %}"></script>
+{% endblock %}

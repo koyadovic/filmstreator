@@ -20,7 +20,7 @@ SECRET_KEY = 'xh8bcfp&=)4g71!@!%@+k*r#0nx80o#qd^b*^mr((#*7izk5s*'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'request',
+    # 'rest_framework',
     'core',
     'implementations',
     'web',
@@ -43,6 +45,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'request.middleware.RequestMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -118,7 +121,14 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-print('Wire implementations')
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
+
 dao_implementation = DAOMongoDB()
 search_implementation = SearchMongoDB()
 services.inject_dao_interface_implementation(dao_implementation)
@@ -130,3 +140,13 @@ if DEBUG or True:
         dsn="https://3f87cf408a0042fc929df4e3ec80e390@sentry.io/1505406",
         integrations=[DjangoIntegration()]
     )
+
+
+REQUEST_IGNORE_PATHS = (
+    r'^admin/',
+)
+REQUEST_IGNORE_USER_AGENTS = (
+    r'^$', # ignore requests with no user agent string set
+    r'Googlebot',
+    r'Baiduspider',
+)

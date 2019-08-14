@@ -1,0 +1,73 @@
+<div class="collapse advanced-filters" id="collapseSearch">
+    <div class="container">
+        <form action="/" method="GET" autocomplete="off">
+
+            <input type="hidden" name="formtype" value="advanced">
+
+            <div class="row">
+                <div class="col text-right">
+                    <i style="color: white;" class="fa fa-window-close" id="hide-advanced-search" aria-hidden="true" data-toggle="collapse" href="#collapseSearch" role="button" aria-expanded="false" aria-controls="collapseSearch"></i>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="input-group mb-2 mr-sm-2" id="basic-search-form">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fa fa-search"></i></div>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Search" name="name__icontains"
+                        value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.name__icontains }}{% endif %}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col numeric-input-range">
+                    <label>From year {{ filter_params.formtype }}</label>
+                    <input name="year__gte" class="form-control" type="range" min="1980" max="{% now 'Y' %}"
+                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.year__gte }}{% else %}1980{% endif %}">
+                </div>
+                <div class="col numeric-input-range">
+                    <label>To year</label>
+                    <input name="year__lte" class="form-control" type="range" min="1980" max="{% now 'Y' %}"
+                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.year__lte }}{% else %}{% now 'Y' %}{% endif %}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col numeric-input-range">
+                    <label>From score</label>
+                    <input name="global_score__gte" class="form-control" type="range" min="0" max="10" step="0.1"
+                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.global_score__gte }}{% else %}0{% endif %}">
+                </div>
+                <div class="col numeric-input-range">
+                    <label>To score</label>
+                    <input name="global_score__lte" class="form-control" type="range" min="0" max="10" step="0.1"
+                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.global_score__lte }}{% else %}10{% endif %}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Genre</label>
+                    <select class="form-control" name="genres__name__in">
+                        <option value="">--- Disabled ---</option>
+                        {% for genre_name in genres_names %}
+                            <option value="{{ genre_name }}"{% if genre_name in filter_params.genres__name__in %} selected{% endif %}>
+                                {{ genre_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col text-center">
+                    <button class="btn btn-primary">Search</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

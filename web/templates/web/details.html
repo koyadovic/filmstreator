@@ -1,0 +1,74 @@
+{% extends "web/base_with_menu_and_footer.html" %}
+{% load static %}
+{% load miscellaneous %}
+{% block title %}Filmstreator - {{ audiovisual_record.name }} - {{ audiovisual_record.year }}{% endblock %}
+
+    {% block head_extra %}
+    <meta name="description" content="Detail page with all the information about {{ audiovisual_record.name }}. Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.">
+    {% endblock %}
+
+
+{% block content %}
+
+    {% if audiovisual_record.name.50 %}
+        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }})</h1>
+    {% else %}
+        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name }} ({{ audiovisual_record.year }})</h1>
+    {% endif %}
+
+    <img style="float: right;" src="{{ audiovisual_record.images.0 }}" alt="Main cover of {{ audiovisual_record.name }}">
+
+    <h5>Genres:</h5>
+    <p><b>{{ audiovisual_record.genres | map:"name" | join:", " }}.</b></p>
+
+    <h5>Directors:</h5>
+    <p><b>{{ audiovisual_record.directors | map:"name" | join:", " }}.</b></p>
+
+    <h5>Writers:</h5>
+    <p><b>{{ audiovisual_record.writers | map:"name" | join:", " }}.</b></p>
+
+    <h5>Stars:</h5>
+    <p><b>{{ audiovisual_record.stars | map:"name" | join:", " }}.</b></p>
+
+    {% for score in audiovisual_record.scores %}
+        <div class="scoring-source">
+            <img class="scoring-source-logo" src="/static/web/img/information_sources/{{ score.source_name }}.png">
+            <h6 class="scoring-source-value">{{ score.value }}</h6>
+        </div>
+    {% endfor %}
+
+    <div class="float-restore"></div>
+    <hr>
+    <table class="table table-hover table-borderless">
+    <thead>
+        <tr>
+            <td><b>Quality</b></td><td><b>Source Language</b></td><td><b>Source</b></td><td><b>Name</b></td>
+        </tr>
+    </thead>
+    <tbody class="table-hover">
+
+    {% for download in downloads %}
+        <tr onclick="window.open('{{ download.link }}', target='_blank');">
+            <td>{{ download.quality }}</td>
+            <td><img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></td>
+            <td>{{ download.source_name }}</td>
+            <td>{{ download.name }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+    <br>
+    <a href="javascript:history.back()" class="btn btn-primary">Go Back</a>
+
+    {% if related_records %}
+    <hr>
+    <div class="text-center">
+    <h5>Related:</h5>
+    {% for audiovisual_item in related_records %}
+        {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
+    {% endfor %}
+    </div>
+    {% endif %}
+
+{% endblock %}

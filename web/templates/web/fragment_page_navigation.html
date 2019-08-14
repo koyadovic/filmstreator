@@ -1,0 +1,11 @@
+
+<div class="notbody text-center" style="margin-bottom: 1em;">
+    <!-- Page navigation -->
+    {% if search.previous_page %}
+        <a class="btn btn-primary" href="{{ search.previous_page }}">Previous Page</a>
+    {% endif %}
+
+    {% if search.next_page %}
+        <a class="btn btn-primary" href="{{ search.next_page }}">Next Page</a>
+    {% endif %}
+</div>
