@@ -1,17 +1,11 @@
 {% load static %}
 {% load miscellaneous %}
 
-<div class="card">
-  <div class="card-body">
-
-  {% if ai.images.0 %}
-    <img class="lazy" style="width: 46px;height: 66px; object-fit: contain;float:right;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"
-         alt="Main cover of {{ ai.name }}" src="" data-src="{{ ai.images.0 }}">
-  {% else %}
-      <div
-          style="width: 46px; height: 66px; float:right; border: 1px solid black; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"></div>
-  {% endif %}
-    <h5 class="card-title"><a href="/{{ ai.slug }}/">{{ ai.name }} ({{ ai.year }})</a></h5>
-    <p class="card-text"><small>Genres: {{ ai.genres | map:"name" | join:", " }}.</small></p>
-  </div>
-</div>
+<a href="/{{ ai.slug }}/" style="color: white !important;">
+    <div style="padding: 5px; border: 1px solid black; overflow: hidden; height: 200px; width: 138px;display: inline-block; background-image: url('{{ ai.images.0 }}')">
+          <div>
+            <h5 class="readable-text">{{ ai.name }}</h5>
+    {#        <p class="readable-text" style="color: white;">{{ ai.genres | map:"name" | join:", " }} - {{ ai.year }}</p>#}
+          </div>
+    </div>
+</a>

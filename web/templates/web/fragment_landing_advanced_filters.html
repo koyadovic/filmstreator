@@ -50,8 +50,9 @@
 
             <div class="row">
                 <div class="col">
-                    <label>Genres</label>
+                    <label>Genre</label>
                     <select class="form-control" name="genres__name__in">
+                        <option value="">--- Disabled ---</option>
                         {% for genre_name in genres_names %}
                             <option value="{{ genre_name }}"{% if genre_name in filter_params.genres__name__in %} selected{% endif %}>
                                 {{ genre_name }}

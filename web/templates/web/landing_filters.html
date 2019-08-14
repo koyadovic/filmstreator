@@ -16,9 +16,11 @@
     {% if request.GET.formtype %}
     {% include 'web/fragment_page_navigation.html' %}
     <!-- results -->
+    <div class="text-center">
     {% for audiovisual_item in search.results %}
         {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
     {% endfor %}
+    </div>
     {% include 'web/fragment_page_navigation.html' %}
     {% else %}
 

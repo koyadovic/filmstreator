@@ -72,9 +72,11 @@ element.style {
     {% if related_records %}
     <hr>
     <h5>Related:</h5>
+    <div class="text-center">
     {% for audiovisual_item in related_records %}
         {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
     {% endfor %}
+    </div>
     {% endif %}
 
 {% endblock %}

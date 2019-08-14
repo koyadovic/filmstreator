@@ -91,16 +91,17 @@ def details(request, slug=None):
 
     audiovisual_record = audiovisual_records[0]
 
-    # related_records = (
-    #     Search.Builder
-    #     .new_search(AudiovisualRecord)
-    #     .add_condition(Condition('deleted', Condition.EQUALS, False))
-    #     .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-    #     .add_condition(Condition('genres__name', Condition.IN, [g['name'] for g in audiovisual_record.genres]))
-    #     .add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
-    #     .search(sort_by='-global_score', page_size=5, page=1, paginate=True)
-    # )['results']
     related_records = []
+    related_records = (
+        Search.Builder
+        .new_search(AudiovisualRecord)
+        .add_condition(Condition('deleted', Condition.EQUALS, False))
+        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+        .add_condition(Condition('genres__name', Condition.IN, [g['name'] for g in audiovisual_record.genres]))
+        .add_condition(Condition('name', Condition.NON_EQUALS, audiovisual_record.name))
+        .add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
+        .search(sort_by='-global_score', page_size=10, page=1, paginate=True)
+    )['results']
 
     downloads = (
         Search.Builder
@@ -171,6 +172,8 @@ def _get_params_to_conditions(params):
             continue
 
         value = v[0]
+        if value == '':
+            continue
         k_parts = k.split('__')
         f_name = '__'.join(k_parts[:-1])
         comparator = k_parts[-1]

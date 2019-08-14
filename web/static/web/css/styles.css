@@ -254,3 +254,16 @@ a:hover {
 li {
     list-style-type: none;
 }
+
+
+.readable-text {
+    text-shadow:
+        0.05em 0 black,
+        0 0.05em black,
+        -0.05em 0 black,
+        0 -0.05em black,
+        -0.05em -0.05em black,
+        -0.05em 0.05em black,
+        0.05em -0.05em black,
+        0.05em 0.05em black;
+}
