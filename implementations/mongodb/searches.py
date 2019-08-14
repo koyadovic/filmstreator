@@ -1,3 +1,6 @@
+import math
+import re
+
 from bson import ObjectId
 from pymongo import MongoClient
 from django.conf import settings
@@ -32,6 +35,7 @@ class SearchMongoDB(SearchInterface):
         # filtering
         collection = self._db[target_class.collection_name]
         mongodb_search = _translate_search_to_mongodb_dict(search)
+        print(mongodb_search)
         results = collection.find(mongodb_search)
 
         # sorting
@@ -45,7 +49,8 @@ class SearchMongoDB(SearchInterface):
 
         search_results = []
 
-        if results.count() > 0:
+        n_items = results.count()
+        if n_items > 0:
             for result in results:
                 for k, v in result.items():
                     if k == '_id':
@@ -71,7 +76,31 @@ class SearchMongoDB(SearchInterface):
                             result[k] = selected_collection_class(**collection.find_one({'_id': v}))
 
                 search_results.append(target_class(**result))
-        return search_results
+
+        """
+        NOTE: if paginate is set to True, must result the following structure:
+        {
+            "current_page": i,
+            "total_pages": j,
+            "results": [
+                // real results
+            ]
+        }
+        """
+        if paginate:
+            total_pages = math.ceil(n_items / float(page_size))
+            returned = {
+                'current_page': page,
+                'total_pages': total_pages,
+                'results': search_results
+            }
+            if page > 1:
+                returned['previous_page'] = page - 1
+            if page < total_pages:
+                returned['next_page'] = page + 1
+            return returned
+        else:
+            return search_results
 
 
 def _translate_search_to_mongodb_dict(search):
@@ -85,24 +114,29 @@ def _translate_search_to_mongodb_dict(search):
             # for references
             if hasattr(value, '_id'):
                 value = getattr(value, '_id')
-            if operator == Condition.OPERATOR_EQUALS:
+            if operator == Condition.EQUALS:
                 dict_condition[field_path] = value
             else:
-                dict_condition[field_path] = {}
-                if operator == Condition.OPERATOR_NON_EQUALS:
+                if field_path not in dict_condition:
+                    dict_condition[field_path] = {}
+                if operator == Condition.NON_EQUALS:
                     dict_condition[field_path]['$ne'] = value
-                elif operator == Condition.OPERATOR_LESS_THAN:
+                elif operator == Condition.LESS_THAN:
                     dict_condition[field_path]['$lt'] = value
-                elif operator == Condition.OPERATOR_GREAT_THAN:
+                elif operator == Condition.GREAT_THAN:
                     dict_condition[field_path]['$gt'] = value
-                elif operator == Condition.OPERATOR_LESS_OR_EQUAL_THAN:
+                elif operator == Condition.LESS_OR_EQUAL_THAN:
                     dict_condition[field_path]['$lte'] = value
-                elif operator == Condition.OPERATOR_GREAT_OR_EQUAL_THAN:
+                elif operator == Condition.GREAT_OR_EQUAL_THAN:
                     dict_condition[field_path]['$gte'] = value
-                elif operator == Condition.OPERATOR_IN:
+                elif operator == Condition.IN:
                     dict_condition[field_path]['$in'] = value
-                elif operator == Condition.OPERATOR_NOT_IN:
+                elif operator == Condition.NOT_IN:
                     dict_condition[field_path]['$nin'] = value
+                elif operator == Condition.CONTAINS:
+                    dict_condition[field_path] = re.compile(value)
+                elif operator == Condition.ICONTAINS:
+                    dict_condition[field_path] = re.compile(value, re.IGNORECASE)
         or_dict_elements.append(dict_condition)
 
     if len(or_dict_elements) == 1:

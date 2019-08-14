@@ -99,6 +99,8 @@ class VideoQualityInStringDetector:
         {'possibility': ' HC ', 'tag': 'HC-HDRip'}
     ]
 
+    our_qualities = sorted(set([e['tag'] for e in qualities]))
+
     def __init__(self, string):
         self._string = string.lower()
         self._quality_ratio = 0.0

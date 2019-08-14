@@ -1,0 +1,20 @@
+<form action="/" method="GET" autocomplete="off" class="form-inline my-2 my-lg-0"
+    style="height: 46px;">
+
+    <input type="hidden" name="formtype" value="basic">
+
+    <div class="input-group mb-2 mr-sm-2" id="basic-search-form">
+        <div class="input-group-prepend">
+            <div class="input-group-text"><i class="fa fa-search"></i></div>
+        </div>
+
+        <input type="text" class="form-control" placeholder="Search" name="name__icontains"
+            value="{% if request.GET.formtype == 'basic' %}{{ request.GET.name__icontains }}{% endif %}">
+        <a id="show-advanced-search" class="btn btn-primary" data-toggle="collapse"
+           href="#collapseSearch" role="button" aria-expanded="false" aria-controls="collapseSearch"
+            style="margin-left:0.5em;">
+            Advanced Search
+        </a>
+    </div>
+</form>
+

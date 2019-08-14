@@ -1,0 +1,21 @@
+{% extends "web/base_with_menu_and_footer.html" %}
+{% load static %}
+{% block title %}Filmstreator - Internal Server Error{% endblock %}
+
+
+    {% block head_extra %}
+    <meta name="description" content="Ups, our error page, sorry!">
+    {% endblock %}
+
+
+{% block content %}
+
+
+<div class="text-center centered">
+    <i class="big-icon far fa-sad-cry"></i>
+    <h1>500</h1>
+    <h2>Internal Server Error</h2>
+    <p>We are investigating the error. Sorry.</p>
+</div>
+    
+{% endblock %}

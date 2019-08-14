@@ -2,23 +2,34 @@ from typing import List
 
 
 class Condition:
-    OPERATOR_EQUALS = 'eq'
-    OPERATOR_NON_EQUALS = 'neq'
-    OPERATOR_LESS_THAN = 'lt'
-    OPERATOR_GREAT_THAN = 'gt'
-    OPERATOR_LESS_OR_EQUAL_THAN = 'lte'
-    OPERATOR_GREAT_OR_EQUAL_THAN = 'gte'
-    OPERATOR_IN = 'in'
-    OPERATOR_NOT_IN = 'nin'
+    EQUALS = 'eq'
+    NON_EQUALS = 'neq'
+    LESS_THAN = 'lt'
+    GREAT_THAN = 'gt'
+    LESS_OR_EQUAL_THAN = 'lte'
+    GREAT_OR_EQUAL_THAN = 'gte'
+    IN = 'in'
+    NOT_IN = 'nin'
+    CONTAINS = 'contains'
+    ICONTAINS = 'icontains'  # case insensitive
 
-    ALL_OPERATORS = (OPERATOR_EQUALS, OPERATOR_NON_EQUALS, OPERATOR_LESS_THAN, OPERATOR_LESS_OR_EQUAL_THAN,
-                     OPERATOR_GREAT_THAN, OPERATOR_GREAT_OR_EQUAL_THAN, OPERATOR_IN, OPERATOR_NOT_IN)
+    ALL_OPERATORS = (EQUALS, NON_EQUALS, LESS_THAN, LESS_OR_EQUAL_THAN,
+                     GREAT_THAN, GREAT_OR_EQUAL_THAN, IN, NOT_IN, CONTAINS, ICONTAINS)
 
     def __init__(self, field_path, operator, value):
-        assert operator in Condition.ALL_OPERATORS, 'Invalid operator provided'
+        try:
+            assert operator in Condition.ALL_OPERATORS, 'Invalid operator provided'
+        except AssertionError as e:
+            raise Condition.InvalidOperator(e)
         self.field_path = field_path
         self.operator = operator
         self.value = value
+
+    class InvalidOperator(Exception):
+        pass
+
+    def __str__(self):
+        return f'{self.field_path} {self.operator} {self.value}'
 
 
 class Search:
@@ -65,4 +76,16 @@ class Search:
 
         def search(self, sort_by=None, paginate=False, page_size=20, page=1):
             from core import services
+            """
+            NOTE: if paginate is set to True, must result the following structure:
+            {
+                "current_page": i,
+                "total_pages": j,
+                "next_page" i + 1,  # only add this two if there is next or previous pages
+                "previous_page" i - 1, 
+                "results": [
+                    // real results
+                ]
+            }
+            """
             return services.search(self._search, sort_by=sort_by, paginate=paginate, page_size=page_size, page=page)

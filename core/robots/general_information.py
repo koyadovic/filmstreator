@@ -14,8 +14,8 @@ import concurrent
 def autocomplete_general_information_for_empty_audiovisual_records():
     audiovisual_records = (
         Search.Builder.new_search(AudiovisualRecord)
-                      .add_condition(Condition('deleted', Condition.OPERATOR_EQUALS, False))
-                      .add_condition(Condition('general_information_fetched', Condition.OPERATOR_EQUALS, False))
+                      .add_condition(Condition('deleted', Condition.EQUALS, False))
+                      .add_condition(Condition('general_information_fetched', Condition.EQUALS, False))
                       .search()
     )
     with ThreadPoolExecutor(max_workers=30) as executor:

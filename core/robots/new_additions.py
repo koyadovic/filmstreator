@@ -62,7 +62,7 @@ def search_for_new_additions():
             results = (
                 Search.Builder
                 .new_search(AudiovisualRecord)
-                .add_condition(Condition('name', Condition.OPERATOR_EQUALS, audiovisual_record.name))
+                .add_condition(Condition('name', Condition.EQUALS, audiovisual_record.name))
                 .search()
             )
             if len(results) == 0:

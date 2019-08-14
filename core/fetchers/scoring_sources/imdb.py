@@ -11,6 +11,6 @@ class IMDBScoringSource(IMDBGeneralInformation, AbstractScoringSource):
     def score(self):
         try:
             value = self.base_tree.xpath('//*[@itemprop="ratingValue"]/text()')[0]
-            return ScoringSource(source_name=IMDBScoringSource.source_name, value=value)
+            return ScoringSource(source_name=IMDBScoringSource.source_name, value=float(value))
         except IndexError:
             raise ScoringSourceException(f'Cannot locate the score for {self.audiovisual_record.name}')
