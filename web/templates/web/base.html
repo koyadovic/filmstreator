@@ -3,27 +3,17 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-
         <title>{% block title %}{% endblock %}</title>
         <meta name="author" content="SitePoint">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
         <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <link rel="stylesheet" href="{% static "web/css/styles.css" %}">
         <link rel="shortcut icon" href="{% static "web/img/favicon.png" %}" type="image/x-icon">
         <link rel="icon" href="{% static "web/img/favicon.png" %}" type="image/x-icon">
-
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-
-        <!-- added -->
-        <link rel="stylesheet" type="text/css" href="{% static 'web/slick/slick.css' %}">
-        <link rel="stylesheet" type="text/css" href="{% static 'web/slick/slick-theme.css' %}">
-        <link rel="stylesheet" type="text/css" href="{% static 'web/css/hover/hover-min.css' %}">
-
     {% block head_extra %}
     {% endblock %}
-
     {% block head_extra_js %}
     {% endblock %}
     </head>
@@ -38,11 +28,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", yall);
     </script>
-
-    <!-- added -->
-    <script type="text/javascript" src="{% static 'web/slick/slick.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'web/js/global.js' %}"></script>
-
     {% block body_extra_js %}
     {% endblock %}
     <script src="{% static 'web/js/min.js' %}" async></script>
