@@ -14,6 +14,8 @@
 {% block content %}
 
     {% if request.GET.formtype %}
+    <h1 class="text-center">Search results:</h1>
+    <hr>
     {% include 'web/fragment_page_navigation.html' %}
     <!-- results -->
     <div class="text-center">
@@ -23,10 +25,6 @@
     </div>
     {% include 'web/fragment_page_navigation.html' %}
     {% else %}
-
-{#    {% for genre_name, audiovisual_records in genres.items %}#}
-{#        {% include 'web/fragment_genre_films.html' with genre_name=genre_name audiovisual_records=audiovisual_records %}#}
-{#    {% endfor %}#}
 
     <div class="text-center">
 

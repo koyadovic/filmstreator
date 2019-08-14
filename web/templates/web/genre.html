@@ -8,13 +8,17 @@
 
 {% block content %}
 
-    {% include 'web/fragment_page_navigation.html' %}
+    <h1 class="text-center">Best films about {{ current_genre }} genre</h1>
+    <hr>
     <!-- results -->
     <div class="text-center">
     {% for audiovisual_item in search.results %}
         {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
+    {% empty %}
+        <p>Sorry but there is nothing to show here ...</p>
     {% endfor %}
     </div>
+    <hr>
     {% include 'web/fragment_page_navigation.html' %}
 
 {% endblock %}

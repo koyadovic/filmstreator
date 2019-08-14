@@ -102,17 +102,26 @@ def details(request, slug=None):
 
     audiovisual_record = audiovisual_records[0]
 
-    related_records = []
-    related_records = (
-        Search.Builder
-        .new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        .add_condition(Condition('genres__name', Condition.IN, [g['name'] for g in audiovisual_record.genres]))
-        .add_condition(Condition('name', Condition.NON_EQUALS, audiovisual_record.name))
-        .add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
-        .search(sort_by='-global_score', page_size=10, page=1, paginate=True)
-    )['results']
+    related_search = Search.Builder.new_search(AudiovisualRecord)
+    related_search.add_condition(Condition('deleted', Condition.EQUALS, False))
+    related_search.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+    related_search.add_condition(Condition('name', Condition.NON_EQUALS, audiovisual_record.name))
+    related_search.add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
+    for genre in audiovisual_record.genres:
+        related_search.add_condition(Condition('genres__name', Condition.EQUALS, genre['name']))
+
+    related_records = related_search.search(sort_by='-global_score', page_size=10, page=1, paginate=True)['results']
+
+    # related_records = (
+    #     Search.Builder
+    #     .new_search(AudiovisualRecord)
+    #     .add_condition(Condition('deleted', Condition.EQUALS, False))
+    #     .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+    #     .add_condition(Condition('genres__name', Condition.IN, [g['name'] for g in audiovisual_record.genres]))
+    #     .add_condition(Condition('name', Condition.NON_EQUALS, audiovisual_record.name))
+    #     .add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
+    #     .search(sort_by='-global_score', page_size=10, page=1, paginate=True)
+    # )['results']
 
     downloads = (
         Search.Builder
@@ -143,7 +152,7 @@ def genre_view(request, genre=None):
     search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
     search_builder.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
     search_builder.add_condition(Condition('genres__name', Condition.EQUALS, genre))
-    search = search_builder.search(paginate=True, page_size=20, page=page)
+    search = search_builder.search(paginate=True, page_size=20, page=page, sort_by='-global_score')
     serializer = AudiovisualRecordSerializer(search.get('results', []), many=True)
     search['results'] = serializer.data
     _add_previous_and_next_navigation_uris_to_search(raw_uri, search)

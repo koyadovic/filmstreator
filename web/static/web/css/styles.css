@@ -10,14 +10,16 @@
 }
 
 body {
-    margin-top: 5em;
+    margin-top: 60px;
     margin-bottom: 5em;
+    overflow-x: hidden;
+    background: #eee;
 }
 
 
 nav.top-nav {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    z-index: 1;
+    z-index: 2;
 }
 
 .container {
@@ -159,6 +161,17 @@ footer {
     color: white !important;
 }
 
+.scoring-source.scoring-source-small .scoring-source-logo {
+    height: 1.5em;
+}
+.scoring-source.scoring-source-small .scoring-source-value {
+    position: absolute;
+    bottom: -8px;
+    right: 2px;
+    text-shadow: 2px 2px 4px #000000;
+    font-weight: 800;
+    font-size: 80%;
+}
 
 .scoring-source {
     float: left;
@@ -266,4 +279,16 @@ li {
         -0.05em 0.05em black,
         0.05em -0.05em black,
         0.05em 0.05em black;
+}
+
+nav .active {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.second-nav {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 1;
+    background: #f7f7f7;
+    margin-bottom: 20px;
 }
