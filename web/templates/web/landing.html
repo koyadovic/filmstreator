@@ -16,13 +16,15 @@
     {% if request.GET.formtype %}
     <h1 class="text-center">Search results:</h1>
     <hr>
-    {% include 'web/fragment_page_navigation.html' %}
     <!-- results -->
     <div class="text-center">
     {% for audiovisual_item in search.results %}
         {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
+    {% empty %}
+        <p>Ups! there is nothing to show here ...</p>
     {% endfor %}
     </div>
+    <br>
     {% include 'web/fragment_page_navigation.html' %}
     {% else %}
 
@@ -42,7 +44,6 @@
             </div>
         </form>
     </div>
-
 
     <h2>Recently added</h2>
     {% for audiovisual_item in last_records %}
