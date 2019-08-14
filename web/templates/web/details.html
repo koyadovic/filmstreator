@@ -9,15 +9,7 @@
 
 
 {% block content %}
-<!--
 
-element.style {
-    color: white;
-    font-weight: 800;
-    background-image: linear-gradient(to right, #343a40, white);
-    padding: 10px;
-}
--->
     {% if audiovisual_record.name.50 %}
         <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }})</h1>
     {% else %}
@@ -71,8 +63,8 @@ element.style {
 
     {% if related_records %}
     <hr>
-    <h5>Related:</h5>
     <div class="text-center">
+    <h5>Related:</h5>
     {% for audiovisual_item in related_records %}
         {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
     {% endfor %}

@@ -14,6 +14,7 @@ urlpatterns = [
     path('500/', views.page500),
 
     # regular pages
+    path('genres/<str:genre>/', views.genre_view),
     path('<slug:slug>/', views.details),
     path('', views.landing),
 ]

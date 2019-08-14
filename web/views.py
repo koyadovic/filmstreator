@@ -23,12 +23,22 @@ Normal Views
 def landing(request):
     get_params = dict(request.GET)
     page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
-    configuration = Configuration.get_configuration(grouped_by_genres.CONFIG_KEY)
 
-    # compiled genres
-    genres = {}
-    if configuration is not None:
-        genres = configuration.data
+    last_records = (
+        Search.Builder
+        .new_search(AudiovisualRecord)
+        .add_condition(Condition('deleted', Condition.EQUALS, False))
+        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+        .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 7.0))
+        .search(sort_by='-created_date', page_size=20, page=1, paginate=True)
+    )['results']
+
+    # configuration = Configuration.get_configuration(grouped_by_genres.CONFIG_KEY)
+    #
+    # # compiled genres
+    # genres = {}
+    # if configuration is not None:
+    #     genres = configuration.data
 
     # filtering by users
     try:
@@ -60,21 +70,22 @@ def landing(request):
     _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
 
     context = {
-        'genres': genres,
+        # 'genres': genres,
+        'last_records': last_records,
         'search': search,
         'filter_params': {k: v[0] for k, v in get_params.items()},
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities
     }
-    return render(request, 'web/landing_filters.html', context=context)
+    return render(request, 'web/landing.html', context=context)
 
 
 def details(request, slug=None):
     now = timezone.now()
-    referer_uri = request.META['HTTP_REFERER']
     try:
+        referer_uri = request.META['HTTP_REFERER']
         get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
-    except IndexError:
+    except (IndexError, KeyError):
         get_params = {}
 
     audiovisual_records = (
@@ -120,6 +131,34 @@ def details(request, slug=None):
     return render(request, 'web/details.html', context=context)
 
 
+def genre_view(request, genre=None):
+    try:
+        referer_uri = request.META['HTTP_REFERER']
+        get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
+    except (IndexError, KeyError):
+        get_params = {}
+    page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
+
+    search_builder = Search.Builder.new_search(AudiovisualRecord)
+    search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
+    search_builder.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+    search_builder.add_condition(Condition('genres__name', Condition.EQUALS, genre))
+    search = search_builder.search(paginate=True, page_size=20, page=page)
+    serializer = AudiovisualRecordSerializer(search.get('results', []), many=True)
+    search['results'] = serializer.data
+    _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
+
+    context = {
+        'filter_params': get_params,
+        'current_genre': genre,
+        'genres_names': _get_genres(),
+        'qualities': VideoQualityInStringDetector.our_qualities,
+        'search': search,
+    }
+
+    return render(request, 'web/genre.html', context=context)
+
+
 def dmca(request):
     return render(request, 'web/dmca.html')
 
@@ -162,7 +201,10 @@ def _add_previous_and_next_navigation_uris_to_search(raw_uri, search):
         if f'page={search["current_page"]}' in raw_uri:
             search['next_page'] = raw_uri.replace(f'page={search["current_page"]}', f'page={search["next_page"]}')
         else:
-            search['next_page'] = raw_uri + f'&page={search["next_page"]}'
+            if '?' in raw_uri:
+                search['next_page'] = raw_uri + f'&page={search["next_page"]}'
+            else:
+                search['next_page'] = raw_uri + f'?page={search["next_page"]}'
 
 
 def _get_params_to_conditions(params):

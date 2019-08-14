@@ -1,0 +1,62 @@
+{% extends "web/base_with_menu_and_footer.html" %}
+{% load static %}
+{% block title %}Filmstreator{% endblock %}
+
+    {% block head_extra %}
+
+    {% if request.GET.formtype %}
+    <meta name="description" content="Filmstreator search result page">
+    {% else %}
+    <meta name="description" content="Search for films, torrents, and explore last additions">
+    {% endif %}
+    {% endblock %}
+
+{% block content %}
+
+    {% if request.GET.formtype %}
+    {% include 'web/fragment_page_navigation.html' %}
+    <!-- results -->
+    <div class="text-center">
+    {% for audiovisual_item in search.results %}
+        {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
+    {% endfor %}
+    </div>
+    {% include 'web/fragment_page_navigation.html' %}
+    {% else %}
+
+{#    {% for genre_name, audiovisual_records in genres.items %}#}
+{#        {% include 'web/fragment_genre_films.html' with genre_name=genre_name audiovisual_records=audiovisual_records %}#}
+{#    {% endfor %}#}
+
+    <div class="text-center">
+
+    <div style="padding: 10rem 0;">
+        <h1>Search for films, torrents and more</h1>
+
+        <form action="/" method="GET" autocomplete="off">
+            <input type="hidden" name="formtype" value="basic">
+            <div class="input-group" id="basic-search-form">
+                <div class="input-group-prepend">
+                    <div class="input-group-text"><i class="fa fa-search"></i></div>
+                </div>
+                <input type="text" class="form-control" placeholder="Search" name="name__icontains"
+                    value="{% if request.GET.formtype == 'basic' %}{{ request.GET.name__icontains }}{% endif %}">
+            </div>
+        </form>
+    </div>
+
+
+    <h2>Recently added</h2>
+    {% for audiovisual_item in last_records %}
+        {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
+    {% endfor %}
+    </div>
+
+    {% endif %}
+{% endblock %}
+
+
+{% block body_extra_js %}
+    {{ block.super }}
+    <script src="{% static 'web/js/landing.js' %}"></script>
+{% endblock %}
