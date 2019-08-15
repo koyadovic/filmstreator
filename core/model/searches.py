@@ -87,5 +87,10 @@ class Search:
                     // real results
                 ]
             }
+            
+            Another point is that sort_by can be a string or a list of strings:
+            - '-created_date' indicates a descendent sorting by created_date field
+            - ('-created_date', 'score') adds a second field for the sort, de ascend score field
+
             """
             return services.search(self._search, sort_by=sort_by, paginate=paginate, page_size=page_size, page=page)

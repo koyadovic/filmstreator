@@ -150,12 +150,23 @@ def _translate_search_to_mongodb_dict(search):
 def _translate_sort_by_to_mongo_dict(sort_by=None):
     if sort_by is None:
         return None
-    sort_by = str(sort_by)
+    if type(sort_by) not in [str, list, tuple]:
+        return None
     if len(sort_by) == 0:
         return None
-    field = sort_by
+
+    result = []
+    if type(sort_by) == str:
+        result.append(_translate_single_field(sort_by))
+    else:
+        for single_field in sort_by:
+            result.append(_translate_single_field(single_field))
+    return tuple(result)
+
+
+def _translate_single_field(single_field):
     direction = 1
-    if sort_by[0] == '-':
+    if single_field[0] == '-':
         direction = -1
-        field = field[1:]
-    return [(field, direction)]
+        single_field = single_field[1:]
+    return single_field, direction
