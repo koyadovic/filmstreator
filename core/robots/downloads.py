@@ -16,7 +16,6 @@ def compile_download_links_from_audiovisual_records():
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for source_class in get_all_download_sources():
-            compile_download_links_from_audiovisual_records.log(f'Checking with source {source_class.source_name}')
             source_name = source_class.source_name
             configuration = _get_ts_configuration(f'last_download_fetched_{source_name}')
             ts = configuration.data.get('ts', 0)
@@ -33,7 +32,9 @@ def compile_download_links_from_audiovisual_records():
             )
 
             for audiovisual_record in audiovisual_records:
-                compile_download_links_from_audiovisual_records.log(f'Checking {audiovisual_record.name}')
+                compile_download_links_from_audiovisual_records.log(
+                    f'Checking {audiovisual_record.name} with {source_class.source_name}'
+                )
                 future = executor.submit(
                     _refresh_download_results_from_source, audiovisual_record, source_class
                 )
