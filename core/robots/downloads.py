@@ -13,7 +13,7 @@ import concurrent
 
 @Ticker.execute_each(interval='1-minute')
 def compile_download_links_from_audiovisual_records():
-    with ThreadPoolExecutor(max_workers=30) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for source_class in get_all_download_sources():
             source_name = source_class.source_name
@@ -66,7 +66,7 @@ def recent_films_without_good_downloads():
     )
     audiovisual_records = [ar for ar in audiovisual_records if ar not in audiovisual_records_to_exclude]
 
-    with ThreadPoolExecutor(max_workers=30) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for source_class in get_all_download_sources():
             for audiovisual_record in audiovisual_records:
@@ -103,7 +103,7 @@ def delete_404_links():
                 _check_has_downloads(audiovisual_record)
             return
 
-    with ThreadPoolExecutor(max_workers=30) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for download_result in download_results:
             future = executor.submit(_check_download_result_existence, download_result)
