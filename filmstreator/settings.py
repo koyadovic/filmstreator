@@ -18,7 +18,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'xh8bcfp&=)4g71!@!%@+k*r#0nx80o#qd^b*^mr((#*7izk5s*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -141,6 +141,7 @@ if DEBUG or True:
 
 REQUEST_IGNORE_PATHS = (
     r'^ad/',
+    r'^favicon\.',
 )
 REQUEST_IGNORE_USER_AGENTS = (
     r'^$',  # ignore requests with no user agent string set
