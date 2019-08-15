@@ -34,10 +34,10 @@ class Ticker:
     def _can_acquire_lock(cls, func):
         lock_file = cls._lock_filename(func)
         if os.path.exists(lock_file):
-            # print(f'Cannot acquire lock {lock_file}')
+            print(f'Cannot acquire lock {lock_file}')
             return False
         else:
-            # print(f'Lock {lock_file} acquired')
+            print(f'Lock {lock_file} acquired')
             open(lock_file, 'w').close()
             return True
 
@@ -80,7 +80,7 @@ class Ticker:
 
     @classmethod
     def _thread_executed_function(cls, function):
-        # print(f'Executing function {function}')
+        print(f'Executing function {function}')
         function()
         Ticker._release_lock(function)
 
@@ -92,7 +92,7 @@ class Ticker:
 
     def register_callable(self, function, interval):
         assert interval in Ticker.INTERVALS.keys(), 'Invalid interval provided'
-        # print(f'Registering {function}')
+        print(f'Registering {function}')
         self.INTERVALS[interval]['functions'].append(function)
 
     def autodiscover_robots(self, base_package):
