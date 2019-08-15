@@ -1,13 +1,12 @@
-from django.urls import path
+from django.urls import path, re_path
 from web import views
+from django.views.generic.base import RedirectView
+
+favicon_view = RedirectView.as_view(url='/static/web/img/favicon.png', permanent=True)
 
 
 urlpatterns = [
-    # for the dashboard/landing page, a simple API
-    # path('api/v1/genres/', views.genres),
-    # path('api/v1/people/', views.people),
-    # path('api/v1/audiovisual/', views.audiovisual),
-    # path('api/v1/landing/', views.landing_genres),
+    re_path(r'^favicon\.ico$', favicon_view),
 
     path('dmca/', views.dmca),
     path('404/', views.page404),
