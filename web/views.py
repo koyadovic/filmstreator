@@ -150,7 +150,10 @@ def genre_view(request, genre=None):
 
 
 def dmca(request):
-    return render(request, 'web/dmca.html')
+    context = {
+        'genres_names': _get_genres()
+    }
+    return render(request, 'web/dmca.html', context=context)
 
 
 def page404(request, exception):
