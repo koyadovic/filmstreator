@@ -1,19 +1,19 @@
 {% extends "web/base_with_menu_and_footer.html" %}
 {% load static %}
 {% load miscellaneous %}
-{% block title %}Filmstreator - {{ audiovisual_record.name }} {{ audiovisual_record.year }} torrents{% endblock %}
+{% block title %}Filmstreator - {{ audiovisual_record.name }} {{ audiovisual_record.year }} torrent{% endblock %}
 
     {% block head_extra %}
-    <meta name="description" content="{{ audiovisual_record.name }} torrents. Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.">
+    <meta name="description" content="{{ audiovisual_record.name }} torrent. Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.">
     {% endblock %}
 
 
 {% block content %}
 
     {% if audiovisual_record.name.50 %}
-        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }})</h1>
+        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }}) Torrent</h1>
     {% else %}
-        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name }} ({{ audiovisual_record.year }})</h1>
+        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name }} ({{ audiovisual_record.year }}) Torrent</h1>
     {% endif %}
 
     <img style="float: right;" src="{{ audiovisual_record.images.0 }}" alt="Main cover of {{ audiovisual_record.name }}">
@@ -39,6 +39,7 @@
 
     <div class="float-restore"></div>
     <hr>
+    <h3>Download Sources:</h3>
     <table class="table table-hover table-borderless">
     <thead>
         <tr>
