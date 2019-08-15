@@ -3,7 +3,7 @@ from ssl import CertificateError
 from core.model.configurations import Configuration
 from core.tools import browsing_proxies
 from core.tools.exceptions import CoreException
-from core.tools.logs import log_exception
+from core.tools.logs import log_exception, log_message
 
 from requests.exceptions import ProxyError, ConnectionError, ReadTimeout, ConnectTimeout
 from urllib3.exceptions import MaxRetryError, NewConnectionError
@@ -42,16 +42,19 @@ class PhantomBrowsingSession:
 
             try:
                 response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
-                # print(f'Retrieved {url} !!!')
                 self._identity.proxy_okay()
                 self._last_response = response
                 self._referer = url
                 return self
 
             except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError,
-                    ReadTimeout, NewConnectionError, CertificateError, ValueError):
+                    ReadTimeout, NewConnectionError):
                 self._identity.some_connection_error()
                 self.refresh_identity()
+
+            except (CertificateError, ValueError) as e:
+                tryings += 1
+                log_message(f'Ignored exception: {e}')
 
             except Exception as e:
                 tryings += 1
