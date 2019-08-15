@@ -18,7 +18,7 @@ def autocomplete_general_information_for_empty_audiovisual_records():
                       .add_condition(Condition('general_information_fetched', Condition.EQUALS, False))
                       .search()
     )
-    with ThreadPoolExecutor(max_workers=30) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for audiovisual_record in audiovisual_records:
             for general_information_klass in get_all_general_information_sources():

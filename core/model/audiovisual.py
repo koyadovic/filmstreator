@@ -241,7 +241,7 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
 
     def save(self):
         self.updated_date = utc_now()
-        all_scores = [score['value'] for score in self.scores]
+        all_scores = [score.value if hasattr(score, 'value') else score['value'] for score in self.scores]
         self.global_score = round(0.0 if len(all_scores) == 0 else sum(all_scores) / len(all_scores), 1)
         from core import services
         return services.save_audiovisual_record(self)

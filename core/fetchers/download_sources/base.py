@@ -1,14 +1,12 @@
-from lxml import html
-from urllib3.exceptions import MaxRetryError, ProxyError
-
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
 from typing import List
 
 import abc
+from lxml import html
 
 from core.tools.browsing import PhantomBrowsingSession
-from core.tools.logs import log_message, log_exception
-from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
+from core.tools.logs import log_exception
+from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector, ratio_of_containing_similar_string, are_similar_strings
 
 
 class AbstractDownloadSource(metaclass=abc.ABCMeta):
@@ -68,6 +66,11 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
             quality = quality_detector.quality
             link = self.base_url + href
             audiovisual_record = self.audiovisual_record
+
+            audiovisual_name = self.audiovisual_record.name
+            similar_audiovisual_name = name.replace(text_without_name, '')
+            if not are_similar_strings(audiovisual_name.lower(), similar_audiovisual_name.lower()):
+                continue
 
             download_results.append(DownloadSourceResult(
                 source_name=source_name,

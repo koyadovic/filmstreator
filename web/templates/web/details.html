@@ -1,10 +1,10 @@
 {% extends "web/base_with_menu_and_footer.html" %}
 {% load static %}
 {% load miscellaneous %}
-{% block title %}Filmstreator - {{ audiovisual_record.name }} - {{ audiovisual_record.year }}{% endblock %}
+{% block title %}Filmstreator - {{ audiovisual_record.name }} {{ audiovisual_record.year }} torrents{% endblock %}
 
     {% block head_extra %}
-    <meta name="description" content="Detail page with all the information about {{ audiovisual_record.name }}. Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.">
+    <meta name="description" content="{{ audiovisual_record.name }} torrents. Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.">
     {% endblock %}
 
 
