@@ -66,7 +66,7 @@ def search_for_new_additions():
                 .search()
             )
             if len(results) == 0:
-                # print(f'Not exist, adding {audiovisual_record}')
+                search_for_new_additions.log(f'Adding new {audiovisual_record.name}')
                 audiovisual_record.save()
 
         dts_done.append(from_str)

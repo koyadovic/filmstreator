@@ -23,6 +23,9 @@ def compile_scores_from_audiovisual_records():
             )
 
             for audiovisual_record in audiovisual_records:
+                compile_scores_from_audiovisual_records.log(
+                    f'Checking {audiovisual_record.name} with {klass.source_name}'
+                )
                 futures.append(executor.submit(_refresh_score, klass, audiovisual_record))
 
         for future in concurrent.futures.as_completed(futures):

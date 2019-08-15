@@ -16,4 +16,5 @@ def do_the_refresh():
         .add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=2))).search()
     )
     for record in records:
+        do_the_refresh.log(f'Checking {record.name}')
         _check_has_downloads(record)

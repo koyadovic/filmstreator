@@ -22,7 +22,15 @@ class Ticker:
     @classmethod
     def execute_each(cls, interval='1-minute'):
         def wrapper(func):
+            fname = cls._lock_filename(func)
+
+            def log(msg: str):
+                now = datetime.utcnow()
+                with open(fname, 'a+') as f:
+                    f.write(f'[{now.strftime("%Y-%m-%d %H:%M:%S")}] {msg}\n')
+
             func.interval = interval
+            func.log = log
             @functools.wraps(func)
             def wrapped(*args):
                 return func(*args)

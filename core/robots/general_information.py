@@ -22,6 +22,9 @@ def autocomplete_general_information_for_empty_audiovisual_records():
         futures = []
         for audiovisual_record in audiovisual_records:
             for general_information_klass in get_all_general_information_sources():
+                autocomplete_general_information_for_empty_audiovisual_records.log(
+                    f'Check {audiovisual_record.name} with {general_information_klass.source_name}'
+                )
                 future = executor.submit(_update, audiovisual_record, general_information_klass)
                 futures.append(future)
         for future in concurrent.futures.as_completed(futures):
