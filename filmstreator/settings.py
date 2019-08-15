@@ -140,10 +140,11 @@ if DEBUG or True:
 
 
 REQUEST_IGNORE_PATHS = (
-    r'^admin/',
+    r'^ad/',
+    r'^favicon\.',
 )
 REQUEST_IGNORE_USER_AGENTS = (
-    r'^$', # ignore requests with no user agent string set
+    r'^$',  # ignore requests with no user agent string set
     r'Googlebot',
     r'Baiduspider',
 )
