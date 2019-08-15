@@ -1,3 +1,4 @@
+import time
 from ssl import CertificateError
 
 from core.model.configurations import Configuration
@@ -34,7 +35,6 @@ class PhantomBrowsingSession:
 
         tryings = 0
         max_tryings = 10
-        # print(f'   Trying {url} ...')
         while tryings < max_tryings:
             headers.update({'User-Agent': self._identity.user_agent})
             if self._referer:
@@ -47,10 +47,13 @@ class PhantomBrowsingSession:
                 self._referer = url
                 return self
 
-            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError,
-                    ReadTimeout, NewConnectionError):
+            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError, ReadTimeout, NewConnectionError):
                 self._identity.some_connection_error()
                 self.refresh_identity()
+
+            except RecursionError:
+                log_message(f'Recursion error logged')
+                break
 
             except (CertificateError, ValueError) as e:
                 tryings += 1
