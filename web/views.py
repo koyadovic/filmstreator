@@ -233,13 +233,13 @@ def _get_params_to_conditions(params):
 
         value = _translate_value_datatype(f_name, value)
         condition = Condition(f_name, comparator, value)
-        print(condition)
+        # print(condition)
         conditions.append(condition)
     return conditions
 
 
 def _translate_value_datatype(f_name, value):
-    print('translate', f_name, value)
+    # print('translate', f_name, value)
     if f_name in ['global_score']:
         value = float(value)
     return value

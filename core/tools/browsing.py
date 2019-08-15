@@ -32,7 +32,7 @@ class PhantomBrowsingSession:
 
         tryings = 0
         max_tryings = 10
-        print(f'   Trying {url} ...')
+        # print(f'   Trying {url} ...')
         while tryings < max_tryings:
             headers.update({'User-Agent': self._identity.user_agent})
             if self._referer:
@@ -40,7 +40,7 @@ class PhantomBrowsingSession:
 
             try:
                 response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
-                print(f'Retrieved {url} !!!')
+                # print(f'Retrieved {url} !!!')
                 self._identity.proxy_okay()
                 self._last_response = response
                 self._referer = url

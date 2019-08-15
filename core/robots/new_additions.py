@@ -57,7 +57,7 @@ def search_for_new_additions():
             current_native_dt,
             current_native_dt + timedelta(days=1)
         )
-        print(f'Found: {audiovisual_records_new}')
+        # print(f'Found: {audiovisual_records_new}')
         for audiovisual_record in audiovisual_records_new:
             results = (
                 Search.Builder
@@ -66,7 +66,7 @@ def search_for_new_additions():
                 .search()
             )
             if len(results) == 0:
-                print(f'Not exist, adding {audiovisual_record}')
+                # print(f'Not exist, adding {audiovisual_record}')
                 audiovisual_record.save()
 
         dts_done.append(from_str)
