@@ -1,14 +1,13 @@
-from lxml import html
-from urllib3.exceptions import MaxRetryError, ProxyError
-
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
 from typing import List
 
 import abc
+from lxml import html
 
 from core.tools.browsing import PhantomBrowsingSession
-from core.tools.logs import log_message, log_exception
-from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
+from core.tools.logs import log_exception
+from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector, \
+    ratio_of_containing_similar_string
 
 
 class AbstractDownloadSource(metaclass=abc.ABCMeta):
@@ -68,6 +67,18 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
             quality = quality_detector.quality
             link = self.base_url + href
             audiovisual_record = self.audiovisual_record
+
+            # check if the download result is from the audiovisual record. Ratio  of coincidence must be above 0.7
+            audiovisual_name = self.audiovisual_record.name
+            container = audiovisual_name if len(audiovisual_name) > len(name) else name
+            text_to_check = audiovisual_name if len(audiovisual_name) <= len(name) else name
+
+            min_length = len(text_to_check)
+            container = container.lower()
+            text_to_check = text_to_check.lower()
+            ratio = ratio_of_containing_similar_string(container, text_to_check, min_length=min_length)
+            if ratio < 0.7:
+                continue
 
             download_results.append(DownloadSourceResult(
                 source_name=source_name,

@@ -1,17 +1,11 @@
-from datetime import timedelta
-
+from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
+from core.model.searches import Search, Condition
+from core.tools.strings import VideoQualityInStringDetector
+from web.serializers import AudiovisualRecordSerializer, GenreSerializer
+from django.shortcuts import render
 from django.utils import timezone
 
-from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
-from core.model.configurations import Configuration
-from core.model.searches import Search, Condition
-from core.robots import grouped_by_genres
-from core.tools.strings import VideoQualityInStringDetector
-
-from web.serializers import AudiovisualRecordSerializer, GenreSerializer
-
-from django.shortcuts import render
-
+from datetime import timedelta
 import re
 
 
@@ -28,17 +22,11 @@ def landing(request):
         Search.Builder
         .new_search(AudiovisualRecord)
         .add_condition(Condition('deleted', Condition.EQUALS, False))
+        .add_condition(Condition('has_downloads', Condition.EQUALS, True))
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
         .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 7.0))
         .search(sort_by='-created_date', page_size=20, page=1, paginate=True)
     )['results']
-
-    # configuration = Configuration.get_configuration(grouped_by_genres.CONFIG_KEY)
-    #
-    # # compiled genres
-    # genres = {}
-    # if configuration is not None:
-    #     genres = configuration.data
 
     # filtering by users
     try:
@@ -48,6 +36,7 @@ def landing(request):
             search_builder.add_condition(condition)
 
         search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
+        search_builder.add_condition(Condition('has_downloads', Condition.EQUALS, True))
         search = search_builder.search(paginate=True, page_size=20, page=page)
         """
         {
@@ -92,6 +81,7 @@ def details(request, slug=None):
         Search.Builder
         .new_search(AudiovisualRecord)
         .add_condition(Condition('deleted', Condition.EQUALS, False))
+        .add_condition(Condition('has_downloads', Condition.EQUALS, True))
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
         .add_condition(Condition('slug', Condition.EQUALS, slug))
         .search()
@@ -104,6 +94,7 @@ def details(request, slug=None):
 
     related_search = Search.Builder.new_search(AudiovisualRecord)
     related_search.add_condition(Condition('deleted', Condition.EQUALS, False))
+    related_search.add_condition(Condition('has_downloads', Condition.EQUALS, True))
     related_search.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
     related_search.add_condition(Condition('name', Condition.NON_EQUALS, audiovisual_record.name))
     related_search.add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
@@ -111,17 +102,6 @@ def details(request, slug=None):
         related_search.add_condition(Condition('genres__name', Condition.EQUALS, genre['name']))
 
     related_records = related_search.search(sort_by='-global_score', page_size=10, page=1, paginate=True)['results']
-
-    # related_records = (
-    #     Search.Builder
-    #     .new_search(AudiovisualRecord)
-    #     .add_condition(Condition('deleted', Condition.EQUALS, False))
-    #     .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-    #     .add_condition(Condition('genres__name', Condition.IN, [g['name'] for g in audiovisual_record.genres]))
-    #     .add_condition(Condition('name', Condition.NON_EQUALS, audiovisual_record.name))
-    #     .add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
-    #     .search(sort_by='-global_score', page_size=10, page=1, paginate=True)
-    # )['results']
 
     downloads = (
         Search.Builder
@@ -150,6 +130,7 @@ def genre_view(request, genre=None):
 
     search_builder = Search.Builder.new_search(AudiovisualRecord)
     search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
+    search_builder.add_condition(Condition('has_downloads', Condition.EQUALS, True))
     search_builder.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
     search_builder.add_condition(Condition('genres__name', Condition.EQUALS, genre))
     search = search_builder.search(paginate=True, page_size=20, page=page, sort_by='-global_score')
@@ -244,76 +225,6 @@ def _translate_value_datatype(f_name, value):
         value = float(value)
     return value
 
-
-"""
-API Restful
-"""
-
-
-# @api_view(http_method_names=['get'])
-# @authentication_classes([])
-# @permission_classes([])
-# def audiovisual(request):
-#     get_params = dict(request.GET)
-#     page = int(get_params.pop('page', '1'))
-#     try:
-#         conditions = _get_params_to_conditions(get_params)
-#     except Condition.InvalidOperator:
-#         return Response([])
-#
-#     search_builder = Search.Builder.new_search(AudiovisualRecord)
-#     for condition in conditions:
-#         search_builder.add_condition(condition)
-#
-#     # TODO when paginate is True, in data returned must include current_page, total_pages and results
-#     results = search_builder.search(paginate=True, page_size=20, page=page)
-#     serializer = AudiovisualRecordSerializer(results, many=True)
-#     return Response(serializer.data)
-#
-#
-# @api_view(http_method_names=['get'])
-# @authentication_classes([])
-# @permission_classes([])
-# def genres(request):
-#     params = dict(request.GET)
-#     try:
-#         conditions = _get_params_to_conditions(params)
-#     except Condition.InvalidOperator:
-#         return Response([])
-#
-#     search_builder = Search.Builder.new_search(Genre)
-#     for condition in conditions:
-#         search_builder.add_condition(condition)
-#     genres = search_builder.search(sort_by='name')
-#     serializer = GenreSerializer(genres, many=True)
-#     return Response(serializer.data)
-#
-#
-# @api_view(http_method_names=['get'])
-# @authentication_classes([])
-# @permission_classes([])
-# def people(request):
-#     params = dict(request.GET)
-#     try:
-#         conditions = _get_params_to_conditions(params)
-#     except Condition.InvalidOperator:
-#         return Response([])
-#     search_builder = Search.Builder.new_search(Person)
-#     for condition in conditions:
-#         search_builder.add_condition(condition)
-#     results = search_builder.search(sort_by='name')
-#     return Response(PersonSerializer(results, many=True).data)
-#
-#
-# @api_view(http_method_names=['get'])
-# @authentication_classes([])
-# @permission_classes([])
-# def landing_genres(request):
-#     configuration = Configuration.get_configuration(grouped_by_genres.CONFIG_KEY)
-#     genres = {}
-#     if configuration is not None:
-#         genres = configuration.data
-#     return Response(genres)
 
 def _get_genres():
     search_builder = Search.Builder.new_search(Genre)
