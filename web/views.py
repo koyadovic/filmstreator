@@ -24,9 +24,9 @@ def landing(request):
         .add_condition(Condition('deleted', Condition.EQUALS, False))
         .add_condition(Condition('has_downloads', Condition.EQUALS, True))
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 5.0))
+        .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 6.0))
         .search(
-            sort_by=['-year', '-created_date', '-global_score'],
+            sort_by=['-year', '-global_score', '-created_date'],
             page_size=20, page=1, paginate=True
         )
     )['results']
