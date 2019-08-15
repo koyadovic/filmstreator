@@ -10,22 +10,22 @@ import operator
 CONFIG_KEY = 'audiovisual_records_grouped_by_genres'
 
 
-@Ticker.execute_each(interval='12-hours')
-def audiovisual_records_grouped_by_genres():
-    groups = _group_by_genres()
-    configuration = _get_or_create_configuration()
-    configuration.data = groups
-    configuration.save()
-
-
-@Ticker.execute_each(interval='1-minute')
-def generate_the_first_audiovisual_records_grouped_by_genres():
-    if Configuration.get_configuration(key=CONFIG_KEY) is None:
-        groups = _group_by_genres()
-        configuration = _get_or_create_configuration()
-        configuration.data = groups
-        configuration.save()
-
+# @Ticker.execute_each(interval='12-hours')
+# def audiovisual_records_grouped_by_genres():
+#     groups = _group_by_genres()
+#     configuration = _get_or_create_configuration()
+#     configuration.data = groups
+#     configuration.save()
+#
+#
+# @Ticker.execute_each(interval='1-minute')
+# def generate_the_first_audiovisual_records_grouped_by_genres():
+#     if Configuration.get_configuration(key=CONFIG_KEY) is None:
+#         groups = _group_by_genres()
+#         configuration = _get_or_create_configuration()
+#         configuration.data = groups
+#         configuration.save()
+#
 
 def _group_by_genres():
     six_month_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)

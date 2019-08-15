@@ -41,7 +41,7 @@ def compile_download_links_from_audiovisual_records():
             future.result()
 
 
-@Ticker.execute_each(interval='1-minute')
+@Ticker.execute_each(interval='12-hours')
 def recent_films_without_good_downloads():
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
@@ -78,7 +78,7 @@ def recent_films_without_good_downloads():
             future.result()
 
 
-@Ticker.execute_each(interval='1-minute')
+@Ticker.execute_each(interval='12-hours')
 def delete_404_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=60)
     download_results = (
