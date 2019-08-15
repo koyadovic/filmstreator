@@ -1,3 +1,5 @@
+from ssl import CertificateError
+
 from core.model.configurations import Configuration
 from core.tools import browsing_proxies
 from core.tools.exceptions import CoreException
@@ -46,7 +48,8 @@ class PhantomBrowsingSession:
                 self._referer = url
                 return self
 
-            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError, ReadTimeout, NewConnectionError):
+            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError,
+                    ReadTimeout, NewConnectionError, CertificateError, ValueError):
                 self._identity.some_connection_error()
                 self.refresh_identity()
 
