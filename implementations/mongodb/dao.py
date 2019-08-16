@@ -5,21 +5,18 @@ from slugify import slugify
 
 from core.interfaces import DAOInterface
 from core.model.audiovisual import AudiovisualRecord, Genre, Person
-from pymongo import MongoClient
 from django.conf import settings
 
 from core.model.configurations import Configuration
 from implementations.mongodb.model import MongoAudiovisualRecord, MongoGenre, MongoPerson, MongoDownloadSourceResult, \
     MongoConfiguration
 
+from implementations.mongodb.connection import client
+
 
 class DAOMongoDB(DAOInterface):
     def __init__(self):
         super().__init__()
-        client = MongoClient(
-            tz_aware=True, maxPoolSize=1000,
-            maxIdleTimeMS=600000, socketTimeoutMS=600000, waitQueueTimeoutMS=600000
-        )
         self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
         MongoAudiovisualRecord.check_collection(self._db)
         MongoDownloadSourceResult.check_collection(self._db)
