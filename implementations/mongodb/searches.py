@@ -24,7 +24,10 @@ class SearchMongoDB(SearchInterface):
     # in the future we will use ElasticSearch
 
     def __init__(self):
-        client = MongoClient(tz_aware=True, maxPoolSize=1000)
+        client = MongoClient(
+            tz_aware=True, maxPoolSize=1000,
+            maxIdleTimeMS=600000, socketTimeoutMS=600000, waitQueueTimeoutMS=600000
+        )
         self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
 
     def search(self, search, sort_by=None, paginate=False, page_size=20, page=1):

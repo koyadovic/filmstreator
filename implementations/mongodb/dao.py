@@ -16,7 +16,10 @@ from implementations.mongodb.model import MongoAudiovisualRecord, MongoGenre, Mo
 class DAOMongoDB(DAOInterface):
     def __init__(self):
         super().__init__()
-        client = MongoClient(tz_aware=True, maxPoolSize=1000)
+        client = MongoClient(
+            tz_aware=True, maxPoolSize=1000,
+            maxIdleTimeMS=600000, socketTimeoutMS=600000, waitQueueTimeoutMS=600000
+        )
         self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
         MongoAudiovisualRecord.check_collection(self._db)
         MongoDownloadSourceResult.check_collection(self._db)
