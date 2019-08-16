@@ -27,7 +27,7 @@ def autocomplete_general_information_for_empty_audiovisual_records():
                 futures.append(future)
         for future in concurrent.futures.as_completed(futures):
             autocomplete_general_information_for_empty_audiovisual_records.log(future.log_msg)
-            future.result()
+            future.result(timeout=600)
 
 
 def _update(audiovisual_record, general_information_klass):

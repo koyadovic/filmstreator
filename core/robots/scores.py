@@ -29,7 +29,7 @@ def compile_scores_from_audiovisual_records():
 
         for future in concurrent.futures.as_completed(futures):
             compile_scores_from_audiovisual_records.log(future.log_msg)
-            future.result()
+            future.result(timeout=600)
 
 
 def _refresh_score(klass, audiovisual_record):

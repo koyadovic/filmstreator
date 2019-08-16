@@ -40,7 +40,7 @@ def compile_download_links_from_audiovisual_records():
 
         for future in concurrent.futures.as_completed(futures):
             compile_download_links_from_audiovisual_records.log(future.log_msg)
-            future.result()
+            future.result(timeout=600)
 
 
 @Ticker.execute_each(interval='12-hours')
@@ -79,7 +79,7 @@ def recent_films_without_good_downloads():
                 futures.append(future)
         for future in concurrent.futures.as_completed(futures):
             recent_films_without_good_downloads.log(future.log_msg)
-            future.result()
+            future.result(timeout=600)
 
 
 @Ticker.execute_each(interval='12-hours')
@@ -116,7 +116,7 @@ def delete_404_links():
         # wait until completed
         for future in concurrent.futures.as_completed(futures):
             delete_404_links.log(future.log_msg)
-            future.result()
+            future.result(timeout=600)
 
 
 def _refresh_download_results_from_source(audiovisual_record, source_class):
