@@ -18,7 +18,7 @@ class AbstractNewAdditions(metaclass=abc.ABCMeta):
         session = PhantomBrowsingSession(referer=self.base_url + '/', headers=headers)
         session.get(self.get_search_url(from_date, to_date), timeout=30)
         response = session.last_response
-        if not self.results_found(response.content):
+        if response is None or not self.results_found(response.content):
             return []
         audiovisual_records = []
         names = self.extract_all_names(response.content)
