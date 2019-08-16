@@ -4,7 +4,12 @@
 {% block title %}Filmstreator - {{ audiovisual_record.name }} {{ audiovisual_record.year }} torrent{% endblock %}
 
     {% block head_extra %}
+    {{ block.super }}
     <meta name="description" content="{{ audiovisual_record.name }} torrent. Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.">
+    <meta property="og:title" content="{{ audiovisual_record.name }} torrent. Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}." />
+    <meta property="og:type" content="video.movie" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+    <meta property="og:image" content="{{ audiovisual_record.images.0 }}" />
     {% endblock %}
 
 

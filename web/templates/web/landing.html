@@ -3,12 +3,13 @@
 {% block title %}Filmstreator{% endblock %}
 
     {% block head_extra %}
-
+    {{ block.super }}
     {% if request.GET.formtype %}
     <meta name="description" content="Filmstreator search result page">
     {% else %}
     <meta name="description" content="Search for films, torrents, and explore last additions">
     {% endif %}
+    <meta property="og:title" content="Filmstreator" />
     {% endblock %}
 
 {% block content %}
