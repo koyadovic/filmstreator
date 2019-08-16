@@ -43,6 +43,7 @@ def _update(audiovisual_record, general_information_klass):
         ) = general_information.writers_directors_stars
         audiovisual_record.genres = general_information.genres
         audiovisual_record.is_a_film = general_information.is_a_film
+        audiovisual_record.name = general_information.name
         audiovisual_record.general_information_fetched = True
         audiovisual_record.save()
 
