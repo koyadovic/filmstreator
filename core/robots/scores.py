@@ -19,7 +19,7 @@ def compile_scores_from_audiovisual_records():
                       .add_condition(Condition('deleted', Condition.EQUALS, False))
                       .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
                       .add_condition(Condition('scores__source_name', Condition.NOT_IN, [klass.source_name]))
-                      .search(paginate=True, page_size=10, page=1)
+                      .search(paginate=True, page_size=20, page=1)
             )['results']
 
             for audiovisual_record in audiovisual_records:
