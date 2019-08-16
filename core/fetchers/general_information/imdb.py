@@ -33,7 +33,10 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
             name = self.base_tree.xpath('//div[@class="originalTitle"]/text()')[0]
         except IndexError:
             name = self.base_tree.xpath('//div[@class="title_wrapper"]/h1/text()')[0]
-        return re.sub(r'[^\x00-\x7f]', r'', name)
+        name = re.sub(r'[^\x00-\x7f]', r'', name)
+        if name == '':
+            raise GeneralInformationException(f'Name for {self.audiovisual_record.name} is \'\'.')
+        return name
 
     @property
     def year(self):
