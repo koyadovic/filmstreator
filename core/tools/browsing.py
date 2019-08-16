@@ -47,15 +47,16 @@ class PhantomBrowsingSession:
                 self._referer = url
                 return self
 
-            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError, ReadTimeout, NewConnectionError):
+            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError, ReadTimeout,
+                    NewConnectionError, ChunkedEncodingError):
                 self._identity.some_connection_error()
                 self.refresh_identity()
 
             except RecursionError:
-                log_message(f'Recursion error logged')
+                log_message(f'Recursion error logged when retrieving {url}')
                 break
 
-            except (ChunkedEncodingError, CertificateError, ValueError) as e:
+            except (CertificateError, ValueError) as e:
                 tryings += 1
                 log_message(f'Ignored exception: {e}')
 
