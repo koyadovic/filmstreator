@@ -28,19 +28,18 @@ def compile_download_links_from_audiovisual_records():
                 .add_condition(Condition('deleted', Condition.EQUALS, False))
                 .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
                 .add_condition(Condition('created_date', Condition.GREAT_THAN, from_dt))
-                .search()
-            )
+                .search(paginate=True, page_size=10, page=1)
+            )['results']
 
             for audiovisual_record in audiovisual_records:
-                compile_download_links_from_audiovisual_records.log(
-                    f'Checking {audiovisual_record.name} with {source_class.source_name}'
-                )
                 future = executor.submit(
                     _refresh_download_results_from_source, audiovisual_record, source_class
                 )
+                future.log_msg = f'Checking {audiovisual_record.name} with {source_class.source_name}'
                 futures.append(future)
 
         for future in concurrent.futures.as_completed(futures):
+            compile_download_links_from_audiovisual_records.log(future.log_msg)
             future.result()
 
 
@@ -65,22 +64,21 @@ def recent_films_without_good_downloads():
         .add_condition(Condition('deleted', Condition.EQUALS, False))
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
         .add_condition(Condition('year', Condition.GREAT_OR_EQUAL_THAN, n_days_ago.strftime('%Y')))
-        .search()
-    )
+        .search(paginate=True, page_size=10, page=1)
+    )['results']
     audiovisual_records = [ar for ar in audiovisual_records if ar not in audiovisual_records_to_exclude]
 
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for source_class in get_all_download_sources():
             for audiovisual_record in audiovisual_records:
-                recent_films_without_good_downloads.log(
-                    f'Checking {audiovisual_record.name} with {source_class.source_name}'
-                )
                 future = executor.submit(
                     _refresh_download_results_from_source, audiovisual_record, source_class
                 )
+                future.log_msg = f'Checking {audiovisual_record.name} with {source_class.source_name}'
                 futures.append(future)
         for future in concurrent.futures.as_completed(futures):
+            recent_films_without_good_downloads.log(future.log_msg)
             future.result()
 
 
@@ -92,8 +90,8 @@ def delete_404_links():
         .Builder
         .new_search(DownloadSourceResult)
         .add_condition(Condition('last_check', Condition.LESS_THAN, n_days_ago))
-        .search(sort_by='last_check')
-    )
+        .search(paginate=True, page_size=10, page=1, sort_by='last_check')
+    )['results']
 
     def _check_download_result_existence(dr):
         session = PhantomBrowsingSession(referer='https://www.google.com/')
@@ -113,9 +111,11 @@ def delete_404_links():
         futures = []
         for download_result in download_results:
             future = executor.submit(_check_download_result_existence, download_result)
+            future.log_msg = f'Checking download result {download_result.name}'
             futures.append(future)
         # wait until completed
         for future in concurrent.futures.as_completed(futures):
+            delete_404_links.log(future.log_msg)
             future.result()
 
 

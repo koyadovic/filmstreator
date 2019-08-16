@@ -19,16 +19,16 @@ def compile_scores_from_audiovisual_records():
                       .add_condition(Condition('deleted', Condition.EQUALS, False))
                       .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
                       .add_condition(Condition('scores__source_name', Condition.NOT_IN, [klass.source_name]))
-                      .search()
-            )
+                      .search(paginate=True, page_size=10, page=1)
+            )['results']
 
             for audiovisual_record in audiovisual_records:
-                compile_scores_from_audiovisual_records.log(
-                    f'Checking {audiovisual_record.name} with {klass.source_name}'
-                )
-                futures.append(executor.submit(_refresh_score, klass, audiovisual_record))
+                future = executor.submit(_refresh_score, klass, audiovisual_record)
+                future.log_msg = f'Checking {audiovisual_record.name} with {klass.source_name}'
+                futures.append(future)
 
         for future in concurrent.futures.as_completed(futures):
+            compile_scores_from_audiovisual_records.log(future.log_msg)
             future.result()
 
 
