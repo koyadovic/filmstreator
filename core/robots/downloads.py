@@ -13,7 +13,7 @@ import concurrent
 
 @Ticker.execute_each(interval='1-minute')
 def compile_download_links_from_audiovisual_records():
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         futures = []
         for source_class in get_all_download_sources():
             source_name = source_class.source_name
@@ -28,7 +28,7 @@ def compile_download_links_from_audiovisual_records():
                 .add_condition(Condition('deleted', Condition.EQUALS, False))
                 .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
                 .add_condition(Condition('created_date', Condition.GREAT_THAN, from_dt))
-                .search(paginate=True, page_size=10, page=1)
+                .search(paginate=True, page_size=20, page=1)
             )['results']
 
             for audiovisual_record in audiovisual_records:
