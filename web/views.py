@@ -24,8 +24,11 @@ def landing(request):
         .add_condition(Condition('deleted', Condition.EQUALS, False))
         .add_condition(Condition('has_downloads', Condition.EQUALS, True))
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 7.0))
-        .search(sort_by='-created_date', page_size=20, page=1, paginate=True)
+        .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 6.0))
+        .search(
+            sort_by=['-year', '-global_score', '-created_date'],
+            page_size=20, page=1, paginate=True
+        )
     )['results']
 
     # filtering by users

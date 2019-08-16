@@ -22,7 +22,16 @@ class Ticker:
     @classmethod
     def execute_each(cls, interval='1-minute'):
         def wrapper(func):
+            def log(msg: str):
+                fname = cls._lock_filename(func)
+                now = datetime.utcnow()
+                with open(fname, 'a+') as f:
+                    text = f'[{now.strftime("%Y-%m-%d %H:%M:%S")}] {msg}'
+                    f.write(text + '\n')
+                    print(text)
+
             func.interval = interval
+            func.log = log
             @functools.wraps(func)
             def wrapped(*args):
                 return func(*args)
@@ -71,17 +80,18 @@ class Ticker:
             for function in Ticker.INTERVALS[interval_slug]['functions']:
                 if not Ticker._can_acquire_lock(function):
                     continue
-                try:
-                    thread = threading.Thread(target=Ticker._thread_executed_function, args=[function])
-                    thread.start()
-                except Exception as e:
-                    log_exception(e)
+                thread = threading.Thread(target=Ticker._thread_executed_function, args=[function])
+                thread.start()
 
     @classmethod
     def _thread_executed_function(cls, function):
         print(f'Executing function {function}')
-        function()
-        Ticker._release_lock(function)
+        try:
+            function()
+        except Exception as e:
+            log_exception(e)
+        finally:
+            Ticker._release_lock(function)
 
     def start(self):
         while True:

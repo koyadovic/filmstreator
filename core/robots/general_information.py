@@ -16,15 +16,17 @@ def autocomplete_general_information_for_empty_audiovisual_records():
         Search.Builder.new_search(AudiovisualRecord)
                       .add_condition(Condition('deleted', Condition.EQUALS, False))
                       .add_condition(Condition('general_information_fetched', Condition.EQUALS, False))
-                      .search()
-    )
+                      .search(paginate=True, page_size=20, page=1)
+    )['results']
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = []
         for audiovisual_record in audiovisual_records:
             for general_information_klass in get_all_general_information_sources():
                 future = executor.submit(_update, audiovisual_record, general_information_klass)
+                future.log_msg = f'Check {audiovisual_record.name} with {general_information_klass.source_name}'
                 futures.append(future)
         for future in concurrent.futures.as_completed(futures):
+            autocomplete_general_information_for_empty_audiovisual_records.log(future.log_msg)
             future.result()
 
 

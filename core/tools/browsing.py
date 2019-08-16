@@ -1,3 +1,4 @@
+import time
 from ssl import CertificateError
 
 from core.model.configurations import Configuration
@@ -5,7 +6,7 @@ from core.tools import browsing_proxies
 from core.tools.exceptions import CoreException
 from core.tools.logs import log_exception, log_message
 
-from requests.exceptions import ProxyError, ConnectionError, ReadTimeout, ConnectTimeout
+from requests.exceptions import ProxyError, ConnectionError, ReadTimeout, ConnectTimeout, ChunkedEncodingError
 from urllib3.exceptions import MaxRetryError, NewConnectionError
 from socket import getaddrinfo, gaierror
 from urllib.parse import urlparse
@@ -34,7 +35,6 @@ class PhantomBrowsingSession:
 
         tryings = 0
         max_tryings = 10
-        # print(f'   Trying {url} ...')
         while tryings < max_tryings:
             headers.update({'User-Agent': self._identity.user_agent})
             if self._referer:
@@ -47,18 +47,13 @@ class PhantomBrowsingSession:
                 self._referer = url
                 return self
 
-            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError,
-                    ReadTimeout, NewConnectionError):
+            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError, ReadTimeout,
+                    NewConnectionError, ChunkedEncodingError, CertificateError):
                 self._identity.some_connection_error()
                 self.refresh_identity()
 
-            except (CertificateError, ValueError) as e:
+            except Exception:
                 tryings += 1
-                log_message(f'Ignored exception: {e}')
-
-            except Exception as e:
-                tryings += 1
-                log_exception(e)
 
     @property
     def last_response(self):

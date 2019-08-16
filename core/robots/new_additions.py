@@ -17,7 +17,7 @@ def search_for_new_additions():
         return
 
     today = datetime.utcnow()
-    two_months_ago = today - timedelta(days=60)
+    time_ago = today - timedelta(days=30)
 
     # Configuration
     config_key = f'search_for_new_additions_{klass.source_name}'
@@ -47,7 +47,7 @@ def search_for_new_additions():
 
     # main loop
     new_additions = klass()
-    while current_native_dt <= to_native_dt and current_native_dt <= two_months_ago:
+    while current_native_dt <= to_native_dt and current_native_dt <= time_ago:
         if current_native_dt.strftime('%Y-%m-%d') in dts_done:
             current_native_dt += timedelta(days=1)
             continue
@@ -57,7 +57,6 @@ def search_for_new_additions():
             current_native_dt,
             current_native_dt + timedelta(days=1)
         )
-        # print(f'Found: {audiovisual_records_new}')
         for audiovisual_record in audiovisual_records_new:
             results = (
                 Search.Builder
@@ -66,7 +65,7 @@ def search_for_new_additions():
                 .search()
             )
             if len(results) == 0:
-                # print(f'Not exist, adding {audiovisual_record}')
+                search_for_new_additions.log(f'Adding new {audiovisual_record.name}')
                 audiovisual_record.save()
 
         dts_done.append(from_str)
