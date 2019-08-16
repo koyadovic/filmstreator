@@ -48,21 +48,12 @@ class PhantomBrowsingSession:
                 return self
 
             except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError, ReadTimeout,
-                    NewConnectionError, ChunkedEncodingError):
+                    NewConnectionError, ChunkedEncodingError, CertificateError):
                 self._identity.some_connection_error()
                 self.refresh_identity()
 
-            except RecursionError:
-                log_message(f'Recursion error logged when retrieving {url}')
-                break
-
-            except (CertificateError, ValueError) as e:
+            except Exception:
                 tryings += 1
-                log_message(f'Ignored exception: {e}')
-
-            except Exception as e:
-                tryings += 1
-                log_exception(e)
 
     @property
     def last_response(self):

@@ -118,8 +118,5 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
 
         session.get(href)
         response = session.last_response
-        try:
-            self._base_tree = html.fromstring(response.content)
-        except AttributeError:
-            raise GeneralInformationException('Unexpected response object')
+        self._base_tree = html.fromstring(response.content)
         return self._base_tree

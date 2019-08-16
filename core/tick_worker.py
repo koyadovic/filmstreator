@@ -80,17 +80,18 @@ class Ticker:
             for function in Ticker.INTERVALS[interval_slug]['functions']:
                 if not Ticker._can_acquire_lock(function):
                     continue
-                try:
-                    thread = threading.Thread(target=Ticker._thread_executed_function, args=[function])
-                    thread.start()
-                except Exception as e:
-                    log_exception(e)
+                thread = threading.Thread(target=Ticker._thread_executed_function, args=[function])
+                thread.start()
 
     @classmethod
     def _thread_executed_function(cls, function):
         print(f'Executing function {function}')
-        function()
-        Ticker._release_lock(function)
+        try:
+            function()
+        except Exception as e:
+            log_exception(e)
+        finally:
+            Ticker._release_lock(function)
 
     def start(self):
         while True:
