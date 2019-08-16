@@ -6,7 +6,7 @@ from core.tools import browsing_proxies
 from core.tools.exceptions import CoreException
 from core.tools.logs import log_exception, log_message
 
-from requests.exceptions import ProxyError, ConnectionError, ReadTimeout, ConnectTimeout
+from requests.exceptions import ProxyError, ConnectionError, ReadTimeout, ConnectTimeout, ChunkedEncodingError
 from urllib3.exceptions import MaxRetryError, NewConnectionError
 from socket import getaddrinfo, gaierror
 from urllib.parse import urlparse
@@ -55,7 +55,7 @@ class PhantomBrowsingSession:
                 log_message(f'Recursion error logged')
                 break
 
-            except (CertificateError, ValueError) as e:
+            except (ChunkedEncodingError, CertificateError, ValueError) as e:
                 tryings += 1
                 log_message(f'Ignored exception: {e}')
 
