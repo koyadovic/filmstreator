@@ -105,7 +105,10 @@ def details(request, slug=None):
     for genre in audiovisual_record.genres:
         related_search.add_condition(Condition('genres__name', Condition.EQUALS, genre['name']))
 
-    related_records = related_search.search(sort_by='-global_score', page_size=10, page=1, paginate=True)['results']
+    related_records = related_search.search(
+        sort_by=['-year', '-global_score', '-created_date'],
+        page_size=10, page=1, paginate=True
+    )['results']
 
     downloads = (
         Search.Builder
@@ -137,7 +140,10 @@ def genre_view(request, genre=None):
     search_builder.add_condition(Condition('has_downloads', Condition.EQUALS, True))
     search_builder.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
     search_builder.add_condition(Condition('genres__name', Condition.EQUALS, genre))
-    search = search_builder.search(paginate=True, page_size=20, page=page, sort_by='-global_score')
+    search = search_builder.search(
+        paginate=True, page_size=20, page=page,
+        sort_by=['-year', '-global_score', '-created_date']
+    )
     serializer = AudiovisualRecordSerializer(search.get('results', []), many=True)
     search['results'] = serializer.data
     _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
