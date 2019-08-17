@@ -129,5 +129,9 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
 
         session.get(href)
         response = session.last_response
+        if response is None:
+            raise GeneralInformationException(
+                f'Cannot retrieved detailed information for {self.audiovisual_record.name}'
+            )
         self._base_tree = html.fromstring(response.content)
         return self._base_tree
