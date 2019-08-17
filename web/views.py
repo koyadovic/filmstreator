@@ -91,7 +91,8 @@ def details(request, slug=None):
     )
     audiovisual_records = list(audiovisual_records)
     if len(audiovisual_records) == 0:
-        return render(request, 'web/404.html', status=404)
+        context = {'genres_names': _get_genres()}
+        return render(request, 'web/404.html', status=404, context=context)
 
     audiovisual_record = audiovisual_records[0]
 
@@ -153,24 +154,8 @@ def genre_view(request, genre=None):
 
 
 def dmca(request):
-    context = {
-        'genres_names': _get_genres()
-    }
+    context = {'genres_names': _get_genres()}
     return render(request, 'web/dmca.html', context=context)
-
-
-def page404(request, exception):
-    context = {
-        'genres_names': _get_genres()
-    }
-    return render(request, 'web/404.html', status=400, context=context)
-
-
-def page500(request):
-    context = {
-        'genres_names': _get_genres()
-    }
-    return render(request, 'web/500.html', status=500, context=context)
 
 
 """

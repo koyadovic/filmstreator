@@ -11,8 +11,6 @@ urlpatterns = [
     re_path(r'^humans\.txt$', TemplateView.as_view(template_name="web/humans.txt", content_type='text/plain')),
 
     path('dmca/', views.dmca),
-    path('404/', views.page404),
-    path('500/', views.page500),
 
     # regular pages
     path('genres/<str:genre>/', views.genre_view),

@@ -48,7 +48,7 @@ footer {
 }
 
 .big-icon {
-    font-size: 6em;
+    font-size: 6em !important;
     color: black;
     margin: 20px;
 }

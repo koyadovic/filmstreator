@@ -10,6 +10,7 @@
     {% include 'web/fragment_landing_advanced_filters.html' %}
 </nav>
 
+{% if genres_names %}
 <nav class="navbar navbar-default navbar-static-top second-nav">
     {% for genres_name in genres_names %}
         {% if forloop.counter < 10 %}
@@ -34,8 +35,8 @@
         </div>
     </li>
     {% endif %}
-
 </nav>
+{% endif %}
 
 <div class="container">
     {% block content %}{% endblock %}
