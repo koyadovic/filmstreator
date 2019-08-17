@@ -160,11 +160,17 @@ def dmca(request):
 
 
 def page404(request, exception):
-    return render(request, 'web/404.html', status=400)
+    context = {
+        'genres_names': _get_genres()
+    }
+    return render(request, 'web/404.html', status=400, context=context)
 
 
 def page500(request):
-    return render(request, 'web/500.html', status=500)
+    context = {
+        'genres_names': _get_genres()
+    }
+    return render(request, 'web/500.html', status=500, context=context)
 
 
 """
