@@ -9,6 +9,7 @@ urlpatterns = [
     re_path(r'^favicon\.ico$', favicon_view),
     re_path(r'^robots\.txt$', TemplateView.as_view(template_name="web/robots.txt", content_type='text/plain')),
     re_path(r'^humans\.txt$', TemplateView.as_view(template_name="web/humans.txt", content_type='text/plain')),
+    re_path(r'^loaderio\-60cc38984a2e87797755e2d79423ec12\.txt$', TemplateView.as_view(template_name="web/humans.txt", content_type='text/plain')),
 
     path('dmca/', views.dmca),
 
