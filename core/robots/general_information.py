@@ -51,6 +51,7 @@ def _update(audiovisual_record, general_information_klass):
             ) > 0
             if not exists:
                 audiovisual_record.name = general_information.name
+                audiovisual_record.slug = None
             else:
                 audiovisual_record.delete()
                 return
