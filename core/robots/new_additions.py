@@ -34,22 +34,30 @@ def search_for_new_additions():
     # parse dates to native objects
     from_native_dt = datetime.strptime(from_dt, '%Y-%m-%d')
     to_native_dt = datetime.strptime(to_dt, '%Y-%m-%d')
-    try:
-        current_native_dt = datetime.strptime(current_dt, '%Y-%m-%d')
-    except ValueError:
-        current_native_dt = from_native_dt
+    current_native_dt = to_native_dt  # TODO remove when done
 
-    if not (from_native_dt <= current_native_dt <= to_native_dt):
-        if current_native_dt > to_native_dt:
-            current_native_dt = to_native_dt
-        else:
-            current_native_dt = from_native_dt
+    # try:
+    #     current_native_dt = datetime.strptime(current_dt, '%Y-%m-%d')
+    # except ValueError:
+    #     current_native_dt = from_native_dt
+    #
+    # if not (from_native_dt <= current_native_dt <= to_native_dt):
+    #     if current_native_dt > to_native_dt:
+    #         current_native_dt = to_native_dt
+    #     else:
+    #         current_native_dt = from_native_dt
 
+    # TODO remove when done
+    while current_native_dt > time_ago:
+        current_native_dt -= timedelta(days=1)
+
+    # TODO when done, change all -= timedelta(days=1) for += timedelta(days=1)
+    # TODO and change configuration with the correct
     # main loop
     new_additions = klass()
-    while current_native_dt <= to_native_dt and current_native_dt <= time_ago:
+    while from_native_dt <= current_native_dt <= to_native_dt and current_native_dt <= time_ago:
         if current_native_dt.strftime('%Y-%m-%d') in dts_done:
-            current_native_dt += timedelta(days=1)
+            current_native_dt -= timedelta(days=1)
             continue
 
         from_str = current_native_dt.strftime('%Y-%m-%d')
@@ -69,7 +77,7 @@ def search_for_new_additions():
                 audiovisual_record.save()
 
         dts_done.append(from_str)
-        current_native_dt += timedelta(days=1)
+        current_native_dt -= timedelta(days=1)
         configuration.data['dts_done'] = dts_done
         configuration.data['current_dt'] = current_native_dt.strftime('%Y-%m-%d')
         configuration.save()
