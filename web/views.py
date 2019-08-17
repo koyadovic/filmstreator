@@ -165,7 +165,7 @@ def genre_view(request, genre=None):
 
 
 def remove_download(request, object_id):
-    if not request.user.is_staff and not request.user.is_superuser:
+    if not request.user.is_superuser:
         return HttpResponse(status=403)
 
     _id = ObjectId(object_id)

@@ -55,7 +55,7 @@
     <thead>
         <tr>
             <td><b>Quality</b></td><td><b>Source Language</b></td><td><b>Source</b></td><td><b>Name</b></td>
-            {% if request.user.is_staff %}<td><b>Remove</b></td>{% endif %}
+            {% if request.user.is_superuser %}<td><b>Remove</b></td>{% endif %}
         </tr>
     </thead>
     <tbody class="table-hover">
@@ -66,7 +66,7 @@
             <td onclick="window.open('{{ download.link }}', target='_blank');"><img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></td>
             <td onclick="window.open('{{ download.link }}', target='_blank');">{{ download.source_name }}</td>
             <td onclick="window.open('{{ download.link }}', target='_blank');">{{ download.name }}</td>
-            {% if request.user.is_staff %}
+            {% if request.user.is_superuser %}
             <td>
                 <a href="/remove-download/{{ download.id }}/" style="color: white;" class="btn btn-primary">Remove</a>
             </td>
