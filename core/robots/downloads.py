@@ -13,7 +13,7 @@ import concurrent
 
 @Ticker.execute_each(interval='1-minute')
 def compile_download_links_from_audiovisual_records():
-    with ThreadPoolExecutor(max_workers=50) as executor:
+    with ThreadPoolExecutor(max_workers=40) as executor:
         futures = []
         for source_class in get_all_download_sources():
             source_name = source_class.source_name
@@ -28,7 +28,7 @@ def compile_download_links_from_audiovisual_records():
                 .add_condition(Condition('deleted', Condition.EQUALS, False))
                 .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
                 .add_condition(Condition('created_date', Condition.GREAT_THAN, from_dt))
-                .search(paginate=True, page_size=50, page=1)
+                .search(paginate=True, page_size=40, page=1)
             )['results']
 
             for audiovisual_record in audiovisual_records:
@@ -64,8 +64,8 @@ def recent_films_without_good_downloads():
         .add_condition(Condition('deleted', Condition.EQUALS, False))
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
         .add_condition(Condition('year', Condition.GREAT_OR_EQUAL_THAN, n_days_ago.strftime('%Y')))
-        .search(paginate=True, page_size=10, page=1)
-    )['results']
+        .search()
+    )
     audiovisual_records = [ar for ar in audiovisual_records if ar not in audiovisual_records_to_exclude]
 
     with ThreadPoolExecutor(max_workers=10) as executor:
@@ -90,8 +90,8 @@ def delete_404_links():
         .Builder
         .new_search(DownloadSourceResult)
         .add_condition(Condition('last_check', Condition.LESS_THAN, n_days_ago))
-        .search(paginate=True, page_size=10, page=1, sort_by='last_check')
-    )['results']
+        .search()
+    )
 
     def _check_download_result_existence(dr):
         session = PhantomBrowsingSession(referer='https://www.google.com/')

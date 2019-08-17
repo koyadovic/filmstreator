@@ -16,9 +16,9 @@ def autocomplete_general_information_for_empty_audiovisual_records():
         Search.Builder.new_search(AudiovisualRecord)
                       .add_condition(Condition('deleted', Condition.EQUALS, False))
                       .add_condition(Condition('general_information_fetched', Condition.EQUALS, False))
-                      .search(paginate=True, page_size=50, page=1)
+                      .search(paginate=True, page_size=20, page=1)
     )['results']
-    with ThreadPoolExecutor(max_workers=50) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         futures = []
         for audiovisual_record in audiovisual_records:
             for general_information_klass in get_all_general_information_sources():
