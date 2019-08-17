@@ -165,21 +165,27 @@ def genre_view(request, genre=None):
 def remove_download(request, object_id):
     if not request.user.is_staff and not request.user.is_superuser:
         return HttpResponse(status=403)
-    _id = ObjectId(object_id)
-    download = (
-        Search.Builder
-        .new_search(DownloadSourceResult)
-        .add_condition(Condition('_id', Condition.EQUALS, _id))
-        .search()
-    )[0]
 
-    download.delete()
+    _id = ObjectId(object_id)
 
     try:
-        referer = request.META['HTTP_REFERER']
-        return redirect(referer)
+        download = (
+            Search.Builder
+            .new_search(DownloadSourceResult)
+            .add_condition(Condition('_id', Condition.EQUALS, _id))
+            .search()
+        )[0]
+        download.delete()
+
     except IndexError:
-        return redirect('/')
+        pass
+
+    finally:
+        try:
+            referer = request.META['HTTP_REFERER']
+            return redirect(referer)
+        except IndexError:
+            return redirect('/')
 
 
 def dmca(request):
