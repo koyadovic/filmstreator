@@ -14,7 +14,7 @@
 
 
 {% block content %}
-
+    <br>
     {% if audiovisual_record.name.50 %}
         <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }}) Torrent</h1>
     {% else %}
@@ -44,7 +44,13 @@
 
     <div class="float-restore"></div>
     <hr>
-    <h3>Download Sources:</h3>
+
+    <div class="text-center">
+    {% include 'web/fragment_social_links.html'  with text=audiovisual_record.name|add:' Downloads' url=request.build_absolute_uri %}
+    </div>
+    <hr>
+
+    <h3>Download Sources</h3>
     <table class="table table-hover table-borderless">
     <thead>
         <tr>

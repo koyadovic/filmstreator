@@ -18,6 +18,13 @@
         <p>Sorry but there is nothing to show here ...</p>
     {% endfor %}
     </div>
+
+    {% if search.results %}
+    <hr>
+    <div class="text-center">
+    {% include 'web/fragment_social_links.html'  with text='Best films about '|add:current_genre url=request.build_absolute_uri %}
+    </div>
+    {% endif %}
     <br>
     {% include 'web/fragment_page_navigation.html' %}
 
