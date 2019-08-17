@@ -273,7 +273,7 @@ class DownloadSourceResult(EqualityMixin):
 
     def save(self):
         from core import services
-        return services.save_download_source_results([self])
+        return services.save_download_source_result(self)
 
     def delete(self):
         self.deleted = True

@@ -33,6 +33,10 @@ def save_download_source_results(download_source_results):
     dao_implementation.save_download_source_results(download_source_results)
 
 
+def save_download_source_result(download_source_result):
+    dao_implementation.save_download_source_result(download_source_result)
+
+
 def delete_download_source_result(download_source_result):
     dao_implementation.delete_download_source_result(download_source_result)
 

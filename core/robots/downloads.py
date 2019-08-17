@@ -43,43 +43,45 @@ def compile_download_links_from_audiovisual_records():
             future.result(timeout=600)
 
 
-@Ticker.execute_each(interval='12-hours')
-def recent_films_without_good_downloads():
-    good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
-    n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
-
-    download_results = (
-        Search
-        .Builder
-        .new_search(DownloadSourceResult)
-        .add_condition(Condition('quality', Condition.IN, good_qualities))
-        .search()
-    )
-    audiovisual_records_to_exclude = [dr.audiovisual_record for dr in download_results]
-
-    audiovisual_records = (
-        Search
-        .Builder
-        .new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        .add_condition(Condition('year', Condition.GREAT_OR_EQUAL_THAN, n_days_ago.strftime('%Y')))
-        .search()
-    )
-    audiovisual_records = [ar for ar in audiovisual_records if ar not in audiovisual_records_to_exclude]
-
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = []
-        for source_class in get_all_download_sources():
-            for audiovisual_record in audiovisual_records:
-                future = executor.submit(
-                    _refresh_download_results_from_source, audiovisual_record, source_class
-                )
-                future.log_msg = f'Checking {audiovisual_record.name} with {source_class.source_name}'
-                futures.append(future)
-        for future in concurrent.futures.as_completed(futures):
-            recent_films_without_good_downloads.log(future.log_msg)
-            future.result(timeout=600)
+# @Ticker.execute_each(interval='12-hours')
+# TODO hay que repensar cómo mantener siempre 3 enlaces por fuente
+# TODO si se van eliminando qué hacer, cómo hacer
+# def recent_films_without_good_downloads():
+#     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
+#     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
+#
+#     download_results = (
+#         Search
+#         .Builder
+#         .new_search(DownloadSourceResult)
+#         .add_condition(Condition('quality', Condition.IN, good_qualities))
+#         .search()
+#     )
+#     audiovisual_records_to_exclude = [dr.audiovisual_record for dr in download_results]
+#
+#     audiovisual_records = (
+#         Search
+#         .Builder
+#         .new_search(AudiovisualRecord)
+#         .add_condition(Condition('deleted', Condition.EQUALS, False))
+#         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+#         .add_condition(Condition('year', Condition.GREAT_OR_EQUAL_THAN, n_days_ago.strftime('%Y')))
+#         .search()
+#     )
+#     audiovisual_records = [ar for ar in audiovisual_records if ar not in audiovisual_records_to_exclude]
+#
+#     with ThreadPoolExecutor(max_workers=10) as executor:
+#         futures = []
+#         for source_class in get_all_download_sources():
+#             for audiovisual_record in audiovisual_records:
+#                 future = executor.submit(
+#                     _refresh_download_results_from_source, audiovisual_record, source_class
+#                 )
+#                 future.log_msg = f'Checking {audiovisual_record.name} with {source_class.source_name}'
+#                 futures.append(future)
+#         for future in concurrent.futures.as_completed(futures):
+#             recent_films_without_good_downloads.log(future.log_msg)
+#             future.result(timeout=600)
 
 
 @Ticker.execute_each(interval='12-hours')
@@ -134,10 +136,17 @@ def _refresh_download_results_from_source(audiovisual_record, source_class):
             .search()
         )
         # limit results to 3 per each source
-        results = results[:3]
+        n = 0
+        real_results = []
         for result in results:
+            if result.quality in ['Audio', 'Unknown']:
+                continue
             result.audiovisual_record = audiovisual_record
-        services.save_download_source_results(results)
+            real_results.append(result)
+            n += 1
+            if n >= 3:
+                break
+        services.save_download_source_results(real_results)
 
     # remove all old download results
     for result in old_download_results:
@@ -157,6 +166,7 @@ def _check_has_downloads(audiovisual_record):
         Search
         .Builder
         .new_search(DownloadSourceResult)
+        .add_condition(Condition('deleted', Condition.EQUALS, False))
         .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
         .search()
     )

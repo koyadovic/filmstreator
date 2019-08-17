@@ -3,6 +3,7 @@ from django.http import HttpResponse
 
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
 from core.model.searches import Search, Condition
+from core.robots.downloads import _check_has_downloads
 from core.tools.strings import VideoQualityInStringDetector
 from web.serializers import AudiovisualRecordSerializer, GenreSerializer
 from django.shortcuts import render, redirect
@@ -117,6 +118,7 @@ def details(request, slug=None):
         Search.Builder
         .new_search(DownloadSourceResult)
         .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
+        .add_condition(Condition('deleted', Condition.EQUALS, False))
         .search(sort_by='quality')
     )
     context = {
@@ -176,7 +178,7 @@ def remove_download(request, object_id):
             .search()
         )[0]
         download.delete()
-
+        _check_has_downloads(download.audiovisual_record)
     except IndexError:
         pass
 

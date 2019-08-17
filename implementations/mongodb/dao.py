@@ -53,6 +53,17 @@ class DAOMongoDB(DAOInterface):
         collection = self._get_collection(MongoDownloadSourceResult)
         collection.insert(many_insert)
 
+    def save_download_source_result(self, result: MongoDownloadSourceResult):
+        dict_obj = dict(result)
+        collection = self._get_collection(MongoDownloadSourceResult)
+
+        _id = dict_obj.pop('_id', None)
+        if not _id:
+            result._id = collection.insert_one(dict_obj).inserted_id
+        else:
+            collection.update({'_id': _id}, dict_obj)
+        return result
+
     def delete_audiovisual_record(self, record: MongoAudiovisualRecord):
         collection = self._get_collection(MongoAudiovisualRecord)
         record_id = getattr(record, '_id', None)
