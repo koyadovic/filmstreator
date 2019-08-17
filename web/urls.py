@@ -14,6 +14,7 @@ urlpatterns = [
 
     # regular pages
     path('genres/<str:genre>/', views.genre_view),
+    path('remove-download/<str:object_id>/', views.remove_download),
     path('<slug:slug>/', views.details),
     path('', views.landing),
 ]

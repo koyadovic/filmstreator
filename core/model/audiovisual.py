@@ -253,6 +253,7 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
 
 class DownloadSourceResult(EqualityMixin):
     last_check: datetime
+    deleted: bool
     source_name: str
     name: str
     link: str
@@ -262,6 +263,7 @@ class DownloadSourceResult(EqualityMixin):
 
     def __init__(self, **kwargs):
         self.last_check = kwargs.pop('last_check', datetime.utcnow().replace(tzinfo=timezone.utc))
+        self.deleted = kwargs.pop('deleted', False)
         self.source_name = kwargs.pop('source_name', '')
         self.name = kwargs.pop('name', '')
         self.link = kwargs.pop('link', '')
@@ -269,6 +271,10 @@ class DownloadSourceResult(EqualityMixin):
         self.lang = kwargs.pop('lang', '')
         self.audiovisual_record = kwargs.pop('audiovisual_record', None)
 
-    def delete(self):
+    def save(self):
         from core import services
-        return services.delete_download_source_result(self)
+        return services.save_download_source_results([self])
+
+    def delete(self):
+        self.deleted = True
+        self.save()

@@ -1,8 +1,11 @@
+from bson import ObjectId
+from django.http import HttpResponse
+
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
 from core.model.searches import Search, Condition
 from core.tools.strings import VideoQualityInStringDetector
 from web.serializers import AudiovisualRecordSerializer, GenreSerializer
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils import timezone
 
 from datetime import timedelta
@@ -157,6 +160,26 @@ def genre_view(request, genre=None):
     }
 
     return render(request, 'web/genre.html', context=context)
+
+
+def remove_download(request, object_id):
+    if not request.user.is_staff and not request.user.is_superuser:
+        return HttpResponse(status=403)
+    _id = ObjectId(object_id)
+    download = (
+        Search.Builder
+        .new_search(DownloadSourceResult)
+        .add_condition(Condition('_id', Condition.EQUALS, _id))
+        .search()
+    )[0]
+
+    download.delete()
+
+    try:
+        referer = request.META['HTTP_REFERER']
+        return redirect(referer)
+    except IndexError:
+        return redirect('/')
 
 
 def dmca(request):

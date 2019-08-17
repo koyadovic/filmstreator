@@ -55,16 +55,22 @@
     <thead>
         <tr>
             <td><b>Quality</b></td><td><b>Source Language</b></td><td><b>Source</b></td><td><b>Name</b></td>
+            {% if request.user.is_staff %}<td><b>Remove</b></td>{% endif %}
         </tr>
     </thead>
     <tbody class="table-hover">
 
     {% for download in downloads %}
-        <tr onclick="window.open('{{ download.link }}', target='_blank');">
-            <td>{{ download.quality }}</td>
-            <td><img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></td>
-            <td>{{ download.source_name }}</td>
-            <td>{{ download.name }}</td>
+        <tr>
+            <td onclick="window.open('{{ download.link }}', target='_blank');">{{ download.quality }}</td>
+            <td onclick="window.open('{{ download.link }}', target='_blank');"><img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></td>
+            <td onclick="window.open('{{ download.link }}', target='_blank');">{{ download.source_name }}</td>
+            <td onclick="window.open('{{ download.link }}', target='_blank');">{{ download.name }}</td>
+            {% if request.user.is_staff %}
+            <td>
+                <a href="/remove-download/{{ download.id }}/" style="color: white;" class="btn btn-primary">Remove</a>
+            </td>
+            {% endif %}
         </tr>
     {% endfor %}
     </tbody>

@@ -159,6 +159,7 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         if hasattr(self, '_id') and bool(getattr(self, '_id')):
             yield '_id', self._id
         yield 'last_check', self.last_check
+        yield 'deleted', self.deleted
         yield 'source_name', self.source_name
         yield 'name', self.name
         yield 'link', self.link
@@ -178,6 +179,7 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         return MongoDownloadSourceResult(
             _id=getattr(download_source_result, '_id') if hasattr(download_source_result, '_id') else None,
             last_check=download_source_result.last_check,
+            deleted=download_source_result.deleted,
             name=download_source_result.name,
             source_name=download_source_result.source_name,
             link=download_source_result.link,
@@ -190,6 +192,10 @@ class MongoDownloadSourceResult(DownloadSourceResult):
     def check_collection(cls, db):
         collection = db[cls.collection_name]
         collection.create_index([('name', 'text')])
+
+    @property
+    def id(self):
+        return self._id
 
 
 class MongoConfiguration(Configuration):
