@@ -24,7 +24,7 @@ def ratio_of_containing_similar_string(container_string, text_string, min_length
     return max_ratio
 
 
-class VideoQualityInStringDetector:
+class VideoQualityInStringDetector:  # TODO hay que repensar esto
     """
     Algorithm will sort by 'possibility' length
     """
