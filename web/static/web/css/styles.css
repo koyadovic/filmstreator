@@ -2,6 +2,16 @@
     font-family: 'Roboto';
 }
 
+@media (max-width: 575.98px) {
+    .container {
+        min-width: 100%;
+    }
+}
+.second-nav {
+    justify-content: flex-start;
+}
+
+
 .top-navbar {
     position: fixed;
     top: 0;
@@ -342,7 +352,8 @@ a.resp-sharing-button__link:hover {
 .resp-sharing-button__icon--solid,
 .resp-sharing-button__icon--solidcircle {
   fill: #fff;
-  stroke: none
+  stroke: none;
+vertical-align: text-top;
 }
 
 .resp-sharing-button--twitter {
