@@ -1,3 +1,5 @@
+from random import shuffle
+
 from core.fetchers.services import get_all_download_sources
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
 from core.model.configurations import Configuration
@@ -17,7 +19,9 @@ from core.tools.logs import log_message
 def compile_download_links_from_audiovisual_records():
     with ThreadPoolExecutor(max_workers=20) as executor:
         futures = []
-        for source_class in get_all_download_sources():
+        sources = get_all_download_sources()
+        shuffle(sources)
+        for source_class in sources:
             source_name = source_class.source_name
             configuration = _get_ts_configuration(f'last_download_fetched_{source_name}')
             ts = configuration.data.get('ts', 0)
@@ -68,7 +72,9 @@ def recheck_downloads():
     )
     with ThreadPoolExecutor(max_workers=20) as executor:
         futures = []
-        for source_class in get_all_download_sources():
+        sources = get_all_download_sources()
+        shuffle(sources)
+        for source_class in sources:
             for audiovisual_record in audiovisual_records:
                 future = executor.submit(
                     _refresh_download_results_from_source, audiovisual_record, source_class
