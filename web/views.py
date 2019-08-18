@@ -176,6 +176,10 @@ def remove_download(request, object_id):
             .search()
         )[0]
         download.delete()
+
+        download.audiovisual_record.metadata['recheck_downloads'] = True
+        download.audiovisual_record.save()
+
         _check_has_downloads(download.audiovisual_record)
     except IndexError:
         pass
