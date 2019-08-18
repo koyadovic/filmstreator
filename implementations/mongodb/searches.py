@@ -8,7 +8,7 @@ from core.model.audiovisual import AudiovisualRecord, Person, Genre, DownloadSou
 from core.model.searches import Condition
 from core.tools.strings import ratio_of_containing_similar_string
 from implementations.mongodb.model import MongoAudiovisualRecord, MongoPerson, MongoGenre, MongoDownloadSourceResult
-from implementations.mongodb.connection import client
+from implementations.mongodb.connection import lazy_client
 
 
 CLASS_MAPPINGS = {
@@ -23,16 +23,13 @@ class SearchMongoDB(SearchInterface):
     # currently we implement the interface for searches here
     # in the future we will use ElasticSearch
 
-    def __init__(self):
-        self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
-
     def search(self, search, sort_by=None, paginate=False, page_size=20, page=1):
         target_class = search.target_class
         if target_class not in CLASS_MAPPINGS.values():
             target_class = CLASS_MAPPINGS[target_class]
 
         # filtering
-        collection = self._db[target_class.collection_name]
+        collection = self.db[target_class.collection_name]
         mongodb_search = _translate_search_to_mongodb_dict(search)
         # print(mongodb_search)
         results = collection.find(mongodb_search)
@@ -71,7 +68,7 @@ class SearchMongoDB(SearchInterface):
                                 selected_collection_name = collection_name
                                 selected_collection_class = collection_class
                         if max_ratio > 0.0:
-                            collection = self._db[selected_collection_name]
+                            collection = self.db[selected_collection_name]
                             result[k] = selected_collection_class(**collection.find_one({'_id': v}))
 
                 search_results.append(target_class(**result))
@@ -100,6 +97,11 @@ class SearchMongoDB(SearchInterface):
             return returned
         else:
             return search_results
+
+    @property
+    def db(self):
+        client = lazy_client.real_client
+        return client.filmstreator_test if settings.DEBUG else client.filmstreator
 
 
 def _translate_search_to_mongodb_dict(search):

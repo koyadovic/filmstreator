@@ -11,16 +11,10 @@ from core.model.configurations import Configuration
 from implementations.mongodb.model import MongoAudiovisualRecord, MongoGenre, MongoPerson, MongoDownloadSourceResult, \
     MongoConfiguration
 
-from implementations.mongodb.connection import client
+from implementations.mongodb.connection import lazy_client
 
 
 class DAOMongoDB(DAOInterface):
-    def __init__(self):
-        super().__init__()
-        self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
-        MongoAudiovisualRecord.check_collection(self._db)
-        MongoDownloadSourceResult.check_collection(self._db)
-        MongoConfiguration.check_collection(self._db)
 
     def save_audiovisual_record(self, record: AudiovisualRecord):
         record = MongoAudiovisualRecord.convert(record)
@@ -137,7 +131,12 @@ class DAOMongoDB(DAOInterface):
             return MongoPerson(**person_dict)
 
     def _get_collection(self, cls):
-        return self._db[cls.collection_name]
+        return self.db[cls.collection_name]
+
+    @property
+    def db(self):
+        client = lazy_client.real_client
+        return client.filmstreator_test if settings.DEBUG else client.filmstreator
 
 
 def _check_audiovisual_slug(dict_obj, collection):
