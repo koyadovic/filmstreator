@@ -92,6 +92,7 @@ def delete_404_links():
         .Builder
         .new_search(DownloadSourceResult)
         .add_condition(Condition('last_check', Condition.LESS_THAN, n_days_ago))
+        .add_condition(Condition('deleted', Condition.EQUALS, False))
         .search()
     )
 
@@ -102,8 +103,10 @@ def delete_404_links():
         audiovisual_record = dr.audiovisual_record
         while current_check < max_checks:
             current_check += 1
-            session.get(dr.link)
-            response = session.last_response
+            response = None
+            while response is None:
+                session.get(dr.link)
+                response = session.last_response
             if response.status_code > 299:
                 dr.delete()
                 _check_has_downloads(audiovisual_record)
