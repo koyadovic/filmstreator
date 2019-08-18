@@ -214,6 +214,11 @@ def dmca(request):
     return render(request, 'web/dmca.html', context=context)
 
 
+def terms_and_conditions(request):
+    context = {'genres_names': _get_genres()}
+    return render(request, 'web/terms_and_conditions.html', context=context)
+
+
 """
 Utilities
 """
