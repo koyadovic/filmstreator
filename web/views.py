@@ -167,9 +167,7 @@ def genre_view(request, genre=None):
 def remove_download(request, object_id):
     if not request.user.is_superuser:
         return HttpResponse(status=403)
-
     _id = ObjectId(object_id)
-
     try:
         download = (
             Search.Builder
@@ -181,7 +179,28 @@ def remove_download(request, object_id):
         _check_has_downloads(download.audiovisual_record)
     except IndexError:
         pass
+    finally:
+        try:
+            referer = request.META['HTTP_REFERER']
+            return redirect(referer)
+        except IndexError:
+            return redirect('/')
 
+
+def remove_film(request, object_id):
+    if not request.user.is_superuser:
+        return HttpResponse(status=403)
+    _id = ObjectId(object_id)
+    try:
+        audiovisual_record = (
+            Search.Builder
+            .new_search(AudiovisualRecord)
+            .add_condition(Condition('_id', Condition.EQUALS, _id))
+            .search()
+        )[0]
+        audiovisual_record.delete()
+    except IndexError:
+        pass
     finally:
         try:
             referer = request.META['HTTP_REFERER']

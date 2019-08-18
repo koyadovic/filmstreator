@@ -12,9 +12,11 @@ urlpatterns = [
 
     path('dmca/', views.dmca),
 
+    path('remove-download/<str:object_id>/', views.remove_download),
+    path('remove-film/<str:object_id>/', views.remove_film),
+
     # regular pages
     path('genres/<str:genre>/', views.genre_view),
-    path('remove-download/<str:object_id>/', views.remove_download),
     path('<slug:slug>/', views.details),
     path('', views.landing),
 ]

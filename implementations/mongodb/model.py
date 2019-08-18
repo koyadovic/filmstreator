@@ -145,6 +145,10 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         collection = db[cls.collection_name]
         collection.create_index([('name', 'text')])
 
+    @property
+    def id(self):
+        return self._id
+
 
 class MongoDownloadSourceResult(DownloadSourceResult):
     _id: str = None
