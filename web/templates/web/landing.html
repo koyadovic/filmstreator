@@ -32,10 +32,8 @@
     {% else %}
 
     <div class="text-center">
-
-    <div style="padding: 5rem 0;">
+    <div style="padding: 3rem 0 0 0;">
         <h1>Search for films, torrents and more</h1>
-
         <div class="container">
             <form action="/" method="GET" autocomplete="off">
                 <input type="hidden" name="formtype" value="basic">
@@ -48,7 +46,18 @@
                 </div>
             </form>
         </div>
+    <br>
+    <p>
+        Filmstreator is a new website to find the movie you want to see for today. We collect links from other websites and information about each movie making filtering and selection simple. We do not appropriate third-party content, our links redirect users to the final websites, where they can download. We do not host direct links, neither torrents nor magnet.
+    </p>
+    <p>
+        For more information see <a href="/info/terms-and-conditions/">terms and conditions</a>
+    </p>
+    <p>
+        <b><u>Welcome to Filmstreator</u></b>
+    </p>
     </div>
+    <hr>
 
     <h2>Recently added</h2>
     {% for audiovisual_item in last_records %}
