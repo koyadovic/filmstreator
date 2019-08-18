@@ -10,7 +10,7 @@
 
         <input type="text" class="form-control" placeholder="Search" name="name__icontains"
             value="{% if request.GET.formtype == 'basic' %}{{ request.GET.name__icontains }}{% endif %}">
-        <a id="show-advanced-search" class="btn btn-primary" data-toggle="collapse"
+        <a id="show-advanced-search" class="btn btn-secondary" data-toggle="collapse"
            href="#collapseSearch" role="button" aria-expanded="false" aria-controls="collapseSearch"
             style="margin-left:0.5em;">
             Advanced Search

@@ -9,7 +9,9 @@
 {% block content %}
 
     <h1 class="text-center">Best films about {{ current_genre }} genre</h1>
-    <hr>
+
+    {% include 'web/fragment_page_navigation.html' %}
+
     <!-- results -->
     <div class="text-center">
     {% for audiovisual_item in search.results %}
@@ -20,18 +22,11 @@
     </div>
 
     {% if search.results %}
+    {% include 'web/fragment_page_navigation.html' %}
     <hr>
     <div class="text-center">
     {% include 'web/fragment_social_links.html'  with text='Best films about '|add:current_genre url=request.build_absolute_uri %}
     </div>
     {% endif %}
-    <hr>
-    {% include 'web/fragment_page_navigation.html' %}
 
-{% endblock %}
-
-
-{% block body_extra_js %}
-    {{ block.super }}
-    <script src="{% static 'web/js/landing.js' %}"></script>
 {% endblock %}
