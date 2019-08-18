@@ -10,6 +10,8 @@ from datetime import datetime, timezone, timedelta
 from concurrent.futures.thread import ThreadPoolExecutor
 import concurrent
 
+from core.tools.logs import log_message
+
 
 @Ticker.execute_each(interval='1-minute')
 def compile_download_links_from_audiovisual_records():
@@ -107,7 +109,8 @@ def delete_404_links():
             while response is None:
                 session.get(dr.link)
                 response = session.last_response
-            if response.status_code > 299:
+            if response.status_code == 404:
+                log_message(f'Removed link {dr.link} with status code {response.status_code}')
                 dr.delete()
                 _check_has_downloads(audiovisual_record)
             return
