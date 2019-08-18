@@ -15,8 +15,10 @@
 {% block content %}
 
     {% if request.GET.formtype %}
-    <h1 class="text-center">Search results:</h1>
-    <hr>
+    <div class="container">
+        <h1 class="text-center">Search results:</h1>
+        <br>
+    </div>
     <!-- results -->
     <div class="text-center">
     {% for audiovisual_item in search.results %}
@@ -34,16 +36,18 @@
     <div style="padding: 5rem 0;">
         <h1>Search for films, torrents and more</h1>
 
-        <form action="/" method="GET" autocomplete="off">
-            <input type="hidden" name="formtype" value="basic">
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <div class="input-group-text"><i class="fa fa-search"></i></div>
+        <div class="container">
+            <form action="/" method="GET" autocomplete="off">
+                <input type="hidden" name="formtype" value="basic">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text"><i class="fa fa-search"></i></div>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Search" name="name__icontains"
+                        value="{% if request.GET.formtype == 'basic' %}{{ request.GET.name__icontains }}{% endif %}">
                 </div>
-                <input type="text" class="form-control" placeholder="Search" name="name__icontains"
-                    value="{% if request.GET.formtype == 'basic' %}{{ request.GET.name__icontains }}{% endif %}">
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
     <h2>Recently added</h2>
