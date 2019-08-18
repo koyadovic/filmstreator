@@ -525,3 +525,9 @@ background-color: #FF6600
   background-color: #1DA851;
   border-color: #1DA851;
 }
+
+
+.dropdown-menu {
+    left: -60px;
+    right: 20px;
+}
