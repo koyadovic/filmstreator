@@ -58,5 +58,6 @@ def _update(audiovisual_record, general_information_klass):
         audiovisual_record.general_information_fetched = True
         audiovisual_record.save()
 
-    except GeneralInformationException:
+    except GeneralInformationException as e:
+        log_exception(e, only_file=True)
         audiovisual_record.delete()
