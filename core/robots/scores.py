@@ -8,7 +8,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 import concurrent
 
 
-@Ticker.execute_each(interval='1-minute')
+@Ticker.execute_each(interval='5-minutes')
 def compile_scores_from_audiovisual_records():
     with ThreadPoolExecutor(max_workers=20) as executor:
         futures = []

@@ -10,7 +10,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 import concurrent
 
 
-@Ticker.execute_each(interval='1-minute')
+@Ticker.execute_each(interval='5-minutes')
 def autocomplete_general_information_for_empty_audiovisual_records():
     audiovisual_records = (
         Search.Builder.new_search(AudiovisualRecord)
