@@ -174,7 +174,7 @@ def delete_404_links():
             future.result(timeout=600)
 
 
-@Ticker.execute_each(interval='60-minutes')
+#@Ticker.execute_each(interval='60-minutes')
 def do_the_refresh():
     now = datetime.utcnow().replace(tzinfo=timezone.utc)
     records = (
