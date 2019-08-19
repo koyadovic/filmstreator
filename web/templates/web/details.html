@@ -16,9 +16,9 @@
 {% block content %}
     <br>
     {% if audiovisual_record.name.50 %}
-        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }}) Torrent {% if request.user.is_superuser %}<a href="/remove-film/{{ audiovisual_record.id }}/" style="color: white;" class="btn btn-secondary">Remove entire film</a>{% endif %}</h1>
+        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }}) Torrent {% if request.user.is_superuser %}<a href="#" onclick="removeFilm('{{ audiovisual_record.id }}');" style="color: white;" class="btn btn-secondary">Remove entire film</a>{% endif %}</h1>
     {% else %}
-        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name }} ({{ audiovisual_record.year }}) Torrent {% if request.user.is_superuser %}<a href="/remove-film/{{ audiovisual_record.id }}/" style="color: white;" class="btn btn-secondary">Remove entire film</a>{% endif %}</h1>
+        <h1 style="color: #5c6166; font-weight: 800;">{{ audiovisual_record.name }} ({{ audiovisual_record.year }}) Torrent {% if request.user.is_superuser %}<a href="#" onclick="removeFilm('{{ audiovisual_record.id }}');" style="color: white;" class="btn btn-secondary">Remove entire film</a>{% endif %}</h1>
     {% endif %}
 
     <img style="float: right;" src="{{ audiovisual_record.images.0 }}" alt="Main cover of {{ audiovisual_record.name }}">
@@ -68,7 +68,7 @@
             <td onclick="window.open('{{ download.link }}', target='_blank');">{{ download.name }}</td>
             {% if request.user.is_superuser %}
             <td>
-                <a href="/remove-download/{{ download.id }}/" style="color: white;" class="btn btn-secondary">Remove</a>
+                <a href="#" onclick="removeDownloadLink('{{ download.id }}');" style="color: white;" class="btn btn-secondary">Remove</a>
             </td>
             {% endif %}
         </tr>
@@ -91,4 +91,22 @@
     </div>
     {% endif %}
 
+{% endblock %}
+
+{% block body_extra_js %}
+    {{ block.super }}
+    {% if request.user.is_superuser %}
+    <script>
+    function removeFilm(pk) {
+        if(window.confirm('Are you sure to remove this film?')) {
+            window.location.href = '/remove-film/' + pk + '/';
+        }
+    }
+    function removeDownloadLink(pk) {
+        if(window.confirm('Are you sure to remove this link?')) {
+            window.location.href = '/remove-download/' + pk + '/';
+        }
+    }
+    </script>
+    {% endif %}
 {% endblock %}
