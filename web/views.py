@@ -30,7 +30,7 @@ def landing(request):
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
         .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 6.0))
         .search(
-            sort_by=['-year', '-global_score', '-created_date'],
+            sort_by=['-year', '-created_date', '-global_score'],
             page_size=20, page=1, paginate=True
         )
     )['results']
@@ -105,12 +105,24 @@ def details(request, slug=None):
     related_search.add_condition(Condition('has_downloads', Condition.EQUALS, True))
     related_search.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
     related_search.add_condition(Condition('name', Condition.NON_EQUALS, audiovisual_record.name))
+    related_search.add_condition(
+        Condition(
+            'year', Condition.IN, [
+                str(int(audiovisual_record.year) - 2),
+                str(int(audiovisual_record.year) - 1),
+                audiovisual_record.year,
+                str(int(audiovisual_record.year) + 1),
+                str(int(audiovisual_record.year) + 2),
+            ]
+        )
+    )
+
     related_search.add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
     for genre in audiovisual_record.genres:
         related_search.add_condition(Condition('genres__name', Condition.EQUALS, genre['name']))
 
     related_records = related_search.search(
-        sort_by=['-year', '-global_score', '-created_date'],
+        sort_by=['-global_score'],
         page_size=10, page=1, paginate=True
     )['results']
 
@@ -147,7 +159,7 @@ def genre_view(request, genre=None):
     search_builder.add_condition(Condition('genres__name', Condition.EQUALS, genre))
     search = search_builder.search(
         paginate=True, page_size=20, page=page,
-        sort_by=['-year', '-global_score', '-created_date']
+        sort_by=['-year', '-created_date', '-global_score']
     )
     serializer = AudiovisualRecordSerializer(search.get('results', []), many=True)
     search['results'] = serializer.data
