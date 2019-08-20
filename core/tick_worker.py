@@ -46,7 +46,13 @@ class Ticker:
         '60-minutes': {'seconds': 60 * 60, 'functions': []},
         '12-hours': {'seconds': 12 * 60 * 60, 'functions': []},
         '24-hours': {'seconds': 24 * 60 * 60, 'functions': []},
+        '2-days': {'seconds': 2 * 24 * 60 * 60, 'functions': []},
+        '3-days': {'seconds': 3 * 24 * 60 * 60, 'functions': []},
+        '4-days': {'seconds': 4 * 24 * 60 * 60, 'functions': []},
+        '5-days': {'seconds': 5 * 24 * 60 * 60, 'functions': []},
+        '6-days': {'seconds': 6 * 24 * 60 * 60, 'functions': []},
         '7-days': {'seconds': 7 * 24 * 60 * 60, 'functions': []},
+        '14-days': {'seconds': 14 * 24 * 60 * 60, 'functions': []},
     }
 
     @classmethod

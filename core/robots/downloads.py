@@ -91,7 +91,7 @@ def recheck_downloads():
         audiovisual_record.save()
 
 
-# @Ticker.execute_each(interval='12-hours')
+@Ticker.execute_each(interval='24-hours')
 def recent_films_without_good_downloads():
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
