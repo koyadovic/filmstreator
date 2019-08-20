@@ -91,7 +91,7 @@ def recheck_downloads():
         audiovisual_record.save()
 
 
-@Ticker.execute_each(interval='24-hours')
+@Ticker.execute_each(interval='3-days')
 def recent_films_without_good_downloads():
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
@@ -174,17 +174,25 @@ def delete_404_links():
             future.result(timeout=600)
 
 
-#@Ticker.execute_each(interval='60-minutes')
+@Ticker.execute_each(interval='60-minutes')
 def do_the_refresh():
+    last_timestamp = do_the_refresh.data.get('last_timestamp')
     now = datetime.utcnow().replace(tzinfo=timezone.utc)
-    records = (
+    from_datetime = None
+    if last_timestamp is not None:
+        from_datetime = datetime.utcfromtimestamp(last_timestamp).replace(tzinfo=timezone.utc)
+    search_builder = (
         Search.Builder
         .new_search(AudiovisualRecord)
-        .add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=2))).search()
+        .add_condition(Condition('updated_date', Condition.LESS_OR_EQUAL_THAN, now))
     )
+    if from_datetime is not None:
+        search_builder.add_condition(Condition('updated_date', Condition.GREAT_THAN, from_datetime))
+    records = search_builder.search()
     for record in records:
         do_the_refresh.log(f'Checking {record.name}')
         _check_has_downloads(record)
+    do_the_refresh.data.set('last_timestamp', now.timestamp())
 
 
 def _refresh_download_results_from_source(audiovisual_record, source_class):
