@@ -5,9 +5,37 @@ from datetime import datetime
 import glob
 import os
 
+from core.model.configurations import Configuration
+from core.services import get_configuration
 from core.tools.logs import log_exception
 from core.tools.packages import PackageDiscover, ModuleDiscover
 from core import robots
+
+
+class TickerFunctionData:
+    def __init__(self, function):
+        self._function = function
+
+    def set(self, key, value):
+        if key == 'enabled':
+            raise Exception
+        config = self._get_config()
+        config.data[key] = value
+        config.save()
+
+    def get(self, key, default=None):
+        return self._get_config().data.get(key, default)
+
+    def _get_config(self):
+        key = 'ticker__' + self._function.__name__
+        config = get_configuration(key)
+        if config is None:
+            config = Configuration(key=key, data=dict())
+            config.save()
+        if 'enabled' not in config.data:
+            config.data['enabled'] = True
+            config.save()
+        return config
 
 
 class Ticker:
@@ -17,6 +45,8 @@ class Ticker:
         '30-minutes': {'seconds': 30 * 60, 'functions': []},
         '60-minutes': {'seconds': 60 * 60, 'functions': []},
         '12-hours': {'seconds': 12 * 60 * 60, 'functions': []},
+        '24-hours': {'seconds': 24 * 60 * 60, 'functions': []},
+        '7-days': {'seconds': 7 * 24 * 60 * 60, 'functions': []},
     }
 
     @classmethod
@@ -80,6 +110,7 @@ class Ticker:
             for function in Ticker.INTERVALS[interval_slug]['functions']:
                 if not Ticker._can_acquire_lock(function):
                     continue
+                function.data = TickerFunctionData(function)
                 thread = threading.Thread(target=Ticker._thread_executed_function, args=[function])
                 thread.start()
 
