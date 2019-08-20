@@ -66,6 +66,7 @@ class Ticker:
                     f.write(text + '\n')
                     print(text)
 
+            func.data = TickerFunctionData(func)
             func.interval = interval
             func.log = log
             @functools.wraps(func)
@@ -116,7 +117,6 @@ class Ticker:
             for function in Ticker.INTERVALS[interval_slug]['functions']:
                 if not Ticker._can_acquire_lock(function):
                     continue
-                function.data = TickerFunctionData(function)
                 if not function.data.get('enabled'):
                     continue
                 thread = threading.Thread(target=Ticker._thread_executed_function, args=[function])
