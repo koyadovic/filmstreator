@@ -117,6 +117,8 @@ class Ticker:
                 if not Ticker._can_acquire_lock(function):
                     continue
                 function.data = TickerFunctionData(function)
+                if not function.data.get('enabled'):
+                    continue
                 thread = threading.Thread(target=Ticker._thread_executed_function, args=[function])
                 thread.start()
 
