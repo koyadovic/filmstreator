@@ -25,7 +25,11 @@ body {
     overflow-x: hidden;
     background: #eee;
 }
-
+h1 {
+    color: #5c6166;
+    font-weight: 800;
+    font-size: 2.0rem;
+}
 
 nav.top-nav {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
