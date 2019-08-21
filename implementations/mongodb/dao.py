@@ -5,22 +5,16 @@ from slugify import slugify
 
 from core.interfaces import DAOInterface
 from core.model.audiovisual import AudiovisualRecord, Genre, Person
-from pymongo import MongoClient
 from django.conf import settings
 
 from core.model.configurations import Configuration
 from implementations.mongodb.model import MongoAudiovisualRecord, MongoGenre, MongoPerson, MongoDownloadSourceResult, \
     MongoConfiguration
 
+from implementations.mongodb.connection import lazy_client
+
 
 class DAOMongoDB(DAOInterface):
-    def __init__(self):
-        super().__init__()
-        client = MongoClient(tz_aware=True)
-        self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
-        MongoAudiovisualRecord.check_collection(self._db)
-        MongoDownloadSourceResult.check_collection(self._db)
-        MongoConfiguration.check_collection(self._db)
 
     def save_audiovisual_record(self, record: AudiovisualRecord):
         record = MongoAudiovisualRecord.convert(record)
@@ -52,6 +46,17 @@ class DAOMongoDB(DAOInterface):
         many_insert = [dict(result) for result in results]
         collection = self._get_collection(MongoDownloadSourceResult)
         collection.insert(many_insert)
+
+    def save_download_source_result(self, result: MongoDownloadSourceResult):
+        dict_obj = dict(result)
+        collection = self._get_collection(MongoDownloadSourceResult)
+
+        _id = dict_obj.pop('_id', None)
+        if not _id:
+            result._id = collection.insert_one(dict_obj).inserted_id
+        else:
+            collection.update({'_id': _id}, dict_obj)
+        return result
 
     def delete_audiovisual_record(self, record: MongoAudiovisualRecord):
         collection = self._get_collection(MongoAudiovisualRecord)
@@ -126,7 +131,12 @@ class DAOMongoDB(DAOInterface):
             return MongoPerson(**person_dict)
 
     def _get_collection(self, cls):
-        return self._db[cls.collection_name]
+        return self.db[cls.collection_name]
+
+    @property
+    def db(self):
+        client = lazy_client.real_client
+        return client.filmstreator_test if settings.DEBUG else client.filmstreator
 
 
 def _check_audiovisual_slug(dict_obj, collection):

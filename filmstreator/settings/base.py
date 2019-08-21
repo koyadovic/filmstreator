@@ -1,9 +1,7 @@
 from implementations.mongodb.dao import DAOMongoDB
 from implementations.mongodb.searches import SearchMongoDB
-from sentry_sdk.integrations.django import DjangoIntegration
 from core import services
 
-import sentry_sdk
 import os
 
 
@@ -33,13 +31,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'request',
-    # 'rest_framework',
     'core',
     'implementations',
     'web',
 ]
 
 MIDDLEWARE = [
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -77,7 +75,7 @@ WSGI_APPLICATION = 'filmstreator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, '../db.sqlite3'),
     }
 }
 
@@ -130,13 +128,6 @@ dao_implementation = DAOMongoDB()
 search_implementation = SearchMongoDB()
 services.inject_dao_interface_implementation(dao_implementation)
 services.inject_search_interface_implementation(search_implementation)
-
-
-if DEBUG or True:
-    sentry_sdk.init(
-        dsn="https://3f87cf408a0042fc929df4e3ec80e390@sentry.io/1505406",
-        integrations=[DjangoIntegration()]
-    )
 
 
 REQUEST_IGNORE_PATHS = (

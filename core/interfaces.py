@@ -12,6 +12,9 @@ class DAOInterface:
     def save_download_source_results(self, results: List[DownloadSourceResult]):
         raise NotImplementedError
 
+    def save_download_source_result(self, result: DownloadSourceResult):
+        raise NotImplementedError
+
     def delete_audiovisual_record(self, record: AudiovisualRecord):
         raise NotImplementedError
 

@@ -24,7 +24,7 @@ def ratio_of_containing_similar_string(container_string, text_string, min_length
     return max_ratio
 
 
-class VideoQualityInStringDetector:
+class VideoQualityInStringDetector:  # TODO hay que repensar esto
     """
     Algorithm will sort by 'possibility' length
     """
@@ -80,6 +80,7 @@ class VideoQualityInStringDetector:
         {'possibility': 'PDTV', 'tag': 'HDTV'},
         {'possibility': 'VODR', 'tag': 'VODRip'},
         {'possibility': 'brip', 'tag': 'BluRayRip'},
+        {'possibility': 'brrip', 'tag': 'BluRayRip'},
         {'possibility': 'bdmv', 'tag': 'BluRayRip'},
         {'possibility': ' CAM ', 'tag': 'Cam'},
         {'possibility': ' PPV ', 'tag': 'PPVRip'},

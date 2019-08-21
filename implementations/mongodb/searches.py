@@ -2,13 +2,13 @@ import math
 import re
 
 from bson import ObjectId
-from pymongo import MongoClient
 from django.conf import settings
 from core.interfaces import SearchInterface
 from core.model.audiovisual import AudiovisualRecord, Person, Genre, DownloadSourceResult
 from core.model.searches import Condition
 from core.tools.strings import ratio_of_containing_similar_string
 from implementations.mongodb.model import MongoAudiovisualRecord, MongoPerson, MongoGenre, MongoDownloadSourceResult
+from implementations.mongodb.connection import lazy_client
 
 
 CLASS_MAPPINGS = {
@@ -23,17 +23,13 @@ class SearchMongoDB(SearchInterface):
     # currently we implement the interface for searches here
     # in the future we will use ElasticSearch
 
-    def __init__(self):
-        client = MongoClient(tz_aware=True)
-        self._db = client.filmstreator_test if settings.DEBUG else client.filmstreator
-
     def search(self, search, sort_by=None, paginate=False, page_size=20, page=1):
         target_class = search.target_class
         if target_class not in CLASS_MAPPINGS.values():
             target_class = CLASS_MAPPINGS[target_class]
 
         # filtering
-        collection = self._db[target_class.collection_name]
+        collection = self.db[target_class.collection_name]
         mongodb_search = _translate_search_to_mongodb_dict(search)
         # print(mongodb_search)
         results = collection.find(mongodb_search)
@@ -56,7 +52,6 @@ class SearchMongoDB(SearchInterface):
                     if k == '_id':
                         continue
                     if type(v) == ObjectId:
-
                         # this automate the translation of an object id into the referenced object
                         # from another collection searching similarities between collection names
                         # and the attribute name that contains the ObjectId
@@ -72,8 +67,12 @@ class SearchMongoDB(SearchInterface):
                                 selected_collection_name = collection_name
                                 selected_collection_class = collection_class
                         if max_ratio > 0.0:
-                            collection = self._db[selected_collection_name]
-                            result[k] = selected_collection_class(**collection.find_one({'_id': v}))
+                            collection = self.db[selected_collection_name]
+                            foreign_element = collection.find_one({'_id': v})
+                            if foreign_element is None:
+                                result[k] = {}
+                            else:
+                                result[k] = selected_collection_class(**foreign_element)
 
                 search_results.append(target_class(**result))
 
@@ -101,6 +100,11 @@ class SearchMongoDB(SearchInterface):
             return returned
         else:
             return search_results
+
+    @property
+    def db(self):
+        client = lazy_client.real_client
+        return client.filmstreator_test if settings.DEBUG else client.filmstreator
 
 
 def _translate_search_to_mongodb_dict(search):

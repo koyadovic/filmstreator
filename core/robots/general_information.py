@@ -10,15 +10,15 @@ from concurrent.futures.thread import ThreadPoolExecutor
 import concurrent
 
 
-@Ticker.execute_each(interval='1-minute')
+@Ticker.execute_each(interval='5-minutes')
 def autocomplete_general_information_for_empty_audiovisual_records():
     audiovisual_records = (
         Search.Builder.new_search(AudiovisualRecord)
                       .add_condition(Condition('deleted', Condition.EQUALS, False))
                       .add_condition(Condition('general_information_fetched', Condition.EQUALS, False))
-                      .search(paginate=True, page_size=20, page=1)
+                      .search(paginate=True, page_size=100, page=1)
     )['results']
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         futures = []
         for audiovisual_record in audiovisual_records:
             for general_information_klass in get_all_general_information_sources():
@@ -27,7 +27,7 @@ def autocomplete_general_information_for_empty_audiovisual_records():
                 futures.append(future)
         for future in concurrent.futures.as_completed(futures):
             autocomplete_general_information_for_empty_audiovisual_records.log(future.log_msg)
-            future.result()
+            future.result(timeout=600)
 
 
 def _update(audiovisual_record, general_information_klass):
@@ -43,9 +43,21 @@ def _update(audiovisual_record, general_information_klass):
         ) = general_information.writers_directors_stars
         audiovisual_record.genres = general_information.genres
         audiovisual_record.is_a_film = general_information.is_a_film
+        if audiovisual_record.name != general_information.name:
+            exists = len(
+                Search.Builder.new_search(AudiovisualRecord)
+                .add_condition(Condition('name', Condition.EQUALS, general_information.name))
+                .search()
+            ) > 0
+            if not exists:
+                audiovisual_record.name = general_information.name
+                audiovisual_record.slug = None
+            else:
+                audiovisual_record.delete()
+                return
         audiovisual_record.general_information_fetched = True
         audiovisual_record.save()
 
     except GeneralInformationException as e:
-        log_exception(e)
+        log_exception(e, only_file=True)
         audiovisual_record.delete()

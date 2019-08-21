@@ -104,4 +104,8 @@ venv.bak/
 .mypy_cache/
 
 .idea/
-static/
+/static/
+
+\.environment
+
+/core/robots/data/

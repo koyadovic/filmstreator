@@ -8,9 +8,9 @@ from concurrent.futures.thread import ThreadPoolExecutor
 import concurrent
 
 
-@Ticker.execute_each(interval='1-minute')
+@Ticker.execute_each(interval='5-minutes')
 def compile_scores_from_audiovisual_records():
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=20) as executor:
         futures = []
         for klass in get_all_scoring_sources():
             audiovisual_records = (
@@ -19,7 +19,7 @@ def compile_scores_from_audiovisual_records():
                       .add_condition(Condition('deleted', Condition.EQUALS, False))
                       .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
                       .add_condition(Condition('scores__source_name', Condition.NOT_IN, [klass.source_name]))
-                      .search(paginate=True, page_size=20, page=1)
+                      .search(paginate=True, page_size=100, page=1)
             )['results']
 
             for audiovisual_record in audiovisual_records:
@@ -29,7 +29,7 @@ def compile_scores_from_audiovisual_records():
 
         for future in concurrent.futures.as_completed(futures):
             compile_scores_from_audiovisual_records.log(future.log_msg)
-            future.result()
+            future.result(timeout=600)
 
 
 def _refresh_score(klass, audiovisual_record):

@@ -28,6 +28,17 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
             raise GeneralInformationException(f'Cannot locate the main image for {self.audiovisual_record.name}')
 
     @property
+    def name(self):
+        try:
+            name = self.base_tree.xpath('//div[@class="originalTitle"]/text()')[0]
+        except IndexError:
+            name = self.base_tree.xpath('//div[@class="title_wrapper"]/h1/text()')[0]
+        name = re.sub(r'[^\x00-\x7f]', r'', name)
+        if name == '':
+            raise GeneralInformationException(f'Name for {self.audiovisual_record.name} is \'\'.')
+        return name
+
+    @property
     def year(self):
         try:
             year_text_results = self.base_tree.xpath(
@@ -118,5 +129,9 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
 
         session.get(href)
         response = session.last_response
+        if response is None:
+            raise GeneralInformationException(
+                f'Cannot retrieved detailed information for {self.audiovisual_record.name}'
+            )
         self._base_tree = html.fromstring(response.content)
         return self._base_tree

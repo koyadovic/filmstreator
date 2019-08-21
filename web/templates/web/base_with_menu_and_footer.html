@@ -7,19 +7,20 @@
 <nav class="notbody navbar navbar-dark bg-dark top-navbar top-nav">
     <a class="text_with_2px_border navbar-brand" href="/">Filmstreator</a>
     {% include 'web/fragment_landing_filters.html' %}
-    {% include 'web/fragment_landing_advanced_filters.html' %}
+{#    {% include 'web/fragment_landing_advanced_filters.html' %}#}
 </nav>
 
+{% if genres_names %}
 <nav class="navbar navbar-default navbar-static-top second-nav">
     {% for genres_name in genres_names %}
-        {% if forloop.counter < 10 %}
+        {% if forloop.counter < 6 %}
         <li class="nav-item{% if genres_name == current_genre %} active{% endif %}">
             <a class="nav-link" href="/genres/{{ genres_name }}/">{{ genres_name }}<span class="sr-only">(current)</span></a>
         </li>
         {% endif %}
     {% endfor %}
 
-    {% if genres_names|length > 9 %}
+    {% if genres_names|length > 5 %}
 
     <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -27,15 +28,15 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% for genres_name in genres_names %}
-                {% if forloop.counter > 9 %}
+                {% if forloop.counter > 5 %}
                 <a class="dropdown-item{% if genres_name == current_genre %} active{% endif %}" href="/genres/{{ genres_name }}/">{{ genres_name }}</a>
                 {% endif %}
             {% endfor %}
         </div>
     </li>
     {% endif %}
-
 </nav>
+{% endif %}
 
 <div class="container">
     {% block content %}{% endblock %}

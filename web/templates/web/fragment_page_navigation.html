@@ -2,10 +2,22 @@
 <div class="notbody text-center" style="margin-bottom: 1em;">
     <!-- Page navigation -->
     {% if search.previous_page %}
-        <a class="btn btn-primary" href="{{ search.previous_page }}">Previous Page</a>
+        <a style="color: #555" class="btn" href="{{ search.previous_page }}"><i class="fa fa-backward" aria-hidden="true"></i></a>
+    {% else %}
+        {% if search.total_pages > 0 %}
+        <a style="color: #999" class="btn disabled" href=""><i class="fa fa-backward" aria-hidden="true"></i></a>
+        {% endif %}
+    {% endif %}
+
+    {% if search.total_pages > 0 %}
+    <span style="color: #555">{{ search.current_page }} of {{ search.total_pages }}</span>
     {% endif %}
 
     {% if search.next_page %}
-        <a class="btn btn-primary" href="{{ search.next_page }}">Next Page</a>
+        <a style="color: #555" class="btn" href="{{ search.next_page }}"><i class="fa fa-forward" aria-hidden="true"></i></a>
+    {% else %}
+        {% if search.total_pages > 0 %}
+        <a style="color: #999" class="btn disabled" href=""><i class="fa fa-forward" aria-hidden="true"></i></a>
+        {% endif %}
     {% endif %}
 </div>

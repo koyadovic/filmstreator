@@ -38,6 +38,9 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
                 trying += 1
                 session.get(self.base_url + self.relative_search_string(), timeout=30)
                 response = session.last_response
+                if response is None:
+                    session.refresh_identity()
+                    continue
                 base_tree = html.fromstring(response.content)
                 results = base_tree.xpath(self.anchors_xpath)
                 if len(results) == 0:

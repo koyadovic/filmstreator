@@ -1,8 +1,12 @@
+from bson import ObjectId
+from django.http import HttpResponse
+
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
 from core.model.searches import Search, Condition
+from core.robots.downloads import _check_has_downloads
 from core.tools.strings import VideoQualityInStringDetector
 from web.serializers import AudiovisualRecordSerializer, GenreSerializer
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils import timezone
 
 from datetime import timedelta
@@ -26,7 +30,7 @@ def landing(request):
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
         .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 6.0))
         .search(
-            sort_by=['-year', '-global_score', '-created_date'],
+            sort_by=['-year', '-created_date', '-global_score'],
             page_size=20, page=1, paginate=True
         )
     )['results']
@@ -91,7 +95,8 @@ def details(request, slug=None):
     )
     audiovisual_records = list(audiovisual_records)
     if len(audiovisual_records) == 0:
-        return render(request, 'web/404.html', status=404)
+        context = {'genres_names': _get_genres()}
+        return render(request, 'web/404.html', status=404, context=context)
 
     audiovisual_record = audiovisual_records[0]
 
@@ -100,16 +105,32 @@ def details(request, slug=None):
     related_search.add_condition(Condition('has_downloads', Condition.EQUALS, True))
     related_search.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
     related_search.add_condition(Condition('name', Condition.NON_EQUALS, audiovisual_record.name))
+    related_search.add_condition(
+        Condition(
+            'year', Condition.IN, [
+                str(int(audiovisual_record.year) - 2),
+                str(int(audiovisual_record.year) - 1),
+                audiovisual_record.year,
+                str(int(audiovisual_record.year) + 1),
+                str(int(audiovisual_record.year) + 2),
+            ]
+        )
+    )
+
     related_search.add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
     for genre in audiovisual_record.genres:
         related_search.add_condition(Condition('genres__name', Condition.EQUALS, genre['name']))
 
-    related_records = related_search.search(sort_by='-global_score', page_size=10, page=1, paginate=True)['results']
+    related_records = related_search.search(
+        sort_by=['-global_score'],
+        page_size=10, page=1, paginate=True
+    )['results']
 
     downloads = (
         Search.Builder
         .new_search(DownloadSourceResult)
         .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
+        .add_condition(Condition('deleted', Condition.EQUALS, False))
         .search(sort_by='quality')
     )
     context = {
@@ -136,7 +157,10 @@ def genre_view(request, genre=None):
     search_builder.add_condition(Condition('has_downloads', Condition.EQUALS, True))
     search_builder.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
     search_builder.add_condition(Condition('genres__name', Condition.EQUALS, genre))
-    search = search_builder.search(paginate=True, page_size=20, page=page, sort_by='-global_score')
+    search = search_builder.search(
+        paginate=True, page_size=20, page=page,
+        sort_by=['-year', '-created_date', '-global_score']
+    )
     serializer = AudiovisualRecordSerializer(search.get('results', []), many=True)
     search['results'] = serializer.data
     _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
@@ -152,19 +176,63 @@ def genre_view(request, genre=None):
     return render(request, 'web/genre.html', context=context)
 
 
+def remove_download(request, object_id):
+    if not request.user.is_superuser:
+        return HttpResponse(status=403)
+    _id = ObjectId(object_id)
+    try:
+        download = (
+            Search.Builder
+            .new_search(DownloadSourceResult)
+            .add_condition(Condition('_id', Condition.EQUALS, _id))
+            .search()
+        )[0]
+        download.delete()
+
+        download.audiovisual_record.metadata['recheck_downloads'] = True
+        download.audiovisual_record.save()
+
+        _check_has_downloads(download.audiovisual_record)
+    except IndexError:
+        pass
+    finally:
+        try:
+            referer = request.META['HTTP_REFERER']
+            return redirect(referer)
+        except IndexError:
+            return redirect('/')
+
+
+def remove_film(request, object_id):
+    if not request.user.is_superuser:
+        return HttpResponse(status=403)
+    _id = ObjectId(object_id)
+    try:
+        audiovisual_record = (
+            Search.Builder
+            .new_search(AudiovisualRecord)
+            .add_condition(Condition('_id', Condition.EQUALS, _id))
+            .search()
+        )[0]
+        audiovisual_record.delete()
+    except IndexError:
+        pass
+    finally:
+        try:
+            referer = request.META['HTTP_REFERER']
+            return redirect(referer)
+        except IndexError:
+            return redirect('/')
+
+
 def dmca(request):
-    context = {
-        'genres_names': _get_genres()
-    }
+    context = {'genres_names': _get_genres()}
     return render(request, 'web/dmca.html', context=context)
 
 
-def page404(request, exception):
-    return render(request, 'web/404.html', status=400)
-
-
-def page500(request):
-    return render(request, 'web/500.html', status=500)
+def terms_and_conditions(request):
+    context = {'genres_names': _get_genres()}
+    return render(request, 'web/terms_and_conditions.html', context=context)
 
 
 """
