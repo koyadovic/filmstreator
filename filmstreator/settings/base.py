@@ -124,12 +124,8 @@ REST_FRAMEWORK = {
     ]
 }
 
-dao_implementation = DAOMongoDB()
-search_implementation = SearchMongoDB()
-services.inject_dao_interface_implementation(dao_implementation)
-services.inject_search_interface_implementation(search_implementation)
 
-
+# from django-request application
 REQUEST_IGNORE_PATHS = (
     r'^ad/',
     r'^favicon\.',
@@ -139,3 +135,10 @@ REQUEST_IGNORE_USER_AGENTS = (
     r'Googlebot',
     r'Baiduspider',
 )
+
+
+# from core application
+dao_implementation = DAOMongoDB()
+search_implementation = SearchMongoDB()
+services.inject_dao_interface_implementation(dao_implementation)
+services.inject_search_interface_implementation(search_implementation)
