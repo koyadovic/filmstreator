@@ -1,6 +1,4 @@
 from core.model.configurations import Configuration
-from core.tick_worker import Ticker
-
 import os
 import re
 
@@ -38,14 +36,18 @@ def _get_proxy_config():
     return Configuration.get_configuration('proxies')
 
 
-@Ticker.execute_each(interval='30-minutes')
 def process_new_proxy_files():
+    """
+    Execute this function when the application is starting up so it can
+    load pending proxys before the application run
+    """
     for f_name in _get_new_file_names():
         proxy_config = _get_proxy_config()
         changed = False
         for line in _get_file_lines(f_name):
             if line not in proxy_config.data['proxies']:
                 proxy_config.data['proxies'].append(line)
+                print(f'From file {f_name} adding {line}.')
                 changed = True
         if changed:
             proxy_config.save()
