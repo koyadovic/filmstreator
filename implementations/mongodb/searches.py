@@ -70,7 +70,7 @@ class SearchMongoDB(SearchInterface):
                             collection = self.db[selected_collection_name]
                             foreign_element = collection.find_one({'_id': v})
                             if foreign_element is None:
-                                result[k] = {}
+                                result[k] = None
                             else:
                                 result[k] = selected_collection_class(**foreign_element)
 
