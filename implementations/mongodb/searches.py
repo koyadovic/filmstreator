@@ -52,7 +52,6 @@ class SearchMongoDB(SearchInterface):
                     if k == '_id':
                         continue
                     if type(v) == ObjectId:
-
                         # this automate the translation of an object id into the referenced object
                         # from another collection searching similarities between collection names
                         # and the attribute name that contains the ObjectId
@@ -69,7 +68,11 @@ class SearchMongoDB(SearchInterface):
                                 selected_collection_class = collection_class
                         if max_ratio > 0.0:
                             collection = self.db[selected_collection_name]
-                            result[k] = selected_collection_class(**collection.find_one({'_id': v}))
+                            foreign_element = collection.find_one({'_id': v})
+                            if foreign_element is None:
+                                result[k] = {}
+                            else:
+                                result[k] = selected_collection_class(**foreign_element)
 
                 search_results.append(target_class(**result))
 
