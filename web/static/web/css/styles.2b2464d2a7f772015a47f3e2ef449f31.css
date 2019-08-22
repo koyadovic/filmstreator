@@ -304,7 +304,10 @@ nav .active {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     z-index: 1;
     background: #f7f7f7;
-    margin-bottom: 20px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    margin-top: -1px;
 }
 
 /* SOCIAL LINKS */
@@ -545,4 +548,76 @@ background-color: #FF6600
 .dropdown-menu {
     left: -60px;
     right: 20px;
+}
+
+
+/* *************************************************************************************************************** */
+/* SIDENAV */
+
+nav.sidebar {
+    position: fixed;
+    width: 20em;
+    height: 100vh;
+    padding: 0 15px;
+    background: #ccc;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+section.content {
+    margin-left: 20em;
+}
+
+@media (max-width: 614px) {
+    .wrapper{
+        margin-top: 112px !important;
+    }
+}
+
+@media (max-height: 750px) {
+    nav.sidebar {
+        display: block;
+        position: static;
+        width:100%;
+        height: auto;
+        box-shadow: none;
+        background: #eee;
+        border-bottom: 1px solid #ddd;
+    }
+    section.content {
+        margin-left: 0em;
+    }
+}
+@media (max-width: 750px) {
+    nav.sidebar {
+        display: block;
+        position: static;
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+        background: #eee;
+        border-bottom: 1px solid #ddd;
+    }
+    section.content {
+        margin-left: 0em;
+    }
+}
+section.content .main-container.container-fluid {
+    padding: 30px;
+}
+
+.main-container.container {
+    margin-top: 56px;
+}
+@media (max-width: 614px) {
+    .main-container.container{
+        margin-top: 100px !important;
+    }
+}
+
+.wrapper {
+    margin-top: 56px;
+}
+
+nav.sidebar label {
+    margin-top: 10px;
 }
