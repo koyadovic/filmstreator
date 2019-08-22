@@ -9,7 +9,7 @@ from web.serializers import AudiovisualRecordSerializer, GenreSerializer
 from django.shortcuts import render, redirect
 from django.utils import timezone
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 import re
 
 
@@ -20,8 +20,9 @@ Normal Views
 
 def landing(request):
     get_params = dict(request.GET)
-    page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
+    get_params = {k: v[0] for k, v in get_params.items()}
 
+    page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
     last_records = (
         Search.Builder
         .new_search(AudiovisualRecord)
@@ -37,14 +38,24 @@ def landing(request):
 
     # filtering by users
     try:
-        conditions = _get_params_to_conditions(get_params)
+        ordering = get_params.pop('ordering', None)
+        conditions = _process_get_params_and_get_conditions(get_params)
+        get_params['ordering'] = ordering
+
         search_builder = Search.Builder.new_search(AudiovisualRecord)
         for condition in conditions:
             search_builder.add_condition(condition)
 
         search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
         search_builder.add_condition(Condition('has_downloads', Condition.EQUALS, True))
-        search = search_builder.search(paginate=True, page_size=20, page=page)
+        search_kwargs = {
+            'paginate': True,
+            'page_size': 20,
+            'page': page
+        }
+        if ordering is not None:
+            search_kwargs['sort_by'] = ordering
+        search = search_builder.search(**search_kwargs)
         """
         {
             'current_page': page,
@@ -65,13 +76,15 @@ def landing(request):
     # here we translate next page number and previous page number into urls
     _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
 
+    print(get_params)
     context = {
         # 'genres': genres,
         'last_records': last_records,
         'search': search,
-        'filter_params': {k: v[0] for k, v in get_params.items()},
+        'filter_params': get_params,
         'genres_names': _get_genres(),
-        'qualities': VideoQualityInStringDetector.our_qualities
+        'qualities': VideoQualityInStringDetector.our_qualities,
+        'year_range': [str(y) for y in range(1970, int(datetime.utcnow().strftime('%Y')) + 1)]
     }
     return render(request, 'web/landing.html', context=context)
 
@@ -139,7 +152,8 @@ def details(request, slug=None):
         'filter_params': get_params,
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
-        'related_records': related_records
+        'related_records': related_records,
+        'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
     }
     return render(request, 'web/details.html', context=context)
 
@@ -171,6 +185,7 @@ def genre_view(request, genre=None):
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
         'search': search,
+        'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
     }
 
     return render(request, 'web/genre.html', context=context)
@@ -226,12 +241,18 @@ def remove_film(request, object_id):
 
 
 def dmca(request):
-    context = {'genres_names': _get_genres()}
+    context = {
+        'genres_names': _get_genres(),
+        'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
+    }
     return render(request, 'web/dmca.html', context=context)
 
 
 def terms_and_conditions(request):
-    context = {'genres_names': _get_genres()}
+    context = {
+        'genres_names': _get_genres(),
+        'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
+    }
     return render(request, 'web/terms_and_conditions.html', context=context)
 
 
@@ -271,13 +292,12 @@ def _add_previous_and_next_navigation_uris_to_search(raw_uri, search):
                 search['next_page'] = raw_uri + f'?page={search["next_page"]}'
 
 
-def _get_params_to_conditions(params):
+def _process_get_params_and_get_conditions(params):
     conditions = []
     for k, v in params.items():
         if k in ['formtype', 'page']:
             continue
-
-        value = v[0]
+        value = v
         if value == '':
             continue
         k_parts = k.split('__')
@@ -287,8 +307,8 @@ def _get_params_to_conditions(params):
             value = value.split(',')
 
         value = _translate_value_datatype(f_name, value)
+        params[k] = value
         condition = Condition(f_name, comparator, value)
-        # print(condition)
         conditions.append(condition)
     return conditions
 

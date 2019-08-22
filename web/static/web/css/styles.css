@@ -558,7 +558,7 @@ nav.sidebar {
     position: fixed;
     width: 20em;
     height: 100vh;
-    padding: 15px;
+    padding: 0 15px;
     background: #ccc;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
@@ -601,4 +601,8 @@ section.content .container-fluid {
 
 .wrapper {
     margin-top: 56px;
+}
+
+nav.sidebar label {
+    margin-top: 10px;
 }

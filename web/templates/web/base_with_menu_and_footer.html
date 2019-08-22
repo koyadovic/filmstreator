@@ -39,34 +39,42 @@
 
 <div class="wrapper">
     <nav class="sidebar">
-        <form action="/" method="GET" autocomplete="off">
+    <!-- {'formtype': 'advanced', 'genres__name__in': ['Crime', 'Drama'], 'year__gte': '1970', 'year__lte': '2019'} -->
+        <form id="advanced-search-form" action="/" method="GET" autocomplete="off">
+            <input type="hidden" name="formtype" value="advanced">
             <label>Title</label>
             <input type="text" class="form-control" placeholder="Search" name="name__icontains"
                     value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.name__icontains }}{% endif %}">
 
             <label>Ordering</label>
             <select name="ordering" class="form-control">
-                <option>Score from best to worst</option>
-                <option>Score from worst to best</option>
+                <option value="-global_score"{% if filter_params.ordering == '-global_score' %} selected="selected"{% endif %}>Score from best to worst</option>
+                <option value="global_score"{% if filter_params.ordering == 'global_score' %} selected="selected"{% endif %}>Score from worst to best</option>
             </select>
             <label>Wanted genres</label>
-            <select class="form-control" name="genres" multiple="multiple" size="7">
+            <select id="genres-select" class="form-control" name="genres__in" multiple="multiple" size="7">
                 {% for genres_name in genres_names %}
-                    <option>{{ genres_name }}</option>
+                    <option value="{{ genres_name }}"
+                    {% if genres_name in filter_params.genres__name__in %} selected="selected"{% endif %}>{{ genres_name }}</option>
                 {% endfor %}
             </select>
             <label>From year:</label>
-            <select class="form-control">
-                <option>1980</option>
-                <option>1990</option>
-                <option>2000</option>
-
+            <select name="year__gte" class="form-control">
+                {% for y in year_range %}
+                <option value="{{ y }}"{% if y == filter_params.year__gte %} selected="selected"{% endif %}>{{ y }}</option>
+                {% endfor %}
             </select>
             <label>To year:</label>
-            <select class="form-control">
-                <option>1980</option>
-                <option>1990</option>
-                <option>2000</option>
+            <select name="year__lte" class="form-control">
+                {% if filter_params.year__lte %}
+                    {% for y in year_range %}
+                        <option value="{{ y }}"{% if y == filter_params.year__lte %} selected="selected"{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                {% else %}
+                    {% for y in year_range %}
+                        <option value="{{ y }}"{% if forloop.last %} selected="selected"{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                {% endif %}
             </select>
             <br>
             <div class="text-center">
@@ -83,4 +91,32 @@
 <!-- footer -->
 <br>
 {% include 'web/fragment_footer.html' %}
+{% endblock %}
+
+
+{% block body_extra_js %}
+<script>
+$('#advanced-search-form').on('submit', function (event) {
+    event.preventDefault();
+
+    var selectedGenresArray = [];
+    $('#genres-select :selected').each(function(i, selected){
+        selectedGenresArray.push($(selected).text());
+    });
+
+    var selectedGenres = selectedGenresArray.join(',');
+    var nameIcontains = $("#advanced-search-form input[name=name__icontains]").val();
+    var ordering = $("#advanced-search-form select[name=ordering]").val();
+    var yearGte = $("#advanced-search-form select[name=year__gte]").val();
+    var yearLte = $("#advanced-search-form select[name=year__lte]").val();
+
+    var url = '/?formtype=advanced';
+    if(nameIcontains !== '') url += '&name__icontains=' + nameIcontains;
+    if (selectedGenres !== '') url += '&genres__name__in=' + selectedGenres;
+    url += '&year__gte=' + yearGte;
+    url += '&year__lte=' + yearLte;
+    url += '&ordering=' + ordering;
+    window.location = url;
+});
+</script>
 {% endblock %}
