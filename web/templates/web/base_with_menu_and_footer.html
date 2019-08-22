@@ -39,6 +39,13 @@
 
 {% if is_landing %}
 <div class="wrapper">
+    <section class="content">
+{% endif %}
+    <div class="main-container {% if is_landing %}container-fluid{% else %}container{% endif %}">
+        {% block content %}{% endblock %}
+    </div>
+{% if is_landing %}
+    </section>
     <nav class="sidebar">
     <!-- {'formtype': 'advanced', 'genres__name__in': ['Crime', 'Drama'], 'year__gte': '1970', 'year__lte': '2019'} -->
         <form id="advanced-search-form" action="/" method="GET" autocomplete="off">
@@ -84,13 +91,6 @@
             <br>
         </form>
     </nav>
-    <section class="content">
-{% endif %}
-    <div class="main-container {% if is_landing %}container-fluid{% else %}container{% endif %}">
-        {% block content %}{% endblock %}
-    </div>
-{% if is_landing %}
-    </section>
 </div>
 {% endif %}
 <!-- footer -->
