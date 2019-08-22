@@ -7,7 +7,6 @@
 <nav class="notbody navbar navbar-dark bg-dark top-navbar top-nav">
     <a class="text_with_2px_border navbar-brand" href="/">Filmstreator</a>
     {% include 'web/fragment_landing_filters.html' %}
-{#    {% include 'web/fragment_landing_advanced_filters.html' %}#}
 </nav>
 
 {% if genres_names %}
@@ -38,45 +37,50 @@
 </nav>
 {% endif %}
 
-<div class="container">
-    {% block content %}{% endblock %}
-</div>
+<div class="wrapper">
+    <nav class="sidebar">
+        <form action="/" method="GET" autocomplete="off">
+            <label>Title</label>
+            <input type="text" class="form-control" placeholder="Search" name="name__icontains"
+                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.name__icontains }}{% endif %}">
 
+            <label>Ordering</label>
+            <select name="ordering" class="form-control">
+                <option>Score from best to worst</option>
+                <option>Score from worst to best</option>
+            </select>
+            <label>Wanted genres</label>
+            <select class="form-control" name="genres" multiple="multiple" size="7">
+                {% for genres_name in genres_names %}
+                    <option>{{ genres_name }}</option>
+                {% endfor %}
+            </select>
+            <label>From year:</label>
+            <select class="form-control">
+                <option>1980</option>
+                <option>1990</option>
+                <option>2000</option>
+
+            </select>
+            <label>To year:</label>
+            <select class="form-control">
+                <option>1980</option>
+                <option>1990</option>
+                <option>2000</option>
+            </select>
+            <br>
+            <div class="text-center">
+                <input type="submit" name="submit" value="Search" class="btn btn-secondary">
+            </div>
+        </form>
+    </nav>
+    <section class="content">
+        <div class="container-fluid">
+            {% block content %}{% endblock %}
+        </div>
+    </section>
+</div>
 <!-- footer -->
 <br>
 {% include 'web/fragment_footer.html' %}
-{% endblock %}
-
-{% block body_extra_js %}
-    {{ block.super }}
-    <script>
-    /* ON READY! */
-    $(function() {
-        // show and hide logic for form search
-        $("#show-advanced-search").on("click", function() {
-            $("#basic-search-form").fadeOut("slow", function () {
-            });
-        });
-        $("#hide-advanced-search").on("click", function() {
-            $("#basic-search-form").fadeIn("slow", function () {
-            });
-        });
-
-        // update labels for numeric input ranges
-        $(".numeric-input-range > input").each(function() {
-            updateLabelOnNumericRange($(this).get(0));
-        });
-    });
-
-    $(".numeric-input-range > input").on('input', function(ev) {
-        updateLabelOnNumericRange(ev.currentTarget);
-    });
-
-    function updateLabelOnNumericRange(inp) {
-        var label = inp.parentElement.getElementsByTagName('label')[0];
-        var value = inp.value;
-        var oldText = label.innerText;
-        label.innerText = /[\d\.]+/.test(oldText) ? oldText.replace(/[\d\.]+/, value) : oldText + " " + value;
-    }
-    </script>
 {% endblock %}
