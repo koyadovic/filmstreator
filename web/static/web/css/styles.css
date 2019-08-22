@@ -567,6 +567,12 @@ section.content {
     margin-left: 20em;
 }
 
+@media (max-width: 614px) {
+    .wrapper{
+        margin-top: 112px !important;
+    }
+}
+
 @media (max-height: 750px) {
     nav.sidebar {
         display: block;
@@ -595,8 +601,17 @@ section.content {
         margin-left: 0em;
     }
 }
-section.content .container-fluid {
+section.content .main-container.container-fluid {
     padding: 30px;
+}
+
+.main-container.container {
+    margin-top: 56px;
+}
+@media (max-width: 614px) {
+    .main-container.container{
+        margin-top: 100px !important;
+    }
 }
 
 .wrapper {

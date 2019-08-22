@@ -76,9 +76,9 @@ def landing(request):
     # here we translate next page number and previous page number into urls
     _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
 
-    print(get_params)
     context = {
         # 'genres': genres,
+        'is_landing': True,
         'last_records': last_records,
         'search': search,
         'filter_params': get_params,
@@ -147,6 +147,7 @@ def details(request, slug=None):
         .search(sort_by='quality')
     )
     context = {
+        'is_landing': False,
         'audiovisual_record': audiovisual_record,
         'downloads': downloads,
         'filter_params': get_params,
@@ -161,9 +162,10 @@ def details(request, slug=None):
 def genre_view(request, genre=None):
     try:
         referer_uri = request.META['HTTP_REFERER']
-        get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
+        # get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
     except (IndexError, KeyError):
-        get_params = {}
+        pass
+        # get_params = {}
     page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
 
     search_builder = Search.Builder.new_search(AudiovisualRecord)
@@ -180,7 +182,8 @@ def genre_view(request, genre=None):
     _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
 
     context = {
-        'filter_params': get_params,
+        # 'filter_params': get_params,
+        'is_landing': True,
         'current_genre': genre,
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
@@ -242,6 +245,7 @@ def remove_film(request, object_id):
 
 def dmca(request):
     context = {
+        'is_landing': False,
         'genres_names': _get_genres(),
         'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
     }
@@ -250,6 +254,7 @@ def dmca(request):
 
 def terms_and_conditions(request):
     context = {
+        'is_landing': False,
         'genres_names': _get_genres(),
         'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
     }

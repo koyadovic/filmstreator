@@ -37,6 +37,7 @@
 </nav>
 {% endif %}
 
+{% if is_landing %}
 <div class="wrapper">
     <nav class="sidebar">
     <!-- {'formtype': 'advanced', 'genres__name__in': ['Crime', 'Drama'], 'year__gte': '1970', 'year__lte': '2019'} -->
@@ -68,11 +69,11 @@
             <select name="year__lte" class="form-control">
                 {% if filter_params.year__lte %}
                     {% for y in year_range %}
-                        <option value="{{ y }}"{% if y == filter_params.year__lte %} selected="selected"{% endif %}>{{ y }}</option>
+                        <option a="a" value="{{ y }}"{% if y == filter_params.year__lte %} selected="selected"{% endif %}>{{ y }}</option>
                     {% endfor %}
                 {% else %}
                     {% for y in year_range %}
-                        <option value="{{ y }}"{% if forloop.last %} selected="selected"{% endif %}>{{ y }}</option>
+                        <option b="b" value="{{ y }}"{% if forloop.last %} selected="selected"{% endif %}>{{ y }}</option>
                     {% endfor %}
                 {% endif %}
             </select>
@@ -80,14 +81,18 @@
             <div class="text-center">
                 <input type="submit" name="submit" value="Search" class="btn btn-secondary">
             </div>
+            <br>
         </form>
     </nav>
     <section class="content">
-        <div class="container-fluid">
-            {% block content %}{% endblock %}
-        </div>
+{% endif %}
+    <div class="main-container {% if is_landing %}container-fluid{% else %}container{% endif %}">
+        {% block content %}{% endblock %}
+    </div>
+{% if is_landing %}
     </section>
 </div>
+{% endif %}
 <!-- footer -->
 <br>
 {% include 'web/fragment_footer.html' %}
