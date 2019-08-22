@@ -89,6 +89,7 @@ class VideoQualityInStringDetector:  # TODO hay que repensar esto
         {'possibility': ' WEB ', 'tag': 'WEBRip'},
         {'possibility': ' bdr ', 'tag': 'BluRayRip'},
         {'possibility': ' TS ', 'tag': 'TS'},
+        {'possibility': ' t-s rip', 'tag': 'TS'},
         {'possibility': ' WP ', 'tag': 'WP'},
         {'possibility': ' TC ', 'tag': 'Telecine'},
         {'possibility': ' R5 ', 'tag': 'R5'},
