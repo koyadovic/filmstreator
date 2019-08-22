@@ -43,23 +43,23 @@
     <!-- {'formtype': 'advanced', 'genres__name__in': ['Crime', 'Drama'], 'year__gte': '1970', 'year__lte': '2019'} -->
         <form id="advanced-search-form" action="/" method="GET" autocomplete="off">
             <input type="hidden" name="formtype" value="advanced">
-            <label>Title</label>
+            <label>Title:</label>
             <input type="text" class="form-control" placeholder="Search" name="name__icontains"
                     value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.name__icontains }}{% endif %}">
 
-            <label>Ordering</label>
+            <label>Ordering:</label>
             <select name="ordering" class="form-control">
                 <option value="-global_score"{% if filter_params.ordering == '-global_score' %} selected="selected"{% endif %}>Score from best to worst</option>
                 <option value="global_score"{% if filter_params.ordering == 'global_score' %} selected="selected"{% endif %}>Score from worst to best</option>
             </select>
-            <label>Wanted genres</label>
+            <label>Wanted genres:</label>
             <select id="genres-select" class="form-control" name="genres__in" multiple="multiple" size="7">
                 {% for genres_name in genres_names %}
                     <option value="{{ genres_name }}"
                     {% if genres_name in filter_params.genres__name__in %} selected="selected"{% endif %}>{{ genres_name }}</option>
                 {% endfor %}
             </select>
-            <label>From year:</label>
+            <label>Film from year:</label>
             <select name="year__gte" class="form-control">
                 {% for y in year_range %}
                 <option value="{{ y }}"{% if y == filter_params.year__gte %} selected="selected"{% endif %}>{{ y }}</option>
