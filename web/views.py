@@ -152,7 +152,7 @@ def details(request, slug=None):
         'audiovisual_record': audiovisual_record,
         'downloads': downloads,
         'filter_params': get_params,
-        'genres_names': _get_genres(),
+        # 'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
         'related_records': related_records,
         'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)

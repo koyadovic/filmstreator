@@ -10,6 +10,11 @@
     <meta property="og:type" content="video.movie" />
     <meta property="og:url" content="{{ request.build_absolute_uri }}" />
     <meta property="og:image" content="{{ audiovisual_record.images.0 }}" />
+    <style>
+    .main-container.container {
+        margin-top: 0px;
+    }
+    </style>
     {% endblock %}
 
 
@@ -50,9 +55,13 @@
     </div>
     <hr>
 
-    <h3>Download Sources</h3>
-    <table class="table table-hover table-borderless">
+    <table class="table table-hover table-dark">
     <thead>
+        <tr>
+            <td class="text-center" colspan="{% if request.user.is_superuser %}5{% else %}4{% endif %}">
+                <b>Download Sources</b>
+            </td>
+        </tr>
         <tr>
             <td><b>Quality</b></td><td><b>Source Language</b></td><td><b>Source</b></td><td><b>Name</b></td>
             {% if request.user.is_superuser %}<td><b>Remove</b></td>{% endif %}
