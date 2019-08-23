@@ -137,6 +137,7 @@ REQUEST_IGNORE_USER_AGENTS = (
     r'YandexBot',
     r'YandexMobileBot',
     r'AhrefsBot',
+    r'bingbot',
 )
 
 
