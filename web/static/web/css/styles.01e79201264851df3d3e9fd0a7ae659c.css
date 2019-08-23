@@ -601,6 +601,9 @@ td {
 
 /* *************************************************************************************************************** */
 /* SIDENAV */
+.navbar {
+    z-index: 100 !important;
+}
 
 nav.sidebar {
     position: fixed;
@@ -620,7 +623,7 @@ section.content {
 }
 
 section.content .main-container.container-fluid {
-    padding: 30px;
+    padding: 0px 30px;
 }
 
 .main-container.container {
@@ -655,6 +658,18 @@ div.audiovisual-item-container:hover {
 /* Narrow screens like mobile phones */
 
 @media (max-height: 750px), (max-width: 750px) {
+    .top-navbar {
+        position: static;
+    }
+    .notbody.navbar * {
+        font-size: .750rem;
+    }
+    footer * {
+        font-size: .950rem;
+    }
+    footer {
+        position: static;
+    }
     .main-container.container{
         margin-top: 20px !important;
         margin-bottom: 50px;
@@ -690,7 +705,8 @@ div.audiovisual-item-container:hover {
         margin-top: 50px;
     }
     body {
-        /* padding-top: 0px !important; */
         margin-bottom: 0em;
+        margin-top: 0px;
+        padding-top: 0px !important;
     }
 }
