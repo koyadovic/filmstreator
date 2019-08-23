@@ -29,7 +29,7 @@ h1, h2, h3 {
     /* color: #5c6166; */
     color: #222;
     font-weight: 800;
-    text-shadow: 2px 2px 8px #aaa;
+    text-shadow: 2px 2px 2px #aaa;
 }
 
 h1 {
@@ -307,7 +307,7 @@ nav .active {
 }
 
 .second-nav {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
     z-index: 1;
     background: #f7f7f7;
     position: fixed;
@@ -622,7 +622,7 @@ nav.sidebar {
     padding: 0 15px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     top: 0;
-    margin-top: 120px;
+    margin-top: 118px;
     background: #5c6166;
     color: #fff;
     text-shadow: 2px 2px 8px #000;
