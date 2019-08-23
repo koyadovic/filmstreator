@@ -115,9 +115,9 @@ class Ticker:
         interval_slugs = self._get_applying_intervals(ts)
         for interval_slug in interval_slugs:
             for function in Ticker.INTERVALS[interval_slug]['functions']:
-                if not Ticker._can_acquire_lock(function):
-                    continue
                 if not function.data.get('enabled'):
+                    continue
+                if not Ticker._can_acquire_lock(function):
                     continue
                 thread = threading.Thread(target=Ticker._thread_executed_function, args=[function])
                 thread.start()
