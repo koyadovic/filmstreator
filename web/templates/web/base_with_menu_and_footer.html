@@ -48,7 +48,7 @@
     </section>
     <nav class="sidebar">
     <!-- {'formtype': 'advanced', 'genres__name__in': ['Crime', 'Drama'], 'year__gte': '1970', 'year__lte': '2019'} -->
-        <form id="advanced-search-form" action="/" method="GET" autocomplete="off">
+        <form id="advanced-search-form" action="/s/" method="GET" autocomplete="off">
             <input type="hidden" name="formtype" value="advanced">
             <label>Title:</label>
             <input type="text" class="form-control" placeholder="Search" name="name__icontains"
@@ -115,7 +115,7 @@ $('#advanced-search-form').on('submit', function (event) {
     var yearGte = $("#advanced-search-form select[name=year__gte]").val();
     var yearLte = $("#advanced-search-form select[name=year__lte]").val();
 
-    var url = '/?formtype=advanced';
+    var url = '/s/?formtype=advanced';
     if(nameIcontains !== '') url += '&name__icontains=' + nameIcontains;
     if (selectedGenres !== '') url += '&genres__name__in=' + selectedGenres;
     url += '&year__gte=' + yearGte;
