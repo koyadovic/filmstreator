@@ -683,6 +683,8 @@ div.audiovisual-item-container:hover {
     .main-container.container{
         margin-top: 20px !important;
         margin-bottom: 50px;
+        padding-left: 10px;
+        padding-right: 10px;
     }
     .wrapper {
         margin-top: 20px;
@@ -702,7 +704,7 @@ div.audiovisual-item-container:hover {
         margin-left: 0em;
     }
     section.content .main-container.container-fluid {
-        padding: 0px;
+        padding: 0px 10px;
     }
     .container {
         padding-left: 0;
