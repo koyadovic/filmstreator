@@ -575,6 +575,22 @@ li.nav-item {
     border-radius: 5px;
 }
 
+table {
+    table-layout:fixed;
+}
+td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+@media only screen and (max-width: 480px) {
+    /* horizontal scrollbar for tables if mobile screen */
+    .tablemobile {
+        overflow-x: auto;
+        display: block;
+    }
+}
+
 /* *************************************************************************************************************** */
 /* SIDENAV */
 
@@ -652,10 +668,17 @@ div.audiovisual-item-container:hover {
     section.content .main-container.container-fluid {
         padding: 0px;
     }
+    .container {
+        padding-left: 0;
+        padding-right: 0;
+    }
     .dropdown-menu {
         margin-top: -90px;
     }
     .centered {
         margin-top: 50px;
+    }
+    body {
+        /* padding-top: 0px !important; */
     }
 }
