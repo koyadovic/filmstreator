@@ -16,7 +16,8 @@
 
     {% if request.GET.formtype %}
     <h1 class="text-center">Search results:</h1>
-    <br>
+    {% include 'web/fragment_page_navigation.html' %}
+
     <!-- results -->
     <div class="text-center">
     {% for audiovisual_item in search.results %}
