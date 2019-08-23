@@ -667,7 +667,7 @@ div.audiovisual-item-container:hover {
 
 /* Narrow screens like mobile phones */
 
-@media (max-height: 750px), (max-width: 750px) {
+@media (max-width: 750px) {
     .top-navbar {
         position: static;
     }
