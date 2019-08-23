@@ -17,7 +17,7 @@ from core.tools.logs import log_message
 
 @Ticker.execute_each(interval='1-minute')
 def compile_download_links_from_audiovisual_records():
-    with ThreadPoolExecutor(max_workers=20) as executor:
+    with ThreadPoolExecutor(max_workers=30) as executor:
         futures = []
         sources = get_all_download_sources()
         shuffle(sources)
