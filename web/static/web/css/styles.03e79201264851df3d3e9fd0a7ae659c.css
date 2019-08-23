@@ -318,6 +318,13 @@ nav .active {
 
 /* SOCIAL LINKS */
 
+.social-links-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 .resp-sharing-button__link {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
