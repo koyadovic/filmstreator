@@ -2,6 +2,7 @@ from bson import ObjectId
 from django.http import HttpResponse
 
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
+from core.model.configurations import Configuration
 from core.model.searches import Search, Condition
 from core.robots.downloads import _check_has_downloads
 from core.tools.strings import VideoQualityInStringDetector
@@ -326,7 +327,11 @@ def _translate_value_datatype(f_name, value):
 
 
 def _get_genres():
-    search_builder = Search.Builder.new_search(Genre)
-    genres = search_builder.search(sort_by='name')
-    serializer = GenreSerializer(genres, many=True)
-    return [e['name'] for e in serializer.data]
+    configuration = Configuration.get_configuration('genres_with_films')
+    if configuration is None:
+        search_builder = Search.Builder.new_search(Genre)
+        genres = search_builder.search(sort_by='name')
+        serializer = GenreSerializer(genres, many=True)
+        return [e['name'] for e in serializer.data]
+    else:
+        return configuration.data
