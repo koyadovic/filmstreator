@@ -26,8 +26,10 @@ body {
     background: #eee;
 }
 h1, h2, h3 {
-    color: #5c6166;
+    /* color: #5c6166; */
+    color: #222;
     font-weight: 800;
+    text-shadow: 2px 2px 8px #aaa;
 }
 
 h1 {
@@ -53,6 +55,7 @@ footer {
     bottom: 0;
     left: 0;
     right: 0;
+    z-index: 100;
 }
 
 .centered {
@@ -315,9 +318,14 @@ nav .active {
 
 /* SOCIAL LINKS */
 
+.resp-sharing-button__link {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
 .resp-sharing-button__link,
 .resp-sharing-button__icon {
-  display: inline-block
+  display: inline-block;
+    border-radius: 5px;
 }
 
 a.resp-sharing-button__link:visited {
@@ -599,10 +607,12 @@ nav.sidebar {
     width: 20em;
     height: 100vh;
     padding: 0 15px;
-    background: #ccc;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     top: 0;
     margin-top: 120px;
+    background: #5c6166;
+    color: #fff;
+    text-shadow: 2px 2px 8px #000;
 }
 
 section.content {
@@ -644,22 +654,21 @@ div.audiovisual-item-container:hover {
 
 /* Narrow screens like mobile phones */
 @media (max-width: 614px) {
-    .wrapper{
-        margin-top: 112px !important;
-    }
     .main-container.container{
         margin-top: 100px !important;
     }
 }
 
 @media (max-height: 750px), (max-width: 750px) {
+    .second-nav {
+        position: static;
+    }
     nav.sidebar {
         display: block;
         position: static;
         width:100%;
         height: auto;
         box-shadow: none;
-        background: #eee;
         margin-top: 0px;
     }
     section.content {
@@ -680,5 +689,6 @@ div.audiovisual-item-container:hover {
     }
     body {
         /* padding-top: 0px !important; */
+        margin-bottom: 0em;
     }
 }
