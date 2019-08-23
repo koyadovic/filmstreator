@@ -58,9 +58,9 @@
     <div class="text-center">
     {% include 'web/fragment_social_links.html'  with text=audiovisual_record.name|add:' Downloads' url=request.build_absolute_uri %}
     </div>
-    <hr>
+    <br>
 
-    <table class="table table-hover table-dark">
+    <table class="table table-hover">
     <thead>
         <tr>
             <td class="text-center" colspan="{% if request.user.is_superuser %}5{% else %}4{% endif %}">
