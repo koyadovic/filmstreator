@@ -30,13 +30,22 @@ class SearchMongoDB(SearchInterface):
 
         # filtering
         collection = self.db[target_class.collection_name]
-        mongodb_search = _translate_search_to_mongodb_dict(search)
-        # print(mongodb_search)
-        results = collection.find(mongodb_search)
+
+        is_searchable = target_class.is_searchable
+        mongodb_search = _translate_search_to_mongodb_dict(search, is_searchable=is_searchable)
+        if type(mongodb_search) == list:
+            results = collection.find(*mongodb_search)
+        else:
+            results = collection.find(mongodb_search)
 
         # sorting
-        if sort_by is not None:
-            mongo_sort_by = _translate_sort_by_to_mongo_dict(sort_by)
+        mongo_sort_by = tuple()
+        if is_searchable:
+            mongo_sort_by = mongo_sort_by + tuple([('_textScoreValue', {'$meta': 'textScore'})])
+        additional_sort = _translate_sort_by_to_mongo_dict(sort_by) if sort_by is not None else tuple()
+        additional_sort = additional_sort or tuple()
+        mongo_sort_by = mongo_sort_by + additional_sort
+        if len(mongo_sort_by) > 0:
             results = results.sort(mongo_sort_by)
 
         # pagination
@@ -48,6 +57,7 @@ class SearchMongoDB(SearchInterface):
         n_items = results.count()
         if n_items > 0:
             for result in results:
+                print(result.get('_textScoreValue'), result.get('name'))
                 for k, v in result.items():
                     if k == '_id':
                         continue
@@ -107,7 +117,71 @@ class SearchMongoDB(SearchInterface):
         return client.filmstreator_test if settings.DEBUG else client.filmstreator
 
 
-def _translate_search_to_mongodb_dict(search):
+def _translate_search_to_mongodb_dict(search, is_searchable=False):
+    if is_searchable:
+        return _translate_search_to_mongodb_dict_index_search(search)
+    else:
+        return _translate_search_to_mongodb_dict_normal_search(search)
+
+
+def _guess_if_have_text_index_search(search, index_field=None):
+    for condition_group in search.conditions:
+        for condition in condition_group:
+            field_path = condition.field_path.replace('__', '.')
+            operator = condition.operator
+            if index_field is not None and field_path == index_field and operator == Condition.SIMILAR:
+                return True
+    return False
+
+
+def _translate_search_to_mongodb_dict_index_search(search):
+    # {$text: {$search: 'john wiss 2'}, 'year': {'$gte': '1970', '$lte': '2018'}}, {score: {'$meta': "textScore"}}
+    dict_condition = {}
+    for condition in search.conditions[0]:
+        field_path = condition.field_path.replace('__', '.')
+        operator = condition.operator
+        value = condition.value
+        if field_path == 'search':
+            # {$text: {$search: 'john wiss 2'}
+            dict_condition['$text'] = {}
+            dict_condition['$text']['$search'] = value
+
+        else:
+            # for references
+            if hasattr(value, '_id'):
+                value = getattr(value, '_id')
+
+            if field_path not in dict_condition:
+                dict_condition[field_path] = {}
+
+            if operator == Condition.EQUALS:
+                dict_condition[field_path] = value
+            elif operator == Condition.NON_EQUALS:
+                dict_condition[field_path]['$ne'] = value
+            elif operator == Condition.LESS_THAN:
+                dict_condition[field_path]['$lt'] = value
+            elif operator == Condition.GREAT_THAN:
+                dict_condition[field_path]['$gt'] = value
+            elif operator == Condition.LESS_OR_EQUAL_THAN:
+                dict_condition[field_path]['$lte'] = value
+            elif operator == Condition.GREAT_OR_EQUAL_THAN:
+                dict_condition[field_path]['$gte'] = value
+            elif operator == Condition.IN:
+                dict_condition[field_path]['$in'] = value
+            elif operator == Condition.NOT_IN:
+                dict_condition[field_path]['$nin'] = value
+            elif operator == Condition.CONTAINS:
+                dict_condition[field_path] = re.compile(value)
+            elif operator == Condition.ICONTAINS:
+                dict_condition[field_path] = re.compile(value, re.IGNORECASE)
+
+            if dict_condition[field_path] == {}:
+                del dict_condition[field_path]
+
+    return [dict_condition, {'_textScoreValue': {'$meta': "textScore"}}]
+
+
+def _translate_search_to_mongodb_dict_normal_search(search):
     or_dict_elements = []
     for condition_group in search.conditions:
         dict_condition = {}
@@ -141,6 +215,10 @@ def _translate_search_to_mongodb_dict(search):
                     dict_condition[field_path] = re.compile(value)
                 elif operator == Condition.ICONTAINS:
                     dict_condition[field_path] = re.compile(value, re.IGNORECASE)
+
+                if dict_condition[field_path] == {}:
+                    del dict_condition[field_path]
+
         or_dict_elements.append(dict_condition)
 
     if len(or_dict_elements) == 1:

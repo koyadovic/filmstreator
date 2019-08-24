@@ -59,8 +59,8 @@
         <form id="advanced-search-form" action="/s/" method="GET" autocomplete="off">
             <input type="hidden" name="formtype" value="advanced">
             <label>Title:</label>
-            <input type="text" class="form-control" placeholder="Search" name="name__icontains"
-                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.name__icontains }}{% endif %}">
+            <input type="text" class="form-control" placeholder="Search" name="search"
+                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.search }}{% endif %}">
 
             <label>Ordering:</label>
             <select name="ordering" class="form-control">
@@ -117,13 +117,13 @@ $('#advanced-search-form').on('submit', function (event) {
     });
 
     var selectedGenres = selectedGenresArray.join(',');
-    var nameIcontains = $("#advanced-search-form input[name=name__icontains]").val();
+    var searchSimilar = $("#advanced-search-form input[name=search]").val();
     var ordering = $("#advanced-search-form select[name=ordering]").val();
     var yearGte = $("#advanced-search-form select[name=year__gte]").val();
     var yearLte = $("#advanced-search-form select[name=year__lte]").val();
 
     var url = '/s/?formtype=advanced';
-    if(nameIcontains !== '') url += '&name__icontains=' + nameIcontains;
+    if(searchSimilar !== '') url += '&search=' + searchSimilar;
     if (selectedGenres !== '') url += '&genres__name__in=' + selectedGenres;
     url += '&year__gte=' + yearGte;
     url += '&year__lte=' + yearLte;
