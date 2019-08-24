@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'request',
     'core',
     'implementations',
     'web',
@@ -43,7 +42,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'request.middleware.RequestMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -123,23 +121,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
-
-
-# from django-request application
-REQUEST_IGNORE_PATHS = (
-    r'^ad/',
-    r'^favicon\.',
-)
-REQUEST_IGNORE_USER_AGENTS = (
-    r'^$',  # ignore requests with no user agent string set
-    r'Googlebot',
-    r'Baiduspider',
-    r'YandexBot',
-    r'YandexMobileBot',
-    r'AhrefsBot',
-    r'bingbot',
-    r'BingPreview',
-)
 
 
 # from core application
