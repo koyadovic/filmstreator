@@ -22,7 +22,7 @@ def compile_download_links_from_audiovisual_records():
     compile_download_links_from_audiovisual_records.log(f'Current switch interval: {sys.getswitchinterval()}')
 
     def _worker(source_class):
-        with ThreadPoolExecutor(max_workers=3) as executor:
+        with ThreadPoolExecutor(max_workers=6) as executor:
             futures = []
             source_name = source_class.source_name
             compile_download_links_from_audiovisual_records.log(f'Begin to retrieve audovisual records for {source_name}')
@@ -74,7 +74,6 @@ def compile_download_links_from_audiovisual_records():
 
     for thread in threads:
         thread.join()
-
 
 
 @Ticker.execute_each(interval='1-minute')
