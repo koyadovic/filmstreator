@@ -58,8 +58,8 @@
 
         <form id="advanced-search-form" action="/s/" method="GET" autocomplete="off">
             <input type="hidden" name="formtype" value="advanced">
-            <label>Title:</label>
-            <input type="text" class="form-control" placeholder="Search" name="search"
+            <label>Search:</label>
+            <input type="text" class="form-control" placeholder="Title, writers, directors, actors, years" name="search"
                     value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.search }}{% endif %}">
 
             <label>Ordering:</label>

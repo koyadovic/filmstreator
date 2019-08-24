@@ -1,3 +1,5 @@
+import urllib
+
 from bson import ObjectId
 from django.http import HttpResponse
 
@@ -94,7 +96,9 @@ def details(request, slug=None):
     now = timezone.now()
     try:
         referer_uri = request.META['HTTP_REFERER']
+        referer_uri = urllib.parse.unquote(referer_uri)
         get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
+        print(get_params)
     except (IndexError, KeyError):
         get_params = {}
 
@@ -155,7 +159,7 @@ def details(request, slug=None):
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
         'related_records': related_records,
-        'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
+        'year_range': [str(y) for y in range(1970, int(datetime.utcnow().strftime('%Y')) + 1)]
     }
     return render(request, 'web/details.html', context=context)
 
