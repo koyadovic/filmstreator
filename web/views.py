@@ -1,3 +1,5 @@
+import urllib
+
 from bson import ObjectId
 from django.http import HttpResponse
 
@@ -94,7 +96,9 @@ def details(request, slug=None):
     now = timezone.now()
     try:
         referer_uri = request.META['HTTP_REFERER']
+        referer_uri = urllib.parse.unquote(referer_uri)
         get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
+        print(get_params)
     except (IndexError, KeyError):
         get_params = {}
 
@@ -155,7 +159,7 @@ def details(request, slug=None):
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
         'related_records': related_records,
-        'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
+        'year_range': [str(y) for y in range(1970, int(datetime.utcnow().strftime('%Y')) + 1)]
     }
     return render(request, 'web/details.html', context=context)
 
@@ -306,16 +310,20 @@ def _process_get_params_and_get_conditions(params):
         value = v
         if value == '':
             continue
-        k_parts = k.split('__')
-        f_name = '__'.join(k_parts[:-1])
-        comparator = k_parts[-1]
-        if comparator in [Condition.IN, Condition.NOT_IN]:
-            value = value.split(',')
+        if k == 'search':
+            condition = Condition('search', Condition.SIMILAR, value)
+            conditions.append(condition)
+        else:
+            k_parts = k.split('__')
+            f_name = '__'.join(k_parts[:-1])
+            comparator = k_parts[-1]
+            if comparator in [Condition.IN, Condition.NOT_IN]:
+                value = value.split(',')
 
-        value = _translate_value_datatype(f_name, value)
-        params[k] = value
-        condition = Condition(f_name, comparator, value)
-        conditions.append(condition)
+            value = _translate_value_datatype(f_name, value)
+            params[k] = value
+            condition = Condition(f_name, comparator, value)
+            conditions.append(condition)
     return conditions
 
 

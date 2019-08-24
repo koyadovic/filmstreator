@@ -62,6 +62,15 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
             raise GeneralInformationException(f'Cannot locate the year for {self.audiovisual_record.name}')
 
     @property
+    def summary(self):
+        try:
+            summary_text = self.base_tree.xpath('//div[@class="summary_text"]/text()')[0]
+            summary_text = summary_text or ''
+        except IndexError:
+            summary_text = ''
+        return summary_text.strip()
+
+    @property
     def writers_directors_stars(self):
         possible_targets = ['director:', 'star:', 'writer:']
         directors = []
@@ -131,7 +140,7 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
         response = session.last_response
         if response is None:
             raise GeneralInformationException(
-                f'Cannot retrieved detailed information for {self.audiovisual_record.name}'
+                f'Cannot retrieve detailed information for {self.audiovisual_record.name}'
             )
         self._base_tree = html.fromstring(response.content)
         return self._base_tree
