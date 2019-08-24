@@ -41,7 +41,8 @@ def compile_download_links_from_audiovisual_records():
                 future = executor.submit(
                     _refresh_download_results_from_source, audiovisual_record, source_class
                 )
-                future.log_msg = f'Checking {audiovisual_record.name} with {source_class.source_name}'
+                future.log_msg = f'Checking {audiovisual_record.name} ({audiovisual_record.year}) with ' \
+                                 f'{source_class.source_name}'
                 future.audiovisual_record = audiovisual_record
                 future.source_class = source_class
                 futures.append(future)
