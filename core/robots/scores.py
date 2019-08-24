@@ -10,7 +10,7 @@ import concurrent
 
 @Ticker.execute_each(interval='5-minutes')
 def compile_scores_from_audiovisual_records():
-    with ThreadPoolExecutor(max_workers=20) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         futures = []
         for klass in get_all_scoring_sources():
             audiovisual_records = (
