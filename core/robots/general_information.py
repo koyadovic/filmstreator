@@ -64,7 +64,7 @@ def _update(audiovisual_record, general_information_klass):
         audiovisual_record.delete()
 
 
-@Ticker.execute_each(interval='1-minutes')
+@Ticker.execute_each(interval='1-minute')
 def autocomplete_missing_summaries():
     audiovisual_records_without_summary_key = (
         Search.Builder.new_search(AudiovisualRecord)
