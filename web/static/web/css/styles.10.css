@@ -712,8 +712,8 @@ div.audiovisual-item-container {
     padding: 5px;
     overflow: hidden;
     height: 200px;
-    width: 30%;
-    max-width: 138px;
+    width: 45%;
+    max-width: 170px;
     display: inline-block;
     transition: transform .2s ease;
 }
