@@ -8,6 +8,7 @@ nav.notbody.navbar.navbar-dark.bg-dark.top-navbar.top-nav {
 }
 footer#sticky-footer {
     background-color: #004466 !important;
+    box-shadow: 0 -2px 4px 0 rgba(0, 0, 0, 0.1), 0 -6px 10px 0 rgba(0, 0, 0, 0.09);
 }
 .btn.btn-secondary {
     background-color: #326984 !important;
@@ -21,9 +22,7 @@ footer#sticky-footer {
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 10px 0 rgba(0, 0, 0, 0.19);
 }
 .sidebar {
-    background: #e5ecef !important;
     color: #046;
-    text-shadow: 2px 2px 2px #e5ecef;
 }
 
 /*
@@ -366,7 +365,7 @@ a:hover {
 }
 
 nav .active {
-    background: #ccc;
+    background: #99b4c1;
     border-radius: 4px;
 }
 
