@@ -17,7 +17,7 @@ from core.tools.logs import log_message
 
 @Ticker.execute_each(interval='1-minute')
 def compile_download_links_from_audiovisual_records():
-    with ThreadPoolExecutor(max_workers=30) as executor:
+    with ThreadPoolExecutor(max_workers=15) as executor:
         futures = []
         sources = get_all_download_sources()
         shuffle(sources)
@@ -34,7 +34,7 @@ def compile_download_links_from_audiovisual_records():
                 .add_condition(Condition('deleted', Condition.EQUALS, False))
                 .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
                 .add_condition(Condition('created_date', Condition.GREAT_THAN, from_dt))
-                .search(paginate=True, page_size=100, page=1)
+                .search(paginate=True, page_size=200, page=1)
             )['results']
 
             for audiovisual_record in audiovisual_records:
@@ -70,7 +70,7 @@ def recheck_downloads():
         .add_condition(Condition('metadata__recheck_downloads', Condition.EQUALS, True))
         .search()
     )
-    with ThreadPoolExecutor(max_workers=20) as executor:
+    with ThreadPoolExecutor(max_workers=15) as executor:
         futures = []
         sources = get_all_download_sources()
         shuffle(sources)
@@ -117,7 +117,7 @@ def recent_films_without_good_downloads():
     )
     audiovisual_records = [ar for ar in audiovisual_records if ar not in audiovisual_records_to_exclude]
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=15) as executor:
         futures = []
         for source_class in get_all_download_sources():
             for audiovisual_record in audiovisual_records:
@@ -162,7 +162,7 @@ def delete_404_links():
                 _check_has_downloads(audiovisual_record)
             return
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=15) as executor:
         futures = []
         for download_result in download_results:
             future = executor.submit(_check_download_result_existence, download_result)
