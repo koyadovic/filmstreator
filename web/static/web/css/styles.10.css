@@ -729,6 +729,7 @@ div.audiovisual-item-container:hover {
 }
 .downloads-table-small-screens {
     display: none;
+    word-break: break-all;
 }
 /* Narrow screens like mobile phones */
 
