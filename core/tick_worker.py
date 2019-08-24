@@ -14,7 +14,7 @@ import sys
 
 
 # if not doing this, CPU is all the time over 100%
-sys.setswitchinterval(20000)
+sys.setswitchinterval(60000)
 
 
 class TickerFunctionData:

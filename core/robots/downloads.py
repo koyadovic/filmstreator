@@ -61,6 +61,7 @@ def compile_download_links_from_audiovisual_records():
                 if source_name not in audiovisual_record.metadata['downloads_fetch']:
                     audiovisual_record.metadata['downloads_fetch'][source_name] = True
                     audiovisual_record.save()
+                    _check_has_downloads(audiovisual_record)
 
     sources = get_all_download_sources()
 
