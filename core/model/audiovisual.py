@@ -114,6 +114,15 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
         self._year = year
 
     @property
+    def summary(self) -> str:
+        return self._summary
+
+    @summary.setter
+    def summary(self, summary):
+        self.updated_date = utc_now()
+        self._summary = summary
+
+    @property
     def directors(self) -> List[Person]:
         return self._directors
 
@@ -220,6 +229,7 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
         self._name = kwargs.pop('name', '')
         self._genres = kwargs.pop('genres', list())
         self._year = kwargs.pop('year', 0)
+        self._summary = kwargs.pop('summary', '')
         self._directors = kwargs.pop('directors', list())
         self._writers = kwargs.pop('writers', list())
         self._stars = kwargs.pop('stars', list())

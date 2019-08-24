@@ -12,10 +12,11 @@ class Condition:
     NOT_IN = 'nin'
     CONTAINS = 'contains'
     ICONTAINS = 'icontains'  # case insensitive
+    EXISTS = 'exists'  # accept boolean values
     SIMILAR = 'simil'
 
     ALL_OPERATORS = (EQUALS, NON_EQUALS, LESS_THAN, LESS_OR_EQUAL_THAN, GREAT_THAN,
-                     GREAT_OR_EQUAL_THAN, IN, NOT_IN, CONTAINS, ICONTAINS, SIMILAR)
+                     GREAT_OR_EQUAL_THAN, IN, NOT_IN, CONTAINS, ICONTAINS, SIMILAR, EXISTS)
 
     def __init__(self, field_path, operator, value):
         try:

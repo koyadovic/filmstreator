@@ -13,7 +13,15 @@ class AbstractGeneralInformation(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @property
+    def name(self):
+        raise NotImplementedError
+
+    @property
     def year(self):
+        raise NotImplementedError
+
+    @property
+    def summary(self):
         raise NotImplementedError
 
     @property

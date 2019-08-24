@@ -33,6 +33,7 @@ def autocomplete_general_information_for_empty_audiovisual_records():
 def _update(audiovisual_record, general_information_klass):
     general_information = general_information_klass(audiovisual_record)
     try:
+        audiovisual_record.summary = general_information.summary
         audiovisual_record.images = [general_information.main_image]
         if not bool(audiovisual_record.year):
             audiovisual_record.year = general_information.year
@@ -61,3 +62,37 @@ def _update(audiovisual_record, general_information_klass):
     except GeneralInformationException as e:
         log_exception(e, only_file=True)
         audiovisual_record.delete()
+
+
+@Ticker.execute_each(interval='1-minutes')
+def autocomplete_missing_summaries():
+    audiovisual_records_without_summary_key = (
+        Search.Builder.new_search(AudiovisualRecord)
+        .add_condition(Condition('deleted', Condition.EQUALS, False))
+        .add_condition(Condition('summary', Condition.EXISTS, False))
+        .search(paginate=True, page_size=100, page=1)
+    )['results']
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = []
+        for audiovisual_record in audiovisual_records_without_summary_key:
+            for general_information_klass in get_all_general_information_sources():
+                future = executor.submit(_update_only_summary, audiovisual_record, general_information_klass)
+                future.log_msg = f'Check summary of {audiovisual_record.name} with ' \
+                                 f'{general_information_klass.source_name}'
+                futures.append(future)
+        for future in concurrent.futures.as_completed(futures):
+            autocomplete_missing_summaries.log(future.log_msg)
+            future.result(timeout=600)
+
+
+def _update_only_summary(audiovisual_record, general_information_klass):
+    general_information = general_information_klass(audiovisual_record)
+    try:
+        summary = general_information.summary
+    except GeneralInformationException:
+        summary = ''
+
+    summary = summary or ''
+    audiovisual_record.summary = summary
+    audiovisual_record.save()

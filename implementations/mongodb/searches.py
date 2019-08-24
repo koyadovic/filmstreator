@@ -57,7 +57,6 @@ class SearchMongoDB(SearchInterface):
         n_items = results.count()
         if n_items > 0:
             for result in results:
-                print(result.get('_textScoreValue'), result.get('name'))
                 for k, v in result.items():
                     if k == '_id':
                         continue
@@ -174,6 +173,9 @@ def _translate_search_to_mongodb_dict_index_search(search):
                 dict_condition[field_path] = re.compile(value)
             elif operator == Condition.ICONTAINS:
                 dict_condition[field_path] = re.compile(value, re.IGNORECASE)
+            elif operator == Condition.EXISTS:
+                dict_condition[field_path] = {}
+                dict_condition[field_path]['$exists'] = value
 
             if dict_condition[field_path] == {}:
                 del dict_condition[field_path]
@@ -215,6 +217,9 @@ def _translate_search_to_mongodb_dict_normal_search(search):
                     dict_condition[field_path] = re.compile(value)
                 elif operator == Condition.ICONTAINS:
                     dict_condition[field_path] = re.compile(value, re.IGNORECASE)
+                elif operator == Condition.EXISTS:
+                    dict_condition[field_path] = {}
+                    dict_condition[field_path]['$exists'] = value
 
                 if dict_condition[field_path] == {}:
                     del dict_condition[field_path]

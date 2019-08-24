@@ -87,6 +87,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         yield 'name', self.name
         yield 'genres', [dict(_) for _ in self.genres]
         yield 'year', self.year
+        yield 'summary', self.summary
         yield 'directors', [dict(_) for _ in self.directors]
         yield 'writers', [dict(_) for _ in self.writers]
         yield 'stars', [dict(_) for _ in self.stars]
@@ -115,6 +116,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
 
             genres=[MongoGenre.convert(g) for g in audiovisual_record.genres],
             year=audiovisual_record.year,
+            summary=audiovisual_record.summary,
 
             directors=[MongoPerson.convert(p) for p in audiovisual_record.directors],
             writers=[MongoPerson.convert(p) for p in audiovisual_record.writers],
@@ -152,11 +154,12 @@ class MongoAudiovisualRecord(AudiovisualRecord):
             [
                 ('name', pymongo.TEXT),
                 ('year', pymongo.TEXT),
+                ('summary', pymongo.TEXT),
                 ('directors.name', pymongo.TEXT),
                 ('writers.name', pymongo.TEXT),
                 ('stars.name', pymongo.TEXT),
             ],
-            weights={'name': 5, 'year': 5, 'directors.name': 2, 'writers.name': 2, 'stars.name': 2}
+            weights={'name': 10, 'year': 9, 'directors.name': 3, 'writers.name': 3, 'stars.name': 3}
         )
 
     @property
