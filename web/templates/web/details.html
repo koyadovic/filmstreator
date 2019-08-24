@@ -27,7 +27,9 @@
             <h1>{{ audiovisual_record.name }} ({{ audiovisual_record.year }}) Torrents {% if request.user.is_superuser %}<a href="#" onclick="removeFilm('{{ audiovisual_record.id }}');" style="color: white;" class="btn btn-secondary">Remove entire film</a>{% endif %}</h1>
         {% endif %}
 
-        <img style="float: right;" src="{{ audiovisual_record.images.0 }}" alt="Main cover of {{ audiovisual_record.name }}">
+        <div style="float: right;width: 200px; height: 294px;">
+            <img style="height: 100%; width: 100%;" src="{{ audiovisual_record.images.0 }}" alt="Main cover of {{ audiovisual_record.name }}">
+        </div>
 
         <h5>Genres:</h5>
         <p class="light-text"><b>{{ audiovisual_record.genres | map:"name" | join:", " }}.</b></p>
@@ -88,7 +90,6 @@
             {% endfor %}
             </tbody>
         </table>
-
         <div class="downloads-table-small-screens">
             <h3>Download Sources</h3>
             <hr>
@@ -98,11 +99,15 @@
                 <p><span class="dark-text">Quality:</span> {{ download.quality }}</p>
                 <p><span class="dark-text">Source Language:</span> <img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></p>
                 <p><span class="dark-text">Source:</span> {{ download.source_name }}</p>
+                {% if request.user.is_superuser %}
+                <p><a href="#" onclick="removeDownloadLink('{{ download.id }}');" style="color: white;" class="btn btn-secondary">Remove</a></p>
+                {% endif %}
                 <hr>
             </div>
             {% endfor %}
         </div>
-
+        <br>
+        <br>
         <br>
         <div class="text-center">
         {% include 'web/fragment_social_links.html'  with text=audiovisual_record.name|add:' Downloads' url=request.build_absolute_uri %}
@@ -114,6 +119,8 @@
         </div>
 
         {% if related_records %}
+        <br>
+        <br>
         <br>
         <div class="text-center">
         <h3>Related:</h3>
