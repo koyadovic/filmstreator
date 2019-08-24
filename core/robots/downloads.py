@@ -108,9 +108,15 @@ def compile_download_links_from_audiovisual_records():
                     configuration.save()
 
     sources = get_all_download_sources()
+
+    threads = []
     for source_class in sources:
         thread = threading.Thread(target=_worker, args=[source_class])
         thread.start()
+        threads.append(thread)
+
+    for thread in threads:
+        thread.join()
 
 
 @Ticker.execute_each(interval='1-minute')
