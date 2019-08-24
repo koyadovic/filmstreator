@@ -75,6 +75,19 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
             if not are_similar_strings(audiovisual_name.lower(), similar_audiovisual_name.lower()):
                 continue
 
+            # calculamos si se parecen por su longitud
+            len_audiovisual_name = len(audiovisual_name)
+            len_similar_audiovisual_name = len(similar_audiovisual_name)
+            divisions = [
+                len_audiovisual_name / len_similar_audiovisual_name,
+                len_similar_audiovisual_name / len_audiovisual_name
+            ]
+            max_division = max(divisions)
+            min_division = min(divisions)
+
+            if max_division - min_division > 1.0:
+                continue
+
             download_results.append(DownloadSourceResult(
                 source_name=source_name,
                 name=name,
