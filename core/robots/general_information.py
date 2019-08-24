@@ -18,7 +18,7 @@ def autocomplete_general_information_for_empty_audiovisual_records():
                       .add_condition(Condition('general_information_fetched', Condition.EQUALS, False))
                       .search(paginate=True, page_size=100, page=1)
     )['results']
-    with ThreadPoolExecutor(max_workers=15) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         futures = []
         for audiovisual_record in audiovisual_records:
             for general_information_klass in get_all_general_information_sources():
@@ -73,7 +73,7 @@ def autocomplete_missing_summaries():
         .search(paginate=True, page_size=100, page=1)
     )['results']
 
-    with ThreadPoolExecutor(max_workers=15) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         futures = []
         for audiovisual_record in audiovisual_records_without_summary_key:
             for general_information_klass in get_all_general_information_sources():

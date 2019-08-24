@@ -66,6 +66,31 @@ class DAOMongoDB(DAOInterface):
         collection.delete_one({'_id': record_id})
         return None
 
+    def refresh_audiovisual_record(self, record: AudiovisualRecord):
+        collection = self._get_collection(MongoAudiovisualRecord)
+        record_id = getattr(record, '_id', None)
+        if record_id is None:
+            return
+        current = collection.find_one({'_id': record_id})
+        if current is not None:
+            current = MongoAudiovisualRecord(**current)
+            record.name = current.name
+            record.genres = current.genres
+            record.year = current.year
+            record.summary = current.summary
+            record.directors = current.directors
+            record.writers = current.writers
+            record.stars = current.stars
+            record.images = current.images
+            record.deleted = current.deleted
+            record.downloads_disabled = current.downloads_disabled
+            record.scores = current.scores
+            record.global_score = current.global_score
+            record.general_information_fetched = current.general_information_fetched
+            record.metadata = current.metadata
+            record.is_a_film = current.is_a_film
+            record.has_downloads = current.has_downloads
+
     def delete_download_source_result(self, result: MongoDownloadSourceResult):
         collection = self._get_collection(MongoDownloadSourceResult)
         result_id = getattr(result, '_id', None)

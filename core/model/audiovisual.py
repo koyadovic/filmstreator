@@ -260,6 +260,10 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
         self.deleted = True
         self.save()
 
+    def refresh(self):
+        from core import services
+        services.refresh_audiovisual_record(self)
+
 
 class DownloadSourceResult(EqualityMixin):
     last_check: datetime

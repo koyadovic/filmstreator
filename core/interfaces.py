@@ -18,6 +18,9 @@ class DAOInterface:
     def delete_audiovisual_record(self, record: AudiovisualRecord):
         raise NotImplementedError
 
+    def refresh_audiovisual_record(self, record: AudiovisualRecord):
+        raise NotImplementedError
+
     def delete_download_source_result(self, result: DownloadSourceResult):
         raise NotImplementedError
 

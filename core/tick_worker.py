@@ -10,6 +10,11 @@ from core.services import get_configuration
 from core.tools.logs import log_exception
 from core.tools.packages import PackageDiscover, ModuleDiscover
 from core import robots
+import sys
+
+
+# if not doing this, CPU is all the time over 100%
+sys.setswitchinterval(20000)
 
 
 class TickerFunctionData:
