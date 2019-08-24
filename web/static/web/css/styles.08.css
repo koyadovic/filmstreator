@@ -753,12 +753,6 @@ div.audiovisual-item-container:hover {
     footer {
         position: static;
     }
-    .main-container.container{
-        margin-top: 20px !important;
-        margin-bottom: 50px;
-        padding-left: 10px;
-        padding-right: 10px;
-    }
     .wrapper {
         margin-top: 20px;
     }
@@ -793,5 +787,14 @@ div.audiovisual-item-container:hover {
         margin-bottom: 0em;
         margin-top: 0px;
         padding-top: 0px !important;
+    }
+    .main-container.container-fluid {
+        margin-top: -1.5em !important;
+    }
+    .main-container.container{
+        margin-top: 0px;
+        margin-bottom: 50px;
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
