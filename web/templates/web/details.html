@@ -35,13 +35,25 @@
         <p class="light-text"><b>{{ audiovisual_record.genres | map:"name" | join:", " }}.</b></p>
 
         <h5>Directors:</h5>
+        {% if audiovisual_record.directors %}
         <p class="light-text"><b>{{ audiovisual_record.directors | map:"name" | join:", " }}.</b></p>
+        {% else %}
+        <p class="light-text"><b>Unavailable.</b></p>
+        {% endif %}
 
         <h5>Writers:</h5>
+        {% if audiovisual_record.writers %}
         <p class="light-text"><b>{{ audiovisual_record.writers | map:"name" | join:", " }}.</b></p>
+        {% else %}
+        <p class="light-text"><b>Unavailable.</b></p>
+        {% endif %}
 
         <h5>Stars:</h5>
+        {% if audiovisual_record.stars %}
         <p class="light-text"><b>{{ audiovisual_record.stars | map:"name" | join:", " }}.</b></p>
+        {% else %}
+        <p class="light-text"><b>Unavailable.</b></p>
+        {% endif %}
 
         {% if audiovisual_record.summary %}
         <h5>Summary:</h5>
