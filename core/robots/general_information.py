@@ -150,12 +150,12 @@ def _save_audiovisual_image_locally(audiovisual_record, local_root_path, web_ser
     filename = remote_image.split('/')[-1]
     try:
         os.makedirs(os.path.join(local_root_path, audiovisual_record.slug))
-        local_target = os.path.join(os.path.join(local_root_path, audiovisual_record.slug), filename)
-        web_server_target = os.path.join(os.path.join(web_server_root_path, audiovisual_record.slug), filename)
-        audiovisual_record.images.append(audiovisual_record.images[0])  # as a backup
-        urllib.request.urlretrieve(audiovisual_record.images[0], local_target)
-        audiovisual_record.images[0] = web_server_target
-        audiovisual_record.metadata['local_image'] = True
-        audiovisual_record.save()
     except FileExistsError:
         pass
+    local_target = os.path.join(os.path.join(local_root_path, audiovisual_record.slug), filename)
+    web_server_target = os.path.join(os.path.join(web_server_root_path, audiovisual_record.slug), filename)
+    audiovisual_record.images.append(audiovisual_record.images[0])  # as a backup
+    urllib.request.urlretrieve(audiovisual_record.images[0], local_target)
+    audiovisual_record.images[0] = web_server_target
+    audiovisual_record.metadata['local_image'] = True
+    audiovisual_record.save()
