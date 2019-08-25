@@ -104,8 +104,11 @@ venv.bak/
 .mypy_cache/
 
 .idea/
-/static/
 
 \.environment
 
 /core/robots/data/
+
+# static and media files
+/media/
+/static/

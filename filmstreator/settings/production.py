@@ -13,8 +13,6 @@ sentry_sdk.init(
 
 FILMSTREATOR_LOG_FILENAME = BASE_DIR + '/../../logs/filmstreator-debug.log'
 
-STATIC_ROOT = BASE_DIR + '/../static/'
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
