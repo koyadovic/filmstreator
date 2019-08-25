@@ -4,7 +4,7 @@
 
     {% block head_extra %}
     {{ block.super }}
-    {% if request.GET.formtype %}
+    {% if request.GET.ft %}
     <meta name="description" content="Filmstreator search result page">
     {% else %}
     <meta name="description" content="Filmstreator is a new website where you can find the movie you want to watch today. Use the filters where you will select the genre you like best. We have the score of each movie so you can choose the best one. Enter the movie, select the source to download and you will be redirected to the website that stores the download. And without advertising!. Enjoy the best movies of the moment and get comfortable. Welcome to Filmstreator">
@@ -14,7 +14,7 @@
 
 {% block content %}
 
-    {% if request.GET.formtype %}
+    {% if request.GET.ft %}
     <br>
     <h1 class="text-center">Search results:</h1>
     {% include 'web/fragment_page_navigation.html' %}

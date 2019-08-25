@@ -47,7 +47,7 @@
 {% if is_landing %}
     </section>
     <nav class="sidebar white-text dark-back">
-    <!-- {'formtype': 'advanced', 'genres__name__in': ['Crime', 'Drama'], 'year__gte': '1970', 'year__lte': '2019'} -->
+    <!-- {'ft': 'advanced', 'genres__name__in': ['Crime', 'Drama'], 'year__gte': '1970', 'year__lte': '2019'} -->
         <br>
         <h5>Advanced search
             <a href="#" id="search-tooltip" data-toggle="tooltip" data-placement="bottom"
@@ -57,10 +57,10 @@
         </h5>
 
         <form id="advanced-search-form" action="/s/" method="GET" autocomplete="off">
-            <input type="hidden" name="formtype" value="advanced">
+            <input type="hidden" name="ft" value="a">
             <label>Search:</label>
-            <input type="text" class="form-control" placeholder="Title, writers, directors, actors, years" name="search"
-                    value="{% if filter_params.formtype == 'advanced' %}{{ filter_params.search }}{% endif %}">
+            <input type="text" class="form-control" placeholder="Title, writers, directors, actors, years" name="s"
+                    value="{% if filter_params.ft == 'a' %}{{ filter_params.s }}{% endif %}">
 
             <label>Ordering:</label>
             <select name="ordering" class="form-control">
@@ -120,13 +120,13 @@ $(document).ready(function () {
             selectedGenresArray.push($(selected).text());
         });
         var selectedGenres = selectedGenresArray.join(',');
-        var searchSimilar = $("#advanced-search-form input[name=search]").val();
+        var searchSimilar = $("#advanced-search-form input[name=s]").val();
         var ordering = $("#advanced-search-form select[name=ordering]").val();
         var yearGte = $("#advanced-search-form select[name=year__gte]").val();
         var yearLte = $("#advanced-search-form select[name=year__lte]").val();
 
-        var url = '/s/?formtype=advanced';
-        if(searchSimilar !== '') url += '&search=' + searchSimilar;
+        var url = '/s/?ft=a';
+        if(searchSimilar !== '') url += '&s=' + searchSimilar;
         if (selectedGenres !== '') url += '&genres__name__in=' + selectedGenres;
         url += '&year__gte=' + yearGte;
         url += '&year__lte=' + yearLte;

@@ -43,6 +43,7 @@ def landing(request):
     try:
         ordering = get_params.pop('ordering', None)
         conditions = _process_get_params_and_get_conditions(get_params)
+        print(get_params)
         get_params['ordering'] = ordering
 
         search_builder = Search.Builder.new_search(AudiovisualRecord)
@@ -305,12 +306,12 @@ def _add_previous_and_next_navigation_uris_to_search(raw_uri, search):
 def _process_get_params_and_get_conditions(params):
     conditions = []
     for k, v in params.items():
-        if k in ['formtype', 'page']:
+        if k in ['ft', 'page']:
             continue
         value = v
         if value == '':
             continue
-        if k == 'search':
+        if k == 's':
             condition = Condition('search', Condition.SIMILAR, value)
             conditions.append(condition)
         else:
