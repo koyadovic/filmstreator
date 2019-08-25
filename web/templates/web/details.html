@@ -93,10 +93,10 @@
 
             {% for download in downloads %}
                 <tr class="light-text">
-                    <td class="text-center" onclick="window.open('{{ download.link }}', target='_blank');">{{ download.quality }}</td>
-                    <td class="text-center" onclick="window.open('{{ download.link }}', target='_blank');"><img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></td>
-                    <td class="text-center" onclick="window.open('{{ download.link }}', target='_blank');">{{ download.source_name }}</td>
-                    <td onclick="window.open('{{ download.link }}', target='_blank');">{{ download.name }}</td>
+                    <td class="text-center" onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');">{{ download.quality }}</td>
+                    <td class="text-center" onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');"><img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></td>
+                    <td class="text-center" onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');">{{ download.source_name }}</td>
+                    <td onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');">{{ download.name }}</td>
                     {% if request.user.is_superuser %}
                     <td>
                         <a href="#" onclick="removeDownloadLink('{{ download.id }}');" style="color: white;" class="btn btn-secondary">Remove</a>
@@ -111,7 +111,7 @@
             <hr>
             {% for download in downloads %}
             <div class="download-element-container">
-                <p><span class="dark-text">Download:</span><a class="light-text" href="{{ download.link }}" target="_blank"> {{ download.name }}</a></p>
+                <p><span class="dark-text">Download:</span><a class="light-text" href="{{ download.source_base_url_plus_relative_link }}" target="_blank"> {{ download.name }}</a></p>
                 <p><span class="dark-text">Quality:</span> {{ download.quality }}</p>
                 <p><span class="dark-text">Source Language:</span> <img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></p>
                 <p><span class="dark-text">Source:</span> {{ download.source_name }}</p>
