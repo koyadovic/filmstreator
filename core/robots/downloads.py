@@ -168,7 +168,7 @@ def delete_404_links():
             current_check += 1
             response = None
             while response is None:
-                session.get(dr.link)
+                session.get(dr.source_base_url_plus_relative_link)
                 response = session.last_response
             if response.status_code == 404:
                 log_message(f'Removed link {dr.link} with status code {response.status_code}')
