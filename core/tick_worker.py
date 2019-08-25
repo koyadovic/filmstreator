@@ -10,11 +10,10 @@ from core.services import get_configuration
 from core.tools.logs import log_exception
 from core.tools.packages import PackageDiscover, ModuleDiscover
 from core import robots
-# import sys
+import sys
 
 
-# if not doing this, CPU is all the time over 100%
-# sys.setswitchinterval(60000)
+sys.setswitchinterval(30)
 
 
 class TickerFunctionData:
@@ -44,6 +43,8 @@ class TickerFunctionData:
 
 
 class Ticker:
+    threads_lock = threading.RLock()
+
     INTERVALS = {
         '1-minute': {'seconds': 1 * 60, 'functions': []},
         '5-minutes': {'seconds': 5 * 60, 'functions': []},
