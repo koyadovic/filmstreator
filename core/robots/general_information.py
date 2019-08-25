@@ -1,3 +1,5 @@
+import os
+
 from core.fetchers.services import get_all_general_information_sources
 from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
@@ -8,6 +10,7 @@ from core.tools.logs import log_exception
 from concurrent.futures.thread import ThreadPoolExecutor
 
 import concurrent
+import urllib.request
 
 
 @Ticker.execute_each(interval='5-minutes')
@@ -95,4 +98,61 @@ def _update_only_summary(audiovisual_record, general_information_klass):
 
     summary = summary or ''
     audiovisual_record.summary = summary
+    audiovisual_record.save()
+
+
+@Ticker.execute_each(interval='1-minute')
+def save_audiovisual_images_locally():
+    local_root_path = save_audiovisual_images_locally.data.get('local_root_path', None)
+    web_server_root_path = save_audiovisual_images_locally.data.get('web_server_root_path', None)
+    if local_root_path is None:
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        core_directory = os.path.dirname(current_directory)
+        media_directory = os.path.dirname(core_directory) + '/media/'
+        local_root_path = os.path.join(media_directory, 'ai')
+        save_audiovisual_images_locally.data.set('local_root_path', local_root_path)
+    if web_server_root_path is None:
+        web_server_root_path = '/media/ai/'
+        save_audiovisual_images_locally.data.set('web_server_root_path', web_server_root_path)
+
+    audiovisual_records = (
+        Search.Builder.new_search(AudiovisualRecord)
+        .add_condition(Condition('deleted', Condition.EQUALS, False))
+        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+        .add_condition(Condition('has_downloads', Condition.EQUALS, True))
+        .add_condition(Condition('metadata__local_image', Condition.EXISTS, False))
+        .search(paginate=True, page_size=10, page=1, sort_by='-global_score')
+    )['results']
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = []
+        for audiovisual_record in audiovisual_records:
+            future = executor.submit(
+                _save_audiovisual_image_locally,
+                audiovisual_record,
+                local_root_path,
+                web_server_root_path
+            )
+            future.log_msg = f'Saving image to local for {audiovisual_record.name} ({audiovisual_record.year})'
+            futures.append(future)
+        for future in concurrent.futures.as_completed(futures):
+            save_audiovisual_images_locally.log(future.log_msg)
+            future.result(timeout=600)
+
+
+def _save_audiovisual_image_locally(audiovisual_record, local_root_path, web_server_root_path):
+    audiovisual_record.refresh()
+    if len(audiovisual_record.images) == 0:
+        return
+    remote_image = audiovisual_record.images[0]
+    if not remote_image.startswith('http'):
+        return
+    filename = remote_image.split('/')[-1]
+    os.makedirs(os.path.join(local_root_path, audiovisual_record.slug))
+    local_target = os.path.join(os.path.join(local_root_path, audiovisual_record.slug), filename)
+    web_server_target = os.path.join(os.path.join(web_server_root_path, audiovisual_record.slug), filename)
+    audiovisual_record.images.append(audiovisual_record.images[0])  # as a backup
+    urllib.request.urlretrieve(audiovisual_record.images[0], local_target)
+    audiovisual_record.images[0] = web_server_target
+    audiovisual_record.metadata['local_image'] = True
     audiovisual_record.save()
