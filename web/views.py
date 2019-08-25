@@ -82,6 +82,7 @@ def landing(request):
 
     context = {
         # 'genres': genres,
+        'context_class': 'landing',
         'is_landing': True,
         'last_records': last_records,
         'search': search,
@@ -99,7 +100,6 @@ def details(request, slug=None):
         referer_uri = request.META['HTTP_REFERER']
         referer_uri = urllib.parse.unquote(referer_uri)
         get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
-        print(get_params)
     except (IndexError, KeyError):
         get_params = {}
 
@@ -118,6 +118,11 @@ def details(request, slug=None):
         return render(request, 'web/404.html', status=404, context=context)
 
     audiovisual_record = audiovisual_records[0]
+
+    # /s/?ft=b&s="{{ person.name }}"
+    for person in audiovisual_record.directors + audiovisual_record.writers + audiovisual_record.stars:
+        person.search_url = f'/s/?ft=b&s="{person.name}"'.replace(' ', '+')
+        print(person.search_url)
 
     related_search = Search.Builder.new_search(AudiovisualRecord)
     related_search.add_condition(Condition('deleted', Condition.EQUALS, False))
@@ -138,7 +143,7 @@ def details(request, slug=None):
 
     related_search.add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
     for genre in audiovisual_record.genres:
-        related_search.add_condition(Condition('genres__name', Condition.EQUALS, genre['name']))
+        related_search.add_condition(Condition('genres__name', Condition.EQUALS, genre.name))
 
     related_records = related_search.search(
         sort_by=['-global_score'],
@@ -153,6 +158,7 @@ def details(request, slug=None):
         .search(sort_by='quality')
     )
     context = {
+        'context_class': 'details',
         'is_landing': True,
         'audiovisual_record': audiovisual_record,
         'downloads': downloads,
@@ -189,6 +195,7 @@ def genre_view(request, genre=None):
 
     context = {
         # 'filter_params': get_params,
+        'context_class': 'genre_view',
         'is_landing': True,
         'current_genre': genre,
         'genres_names': _get_genres(),
@@ -251,6 +258,7 @@ def remove_film(request, object_id):
 
 def dmca(request):
     context = {
+        'context_class': 'dmca',
         'is_landing': False,
         'genres_names': _get_genres(),
         'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
@@ -260,6 +268,7 @@ def dmca(request):
 
 def terms_and_conditions(request):
     context = {
+        'context_class': 'terms',
         'is_landing': False,
         'genres_names': _get_genres(),
         'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
