@@ -65,7 +65,7 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
             quality_detector = VideoQualityInStringDetector(text_without_name)
 
             source_name = self.source_name
-            name = text
+            name = text.strip()
             quality = quality_detector.quality
             link = self.base_url + href
             audiovisual_record = self.audiovisual_record
