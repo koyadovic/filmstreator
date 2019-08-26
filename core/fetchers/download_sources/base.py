@@ -7,6 +7,7 @@ from lxml import html
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.logs import log_exception
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector, ratio_of_containing_similar_string, are_similar_strings
+import re
 
 
 class AbstractDownloadSource(metaclass=abc.ABCMeta):
@@ -69,23 +70,13 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
             quality = quality_detector.quality
             link = self.base_url + href
             audiovisual_record = self.audiovisual_record
-
-            audiovisual_name = self.audiovisual_record.name
-            similar_audiovisual_name = name.replace(text_without_name, '')
+            audiovisual_name = self.audiovisual_record.name.strip()
+            search = re.search(r'(.*)(19\d{2}|20\d{2})(.*)', name)
+            if search is None:
+                similar_audiovisual_name = name.replace(text_without_name, '')
+            else:
+                similar_audiovisual_name = search.group(1).strip()
             if not are_similar_strings(audiovisual_name.lower(), similar_audiovisual_name.lower()):
-                continue
-
-            # calculamos si se parecen por su longitud
-            len_audiovisual_name = len(audiovisual_name)
-            len_similar_audiovisual_name = len(similar_audiovisual_name)
-            divisions = [
-                len_audiovisual_name / len_similar_audiovisual_name,
-                len_similar_audiovisual_name / len_audiovisual_name
-            ]
-            max_division = max(divisions)
-            min_division = min(divisions)
-
-            if max_division - min_division > 1.0:
                 continue
 
             download_results.append(DownloadSourceResult(
