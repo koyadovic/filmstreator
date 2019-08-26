@@ -132,7 +132,6 @@ footer {
 
 .big-icon {
     font-size: 6em !important;
-    color: black;
     margin: 20px;
 }
 
@@ -799,8 +798,11 @@ div.audiovisual-item-container:hover {
         font-size: .950rem;
         letter-spacing: initial;
     }
-    footer * {
-        font-size: .950rem;
+    * {
+        font-size: .900rem;
+    }
+    h1, h2, h3 {
+        font-size: 1.5rem;
     }
     footer {
         position: static;
