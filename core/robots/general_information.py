@@ -1,4 +1,5 @@
 import os
+from urllib.error import HTTPError
 
 from core.fetchers.services import get_all_general_information_sources
 from core.model.audiovisual import AudiovisualRecord
@@ -155,7 +156,10 @@ def _save_audiovisual_image_locally(audiovisual_record, local_root_path, web_ser
     local_target = os.path.join(os.path.join(local_root_path, audiovisual_record.slug), filename)
     web_server_target = os.path.join(os.path.join(web_server_root_path, audiovisual_record.slug), filename)
     audiovisual_record.images.append(audiovisual_record.images[0])  # as a backup
-    urllib.request.urlretrieve(audiovisual_record.images[0], local_target)
-    audiovisual_record.images[0] = web_server_target
-    audiovisual_record.metadata['local_image'] = True
-    audiovisual_record.save()
+    try:
+        urllib.request.urlretrieve(audiovisual_record.images[0], local_target)
+        audiovisual_record.images[0] = web_server_target
+        audiovisual_record.metadata['local_image'] = True
+        audiovisual_record.save()
+    except (HTTPError, FileNotFoundError) as e:
+        log_exception(e, only_file=True)
