@@ -1,6 +1,5 @@
 import re
 import sys
-import threading
 from random import shuffle
 
 from core.fetchers.services import get_all_download_sources
@@ -16,67 +15,67 @@ from concurrent.futures.thread import ThreadPoolExecutor
 import concurrent
 
 from core.tools.logs import log_message
-from core.tools.strings import RemoveAudiovisualRecordNameFromString, are_similar_strings
+from core.tools.strings import are_similar_strings
 
 
 @Ticker.execute_each(interval='1-minute')
 def compile_download_links_from_audiovisual_records():
     compile_download_links_from_audiovisual_records.log(f'Current switch interval: {sys.getswitchinterval()}')
 
-    def _worker(source_class):
-        with ThreadPoolExecutor(max_workers=6) as executor:
-            futures = []
-            source_name = source_class.source_name
-            compile_download_links_from_audiovisual_records.log(f'Begin to retrieve audovisual records for {source_name}')
-            audiovisual_records = (
-                Search
-                .Builder
-                .new_search(AudiovisualRecord)
-                .add_condition(Condition('deleted', Condition.EQUALS, False))
-                .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-                .add_condition(Condition('has_downloads', Condition.EQUALS, False))
-                .add_condition(Condition(f'metadata__downloads_fetch__{source_name}', Condition.EXISTS, False))
-                .search(paginate=True, page_size=20, page=1, sort_by='-global_score')
-            )['results']
-
-            compile_download_links_from_audiovisual_records.log(f'Retrieved {len(audiovisual_records)} for source {source_name}')
-
-            for audiovisual_record in audiovisual_records:
-                compile_download_links_from_audiovisual_records.log(f'For {source_name} launching search for {audiovisual_record.name}')
-                future = executor.submit(
-                    _refresh_download_results_from_source, audiovisual_record, source_class
-                )
-                future.log_msg = f'Checked {audiovisual_record.name} ({audiovisual_record.year}) with ' \
-                                 f'{source_class.source_name}'
-                future.audiovisual_record = audiovisual_record
-                future.source_class = source_class
-                futures.append(future)
-
-            for future in concurrent.futures.as_completed(futures):
-                future.result(timeout=600)
-                compile_download_links_from_audiovisual_records.log(future.log_msg)
-
-                audiovisual_record = future.audiovisual_record
-                with Ticker.threads_lock:
-                    audiovisual_record.refresh()
-                    if 'downloads_fetch' not in audiovisual_record.metadata:
-                        audiovisual_record.metadata['downloads_fetch'] = {}
-                    if source_name not in audiovisual_record.metadata['downloads_fetch']:
-                        audiovisual_record.metadata['downloads_fetch'][source_name] = True
-                        audiovisual_record.save()
-                _check_has_downloads(audiovisual_record)
+    def _get_audiovisual_records(source_class):
+        source_name = source_class.source_name
+        audiovisual_records = (
+            Search
+            .Builder
+            .new_search(AudiovisualRecord)
+            .add_condition(Condition('deleted', Condition.EQUALS, False))
+            .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+            .add_condition(Condition(f'metadata__downloads_fetch__{source_name}', Condition.EXISTS, False))
+            .search(paginate=True, page_size=20, page=1, sort_by='-global_score')
+        )['results']
+        return audiovisual_records
 
     sources = get_all_download_sources()
 
-    threads = []
+    for_work = []
     for source_class in sources:
-        thread = threading.Thread(target=_worker, args=[source_class])
-        thread.start()
-        compile_download_links_from_audiovisual_records.log(f'Start thread for {source_class.source_name}')
-        threads.append(thread)
+        for audiovisual_record in _get_audiovisual_records(source_class):
+            for_work.append((source_class, audiovisual_record))
 
-    for thread in threads:
-        thread.join()
+    for_work.sort(key=lambda e: e[1].global_score, reverse=True)
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = []
+        for source_class, audiovisual_record in for_work:
+            compile_download_links_from_audiovisual_records.log(
+                f'Launching search for {audiovisual_record.name} '
+                f'({audiovisual_record.year}) for source {source_class.source_name}'
+            )
+            future = executor.submit(
+                _refresh_download_results_from_source, audiovisual_record, source_class,
+                compile_download_links_from_audiovisual_records.log
+            )
+            future.audiovisual_record = audiovisual_record
+            future.source_class = source_class
+            futures.append(future)
+        for future in concurrent.futures.as_completed(futures):
+            future.result(timeout=600)
+            compile_download_links_from_audiovisual_records.log(future.log_msg)
+            audiovisual_record = future.audiovisual_record
+            source_class = future.source_class
+            source_name = source_class.source_name
+            compile_download_links_from_audiovisual_records.log(
+                f'Checked {audiovisual_record.name} '
+                f'({audiovisual_record.year}) with {source_name}'
+            )
+            with Ticker.threads_lock:
+                audiovisual_record.refresh()
+                if 'downloads_fetch' not in audiovisual_record.metadata:
+                    audiovisual_record.metadata['downloads_fetch'] = {}
+                if source_name not in audiovisual_record.metadata['downloads_fetch']:
+                    audiovisual_record.metadata['downloads_fetch'][source_name] = True
+                    audiovisual_record.save()
+                _check_has_downloads(audiovisual_record)
 
 
 @Ticker.execute_each(interval='3-days')
@@ -112,8 +111,6 @@ def recheck_downloads():
 
 @Ticker.execute_each(interval='3-days')
 def recent_films_without_good_downloads():
-    # TODO mejorar esto. De cada fuente tendría que tener el mayor número de buenas descargas posibles
-    # TODO hay que pensar el algoritmo a usar.
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
 
@@ -217,13 +214,13 @@ def do_the_refresh():
     do_the_refresh.data.set('last_timestamp', now.timestamp())
 
 
-def _refresh_download_results_from_source(audiovisual_record, source_class):
+def _refresh_download_results_from_source(audiovisual_record, source_class, logger=None):
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']  # de verdad sólo son estos???
     download_source = source_class(audiovisual_record)
-    # n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
+    n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
 
     # get results found by source_class for audiovisual_record
-    results = download_source.get_source_results()
+    results = download_source.get_source_results(logger=logger)
 
     poor_quality_links = []
     remove_bad_links = False
@@ -266,6 +263,8 @@ def _refresh_download_results_from_source(audiovisual_record, source_class):
                 continue
 
             if not _valid_result(result):
+                if logger:
+                    logger(f'[{source_class.source_name}] [{audiovisual_record.name}] Not valid link: {result.name}')
                 result.metadata['validation'] = {
                     'valid': False,
                     'reason': f'Detected as invalid link for \'{audiovisual_record.name}\''
@@ -276,17 +275,17 @@ def _refresh_download_results_from_source(audiovisual_record, source_class):
             real_results.append(result)
             n += 1
 
-        # if len(real_results) < 3 and audiovisual_record.year >= str(n_days_ago.year):
-        #     if audiovisual_record.metadata.get('recheck_downloads_executions', 0) <= 10:
-        #         # if the film has less than 3 good downloads and is a recent film, mark it as
-        #         # recheck downloads again
-        #         audiovisual_record.refresh()
-        #         audiovisual_record.metadata['recheck_downloads'] = True
-        #         try:
-        #             audiovisual_record.metadata['recheck_downloads_executions'] += 1
-        #         except KeyError:
-        #             audiovisual_record.metadata['recheck_downloads_executions'] = 1
-        #         audiovisual_record.save()
+        if len(real_results) < 2 and audiovisual_record.year >= str(n_days_ago.year):
+            if audiovisual_record.metadata.get('recheck_downloads_executions', 0) <= 10:
+                # if the film has less than 3 good downloads and is a recent film, mark it as
+                # recheck downloads again
+                audiovisual_record.refresh()
+                audiovisual_record.metadata['recheck_downloads'] = True
+                try:
+                    audiovisual_record.metadata['recheck_downloads_executions'] += 1
+                except KeyError:
+                    audiovisual_record.metadata['recheck_downloads_executions'] = 1
+                audiovisual_record.save()
 
         # if we didn't found good links, we check for whatever quality
         for result in results:
@@ -300,6 +299,8 @@ def _refresh_download_results_from_source(audiovisual_record, source_class):
                 continue
 
             if not _valid_result(result):
+                if logger:
+                    logger(f'[{source_class.source_name}] [{audiovisual_record.name}] Not valid link: {result.name}')
                 result.metadata['validation'] = {
                     'valid': False,
                     'reason': f'Detected as invalid link for \'{audiovisual_record.name}\''
@@ -307,6 +308,8 @@ def _refresh_download_results_from_source(audiovisual_record, source_class):
                 result.save()
                 continue
 
+            if logger:
+                logger(f'[{source_class.source_name}] [{audiovisual_record.name}] +++ ADDING link: {result.name}')
             real_results.append(result)
             n += 1
 
@@ -325,12 +328,13 @@ def _refresh_download_results_from_source(audiovisual_record, source_class):
 
 
 def _valid_result(result):
-    name_remover = RemoveAudiovisualRecordNameFromString(result.audiovisual_record.name)
-    text_without_name = name_remover.replace_name_from_string(result.name)
+    # name_remover = RemoveAudiovisualRecordNameFromString(result.audiovisual_record.name)
+    # text_without_name = name_remover.replace_name_from_string(result.name)
     audiovisual_name = result.audiovisual_record.name.strip()
     search = re.search(r'(.*)(19\d{2}|20\d{2})(.*)', result.name)
     if search is None:
-        similar_audiovisual_name = result.name.replace(text_without_name, '')
+        # similar_audiovisual_name = result.name.replace(text_without_name, '')
+        return False
     else:
         similar_audiovisual_name = search.group(1).strip()
     return are_similar_strings(audiovisual_name.lower(), similar_audiovisual_name.lower())

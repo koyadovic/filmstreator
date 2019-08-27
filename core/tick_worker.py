@@ -13,7 +13,7 @@ from core import robots
 import sys
 
 
-sys.setswitchinterval(30)
+sys.setswitchinterval(0.5)
 
 
 class TickerFunctionData:
