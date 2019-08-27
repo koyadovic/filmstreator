@@ -30,6 +30,7 @@ def compile_download_links_from_audiovisual_records():
             .new_search(AudiovisualRecord)
             .add_condition(Condition('deleted', Condition.EQUALS, False))
             .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+            .add_condition(Condition('has_downloads', Condition.EQUALS, False))
             .add_condition(Condition(f'metadata__downloads_fetch__{source_name}', Condition.EXISTS, False))
             .search(paginate=True, page_size=20, page=1, sort_by='-global_score')
         )['results']
