@@ -275,6 +275,7 @@ class DownloadSourceResult(EqualityMixin):
     quality: str
     lang: str  # ISO 639-2 Code, three characters
     audiovisual_record: AudiovisualRecord
+    metadata: dict
 
     _download_sources_ = {}
 
@@ -287,6 +288,7 @@ class DownloadSourceResult(EqualityMixin):
         self.quality = kwargs.pop('quality', '')
         self.lang = kwargs.pop('lang', '')
         self.audiovisual_record = kwargs.pop('audiovisual_record', None)
+        self.metadata = kwargs.pop('metadata', dict())
 
     def save(self):
         from core import services

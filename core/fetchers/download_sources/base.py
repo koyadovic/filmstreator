@@ -68,24 +68,19 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
             source_name = self.source_name
             name = text.strip()
             quality = quality_detector.quality
-            link = self.base_url + href
-            audiovisual_record = self.audiovisual_record
-            audiovisual_name = self.audiovisual_record.name.strip()
-            search = re.search(r'(.*)(19\d{2}|20\d{2})(.*)', name)
-            if search is None:
-                similar_audiovisual_name = name.replace(text_without_name, '')
+            if not href.lower().startswith('http'):
+                link = self.base_url + href
             else:
-                similar_audiovisual_name = search.group(1).strip()
-            if not are_similar_strings(audiovisual_name.lower(), similar_audiovisual_name.lower()):
-                continue
-
-            download_results.append(DownloadSourceResult(
+                link = href
+            audiovisual_record = self.audiovisual_record
+            result = DownloadSourceResult(
                 source_name=source_name,
                 name=name,
                 link=link,
                 quality=quality,
                 lang=self.language,
                 audiovisual_record=audiovisual_record
-            ))
+            )
+            download_results.append(result)
 
         return download_results

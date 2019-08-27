@@ -187,6 +187,7 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         yield 'quality', self.quality
         yield 'lang', self.lang
         yield 'audiovisual_record', getattr(self.audiovisual_record, '_id')
+        yield 'metadata', self.metadata
 
     @classmethod
     def convert(cls, download_source_result):
@@ -207,6 +208,7 @@ class MongoDownloadSourceResult(DownloadSourceResult):
             quality=download_source_result.quality,
             lang=download_source_result.lang,
             audiovisual_record=download_source_result.audiovisual_record,
+            metadata=download_source_result.metadata,
         )
 
     is_searchable = True
