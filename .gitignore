@@ -112,3 +112,4 @@ venv.bak/
 # static and media files
 /media/
 /static/
+/filmstreator/logs/
