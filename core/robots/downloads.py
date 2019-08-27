@@ -291,7 +291,7 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
         for result in results:
             if n >= 3:
                 break
-            if result.quality in ['Audio', 'Unknown']:
+            if result.quality in ['Audio']:
                 continue
             if result.link in current_links:
                 continue
