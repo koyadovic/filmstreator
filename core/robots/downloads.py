@@ -111,6 +111,7 @@ def recheck_downloads():
 
 @Ticker.execute_each(interval='3-days')
 def recent_films_without_good_downloads():
+    # TODO hay que buscar de cada source, y por cada película, descargas que no sean de buena calidad.
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
 
