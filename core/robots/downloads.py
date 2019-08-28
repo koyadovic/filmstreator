@@ -44,7 +44,10 @@ def compile_download_links_from_audiovisual_records():
             for audiovisual_record in audiovisual_records:
                 compile_download_links_from_audiovisual_records.log(f'For {source_name} launching search for {audiovisual_record.name}')
                 future = executor.submit(
-                    _refresh_download_results_from_source, audiovisual_record, source_class
+                    _refresh_download_results_from_source,
+                    audiovisual_record,
+                    source_class,
+                    compile_download_links_from_audiovisual_records.log
                 )
                 future.log_msg = f'Checked {audiovisual_record.name} ({audiovisual_record.year}) with ' \
                                  f'{source_class.source_name}'
