@@ -31,16 +31,17 @@ class PhantomBrowsingSession:
             if self._referer:
                 headers.update({'Referer': self._referer})
 
+            response = None
             try:
                 response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
                 response.raise_for_status()
-                self._identity.proxy_okay()
-                self._last_response = response
-                self._referer = url
-                return self
 
             except requests.exceptions.HTTPError as e:
                 """An HTTP error occurred."""
+                # Retry-After
+                if response is not None:
+                    print(response.status_code)
+                    print(response.headers)
                 log_exception(e, only_file=True)
                 tryings += 1
 
@@ -71,6 +72,13 @@ class PhantomBrowsingSession:
             except Exception as e:
                 log_exception(e, only_file=True)
                 tryings += 1
+
+            else:
+                # Everything was okay
+                self._identity.proxy_okay()
+                self._last_response = response
+                self._referer = url
+                return self
 
     @property
     def last_response(self):

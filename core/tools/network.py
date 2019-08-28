@@ -16,11 +16,8 @@ def domain_exists(domain):
 
 
 def is_tcp_port_open(ip_address, tcp_port):
-    try:
-        with timeout(10):
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            result = sock.connect_ex((ip_address, int(tcp_port)))
-            sock.close()
-            return result == 0
-    except TimeoutError:
-        return False
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(3.0)
+    result = sock.connect_ex((ip_address, int(tcp_port)))
+    sock.close()
+    return result == 0
