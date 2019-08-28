@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 import requests
 import random
 
+from core.tools.network import domain_exists
+
 
 class PhantomBrowsingSession:
     def __init__(self, referer=None, headers=None):
@@ -46,6 +48,8 @@ class PhantomBrowsingSession:
 
             except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError, ReadTimeout,
                     NewConnectionError, ChunkedEncodingError, CertificateError):
+                # 95.179.181.1:80
+
                 self._identity.some_connection_error()
                 self.refresh_identity()
 
@@ -64,9 +68,7 @@ class PhantomBrowsingSession:
     @classmethod
     def _check_domain(cls, url):
         domain = urlparse(url).netloc  # extract the domain from the url
-        try:
-            getaddrinfo(domain, 80)
-        except gaierror:
+        if not domain_exists(domain):
             raise PhantomBrowsingSession.InvalidURLProvided(f'Domain {domain} of url {url} does not exist')
 
     class InvalidURLProvided(CoreException):
