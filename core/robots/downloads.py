@@ -34,14 +34,35 @@ def compile_download_links_from_audiovisual_records():
                 .new_search(AudiovisualRecord)
                 .add_condition(Condition('deleted', Condition.EQUALS, False))
                 .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-                .add_condition(Condition('has_downloads', Condition.EQUALS, False))
                 .add_condition(Condition(f'metadata__downloads_fetch__{source_name}', Condition.EXISTS, False))
                 .search(paginate=True, page_size=20, page=1, sort_by='-global_score')
             )['results']
 
-            compile_download_links_from_audiovisual_records.log(f'Retrieved {len(audiovisual_records)} for source {source_name}')
-
+            target_audiovisual_records = []
             for audiovisual_record in audiovisual_records:
+                download_results = (
+                    Search
+                    .Builder
+                    .new_search(DownloadSourceResult)
+                    .add_condition(Condition('source_name', Condition.EQUALS, source_name))
+                    .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
+                    .search()
+                )
+                has_downloads = len(download_results) > 0
+                if not has_downloads:
+                    target_audiovisual_records.append(audiovisual_record)
+                else:
+                    audiovisual_record.refresh()
+                    if 'downloads_fetch' not in audiovisual_record.metadata:
+                        audiovisual_record.metadata['downloads_fetch'] = {}
+                    audiovisual_record.metadata['downloads_fetch'][source_name] = True
+                    audiovisual_record.save()
+                    _check_has_downloads(audiovisual_record)
+                    continue
+
+            compile_download_links_from_audiovisual_records.log(f'Retrieved {len(target_audiovisual_records)} for source {source_name}')
+
+            for audiovisual_record in target_audiovisual_records:
                 compile_download_links_from_audiovisual_records.log(f'For {source_name} launching search for {audiovisual_record.name}')
                 future = executor.submit(
                     _refresh_download_results_from_source,
@@ -64,9 +85,8 @@ def compile_download_links_from_audiovisual_records():
                     audiovisual_record.refresh()
                     if 'downloads_fetch' not in audiovisual_record.metadata:
                         audiovisual_record.metadata['downloads_fetch'] = {}
-                    if source_name not in audiovisual_record.metadata['downloads_fetch']:
-                        audiovisual_record.metadata['downloads_fetch'][source_name] = True
-                        audiovisual_record.save()
+                    audiovisual_record.metadata['downloads_fetch'][source_name] = True
+                    audiovisual_record.save()
                 _check_has_downloads(audiovisual_record)
 
     sources = get_all_download_sources()
