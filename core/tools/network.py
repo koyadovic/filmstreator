@@ -21,3 +21,8 @@ def is_tcp_port_open(ip_address, tcp_port):
     result = sock.connect_ex((ip_address, int(tcp_port)))
     sock.close()
     return result == 0
+
+
+def get_index_url(url):
+    parsed = urllib.parse.urlparse(url)
+    return parsed.scheme + '://' + parsed.netloc + '/'

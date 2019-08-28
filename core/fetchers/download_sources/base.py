@@ -44,7 +44,7 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
             try:
                 trying += 1
                 self.log(f'Trying to get {self.base_url + self.relative_search_string()}')
-                session.get(self.base_url + self.relative_search_string(), timeout=30)
+                session.get(self.base_url + self.relative_search_string(), timeout=120)
                 self._last_response = response = session.last_response
                 if response is None:
                     self.log(f'Response is None! refreshing identity')

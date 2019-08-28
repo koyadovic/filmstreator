@@ -1,5 +1,6 @@
 import re
 import sys
+import time
 from random import shuffle
 
 from core.fetchers.services import get_all_download_sources
@@ -75,6 +76,7 @@ def compile_download_links_from_audiovisual_records():
                 future.audiovisual_record = audiovisual_record
                 future.source_class = source_class
                 futures.append(future)
+                time.sleep(30)
 
             for future in concurrent.futures.as_completed(futures):
                 future.result(timeout=600)

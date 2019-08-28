@@ -1,8 +1,10 @@
+import time
+
 from core.model.configurations import Configuration
 from core.tools import browsing_proxies
 from core.tools.exceptions import CoreException
-from core.tools.logs import log_exception
-from core.tools.network import domain_exists, get_domain_from_url, is_tcp_port_open
+from core.tools.logs import log_exception, log_message
+from core.tools.network import domain_exists, get_domain_from_url, is_tcp_port_open, get_index_url
 
 import requests
 import random
@@ -33,17 +35,33 @@ class PhantomBrowsingSession:
 
             response = None
             try:
-                response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
+                # first we get the index page
+                self._session.get(
+                    get_index_url(url),
+                    proxies=self._identity.current_proxies,
+                    headers=headers,
+                    timeout=timeout
+                )
+                time.sleep(10)
+
+                # this is the target page
+                response = self._session.get(
+                    url,
+                    proxies=self._identity.current_proxies,
+                    headers=headers,
+                    timeout=timeout
+                )
                 response.raise_for_status()
 
             except requests.exceptions.HTTPError as e:
                 """An HTTP error occurred."""
-                # Retry-After
-                if response is not None:
-                    print(response.status_code)
-                    print(response.headers)
                 log_exception(e, only_file=True)
-                tryings += 1
+                if response is not None:
+                    if 400 <= response.status_code <= 500 or response.status_code in [503]:
+                        self.refresh_identity()
+                    else:
+                        time.sleep(30)
+                        tryings += 1
 
             except requests.exceptions.ConnectionError as e:
                 """A proxy error occurred."""
@@ -51,10 +69,19 @@ class PhantomBrowsingSession:
                 # before mark this proxy as bad, test the name resolution and connection to the webserver
                 domain = get_domain_from_url(url)
                 if domain_exists(domain) and any([is_tcp_port_open(domain, 443), is_tcp_port_open(domain, 80)]):
+                    # ConnectionError
+                    log_message(
+                        f'ConnectionError but domain {domain} exists and has ports 443 or 80 opened',
+                        only_file=True
+                    )
                     # is the proxy
                     self._identity.some_connection_error()
                     self.refresh_identity()
                 else:
+                    log_message(
+                        f'ConnectionError with domain {domain} maybe domain blocked? has 80 or 443 ports opened?',
+                        only_file=True
+                    )
                     # webpage? try again
                     log_exception(e, only_file=True)
                     tryings += 1
@@ -91,7 +118,7 @@ class PhantomBrowsingSession:
 
 
 class BrowsingIdentity:
-    proxies = {}
+    current_proxies = {}
     user_agent = None
 
     def __init__(self):
@@ -120,14 +147,14 @@ class BrowsingIdentity:
                 continue
             if proxy in config.data['bad']:
                 proxy = None
-        self.proxies = {
+        self.current_proxies = {
             'http': proxy,
             'https': proxy,
             'ftp': proxy
         }
 
     def some_connection_error(self):
-        current_proxy = self.proxies['http']
+        current_proxy = self.current_proxies['http']
         config = BrowsingIdentity._get_config()
         if current_proxy not in config.data['errors']:
             config.data['errors'][current_proxy] = 0
@@ -141,7 +168,7 @@ class BrowsingIdentity:
         self._check_if_everything_its_okay()
 
     def proxy_okay(self):
-        current_proxy = self.proxies['http']
+        current_proxy = self.current_proxies['http']
         config = BrowsingIdentity._get_config()
         if current_proxy in config.data['errors']:
             config.data['errors'][current_proxy] = 0
