@@ -45,15 +45,15 @@ class PhantomBrowsingSession:
             response = None
             try:
                 # first we get the index page
-                self.log(f'Get the index page {get_index_url(url)}')
-                self._session.get(
-                    get_index_url(url),
-                    proxies=self._identity.current_proxies,
-                    headers=headers,
-                    timeout=timeout
-                )
-                self.log('Sleeping ten seconds.')
-                time.sleep(4)
+                # self.log(f'Get the index page {get_index_url(url)}')
+                # self._session.get(
+                #     get_index_url(url),
+                #     proxies=self._identity.current_proxies,
+                #     headers=headers,
+                #     timeout=timeout
+                # )
+                # self.log('Sleeping ten seconds.')
+                # time.sleep(4)
 
                 # this is the target page
                 self.log(f'Get the target page {url}')

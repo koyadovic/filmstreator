@@ -53,32 +53,20 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
         self._logger = logger
         session = PhantomBrowsingSession(referer=self.base_url + '/')
         results = None
-        trying = 0
-        while results is None or len(results) == 0:
-            try:
-                trying += 1
-                self.log(f'Trying to get {self.base_url + self.relative_search_string()}')
-                session.get(self.base_url + self.relative_search_string(), timeout=30, logger=logger)
-                self._last_response = response = session.last_response
-                if response is None:
-                    self.log(f'Response is None! refreshing identity')
-                    session.refresh_identity()
-                    continue
-                base_tree = html.fromstring(response.content)
-                results = base_tree.xpath(self.anchors_xpath)
-                if len(results) == 0:
-                    # TODO check for not result call. If exist the xpath, return [] we don't continue trying.
-                    if trying > 2:
-                        self.log('Tryings more than 2, returning nothing')
-                        return []
-                    self.log('Parsing response get zero results ... Refreshing identity')
-                    session.refresh_identity()
-                else:
-                    self.log('Parsing response get results!')
-            except Exception as e:
-                log_exception(e)
-        download_results = self._translate(results)
-        return download_results
+        try:
+            self.log(f'Trying to get {self.base_url + self.relative_search_string()}')
+            session.get(self.base_url + self.relative_search_string(), timeout=30, logger=logger)
+            self._last_response = response = session.last_response
+            if response is None:
+                return results
+            base_tree = html.fromstring(response.content)
+            results = base_tree.xpath(self.anchors_xpath)
+            if len(results) == 0:
+                return []
+            download_results = self._translate(results)
+            return download_results
+        except Exception as e:
+            log_exception(e)
 
     def _translate(self, results):
         download_results = []

@@ -248,11 +248,15 @@ def do_the_refresh():
 
 def _refresh_download_results_from_source(audiovisual_record, source_class, logger=None):
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']  # de verdad sólo son estos???
+    audiovisual_record.refresh()
     download_source = source_class(audiovisual_record)
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
 
     # get results found by source_class for audiovisual_record
     results = download_source.get_source_results(logger=logger)
+    if results is None:
+        # Do nothing
+        return
 
     poor_quality_links = []
     remove_bad_links = False
@@ -297,11 +301,13 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
             if not _valid_result(result):
                 if logger:
                     logger(f'[{source_class.source_name}] [{audiovisual_record.name}] Not valid link: {result.name}')
-                result.metadata['validation'] = {
-                    'valid': False,
-                    'reason': f'Detected as invalid link for \'{audiovisual_record.name}\''
-                }
-                result.save()
+
+                # TODO casca
+                # result.metadata['validation'] = {
+                #     'valid': False,
+                #     'reason': f'Detected as invalid link for {audiovisual_record.name}'
+                # }
+                # result.save()
                 continue
 
             real_results.append(result)
@@ -333,11 +339,12 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
             if not _valid_result(result):
                 if logger:
                     logger(f'[{source_class.source_name}] [{audiovisual_record.name}] Not valid link: {result.name}')
-                result.metadata['validation'] = {
-                    'valid': False,
-                    'reason': f'Detected as invalid link for \'{audiovisual_record.name}\''
-                }
-                result.save()
+
+                # TODO casca
+                # result.metadata['validation'] = {
+                #     'valid': False, 'reason': f'Detected as invalid link for {audiovisual_record.name}'
+                # }
+                # result.save()
                 continue
 
             if logger:
@@ -356,6 +363,8 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
             for bad_link in poor_quality_links:
                 bad_link.delete()
 
+    if logger:
+        logger(f'FINISHED _refresh_download_results_from_source for {audiovisual_record.name} {source_class.source_name}')
     _check_has_downloads(audiovisual_record)
 
 
@@ -384,6 +393,7 @@ def _check_has_downloads(audiovisual_record):
     has_downloads = len(downloads) > 0
     if audiovisual_record.has_downloads is not has_downloads:
         with Ticker.threads_lock:
+            audiovisual_record.refresh()
             audiovisual_record.has_downloads = has_downloads
             audiovisual_record.save()
 
