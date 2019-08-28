@@ -1,17 +1,11 @@
-from ssl import CertificateError
 from core.model.configurations import Configuration
 from core.tools import browsing_proxies
 from core.tools.exceptions import CoreException
-
-from requests.exceptions import ProxyError, ConnectionError, ReadTimeout, ConnectTimeout, ChunkedEncodingError
-from urllib3.exceptions import MaxRetryError, NewConnectionError
-from socket import getaddrinfo, gaierror
-from urllib.parse import urlparse
+from core.tools.logs import log_exception
+from core.tools.network import domain_exists, get_domain_from_url, is_tcp_port_open
 
 import requests
 import random
-
-from core.tools.network import domain_exists
 
 
 class PhantomBrowsingSession:
@@ -25,8 +19,6 @@ class PhantomBrowsingSession:
         self.refresh_identity()
 
     def get(self, url, headers=None, timeout=30):
-        PhantomBrowsingSession._check_domain(url)
-
         initial_headers = self._headers
         headers = headers or {}
         initial_headers.update(**headers)
@@ -41,19 +33,43 @@ class PhantomBrowsingSession:
 
             try:
                 response = self._session.get(url, proxies=self._identity.proxies, headers=headers, timeout=timeout)
+                response.raise_for_status()
                 self._identity.proxy_okay()
                 self._last_response = response
                 self._referer = url
                 return self
 
-            except (ConnectTimeout, MaxRetryError, ProxyError, ConnectionError, ReadTimeout,
-                    NewConnectionError, ChunkedEncodingError, CertificateError):
-                # 95.179.181.1:80
+            except requests.exceptions.HTTPError as e:
+                """An HTTP error occurred."""
+                log_exception(e, only_file=True)
+                tryings += 1
 
-                self._identity.some_connection_error()
-                self.refresh_identity()
+            except requests.exceptions.ConnectionError as e:
+                """A proxy error occurred."""
+                """An SSL error occurred."""
+                # before mark this proxy as bad, test the name resolution and connection to the webserver
+                domain = get_domain_from_url(url)
+                if domain_exists(domain) and any([is_tcp_port_open(domain, 443), is_tcp_port_open(domain, 80)]):
+                    # is the proxy
+                    self._identity.some_connection_error()
+                    self.refresh_identity()
+                else:
+                    # webpage? try again
+                    log_exception(e, only_file=True)
+                    tryings += 1
 
-            except Exception:
+            except requests.exceptions.Timeout as e:
+                """The request timed out."""
+                log_exception(e, only_file=True)
+                tryings += 1
+
+            except requests.exceptions.RequestException as e:
+                """An general requests error occurred."""
+                log_exception(e, only_file=True)
+                tryings += 1
+
+            except Exception as e:
+                log_exception(e, only_file=True)
                 tryings += 1
 
     @property
@@ -64,15 +80,6 @@ class PhantomBrowsingSession:
         self._referer = self._initial_referer
         self._session = requests.Session()
         self._identity = BrowsingIdentity()
-
-    @classmethod
-    def _check_domain(cls, url):
-        domain = urlparse(url).netloc  # extract the domain from the url
-        if not domain_exists(domain):
-            raise PhantomBrowsingSession.InvalidURLProvided(f'Domain {domain} of url {url} does not exist')
-
-    class InvalidURLProvided(CoreException):
-        pass
 
 
 class BrowsingIdentity:

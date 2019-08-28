@@ -1,5 +1,10 @@
 from core.tools.timeouts import timeout
 import socket
+import urllib.parse
+
+
+def get_domain_from_url(url):
+    return urllib.parse.urlparse(url).netloc
 
 
 def domain_exists(domain):
