@@ -81,6 +81,9 @@ def compile_download_links_from_audiovisual_records():
 
 @Ticker.execute_each(interval='3-days')
 def recheck_downloads():
+    """
+    En un principio era por el eliminado de algunos enlaces. Se marcaban las películas para ser rechequeadas.
+    """
     audiovisual_records = (
         Search
         .Builder
