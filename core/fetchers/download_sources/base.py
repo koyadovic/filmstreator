@@ -53,6 +53,7 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
                 base_tree = html.fromstring(response.content)
                 results = base_tree.xpath(self.anchors_xpath)
                 if len(results) == 0:
+                    # TODO check for not result call. If exist the xpath, return [] we don't continue trying.
                     if trying > 2:
                         self.log('Tryings more than 2, returning nothing')
                         return []
