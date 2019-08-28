@@ -11,6 +11,8 @@ import random
 
 
 class PhantomBrowsingSession:
+    domain_checks = {}
+
     def __init__(self, referer=None, headers=None):
         self._referer = referer
         self._initial_referer = self._referer
@@ -18,9 +20,16 @@ class PhantomBrowsingSession:
         self._identity = None
         self._last_response = None
         self._headers = headers or {}
+        self._logger = None
         self.refresh_identity()
 
-    def get(self, url, headers=None, timeout=30):
+    def log(self, text):
+        if self._logger:
+            current_proxy = self._identity.current_proxies['https']
+            self._logger(f'[PhantomBrowsingSession] [{current_proxy}] {text}')
+
+    def get(self, url, headers=None, timeout=30, logger=None):
+        self._logger = logger
         initial_headers = self._headers
         headers = headers or {}
         initial_headers.update(**headers)
@@ -36,15 +45,18 @@ class PhantomBrowsingSession:
             response = None
             try:
                 # first we get the index page
+                self.log(f'Get the index page {get_index_url(url)}')
                 self._session.get(
                     get_index_url(url),
                     proxies=self._identity.current_proxies,
                     headers=headers,
                     timeout=timeout
                 )
-                time.sleep(10)
+                self.log('Sleeping ten seconds.')
+                time.sleep(4)
 
                 # this is the target page
+                self.log(f'Get the target page {url}')
                 response = self._session.get(
                     url,
                     proxies=self._identity.current_proxies,
@@ -58,54 +70,68 @@ class PhantomBrowsingSession:
                 log_exception(e, only_file=True)
                 if response is not None:
                     if 400 <= response.status_code <= 500 or response.status_code in [503]:
+                        self.log(f'Status {response.status_code}. Refreshing identity.')
                         self.refresh_identity()
                     else:
-                        time.sleep(30)
+                        time.sleep(20)
                         tryings += 1
 
             except requests.exceptions.ConnectionError as e:
                 """A proxy error occurred."""
                 """An SSL error occurred."""
                 # before mark this proxy as bad, test the name resolution and connection to the webserver
-                domain = get_domain_from_url(url)
-                if domain_exists(domain) and any([is_tcp_port_open(domain, 443), is_tcp_port_open(domain, 80)]):
+                if self.is_all_okay_with_url(url):
                     # ConnectionError
-                    log_message(
-                        f'ConnectionError but domain {domain} exists and has ports 443 or 80 opened',
-                        only_file=True
-                    )
                     # is the proxy
                     self._identity.some_connection_error()
                     self.refresh_identity()
                 else:
-                    log_message(
-                        f'ConnectionError with domain {domain} maybe domain blocked? has 80 or 443 ports opened?',
-                        only_file=True
-                    )
-                    # webpage? try again
+                    # web page? try again
                     log_exception(e, only_file=True)
                     tryings += 1
 
             except requests.exceptions.Timeout as e:
                 """The request timed out."""
+                self.log(f'{e}')
                 log_exception(e, only_file=True)
                 tryings += 1
 
             except requests.exceptions.RequestException as e:
                 """An general requests error occurred."""
+                self.log(f'{e}')
                 log_exception(e, only_file=True)
                 tryings += 1
 
             except Exception as e:
+                self.log(f'{e}')
                 log_exception(e, only_file=True)
                 tryings += 1
 
             else:
                 # Everything was okay
+                self.log(f'Everything was okay!')
                 self._identity.proxy_okay()
                 self._last_response = response
                 self._referer = url
                 return self
+
+    def is_all_okay_with_url(self, url):
+        domain = get_domain_from_url(url)
+        if domain in PhantomBrowsingSession.domain_checks:
+            return PhantomBrowsingSession.domain_checks[domain]
+        else:
+            domain_check = domain_exists(domain) and any([is_tcp_port_open(domain, 443), is_tcp_port_open(domain, 80)])
+            if domain_check:
+                text = f'ConnectionError but domain {domain} exists and has ports 443 or 80 opened. Proxy Error'
+                self.log(text)
+                log_message(text, only_file=True)
+            else:
+                text = f'ConnectionError with domain {domain} maybe domain blocked? has 80 or 443 ports opened?'
+                self.log(text)
+                log_message(text, only_file=True)
+
+            PhantomBrowsingSession.domain_checks[domain] = domain_check
+            return domain_check
 
     @property
     def last_response(self):

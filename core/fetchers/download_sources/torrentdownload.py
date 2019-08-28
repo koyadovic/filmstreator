@@ -13,3 +13,9 @@ class TorrentDownloadSource(AbstractDownloadSource):
         encoded_name = urllib.parse.quote_plus(name.lower())
         url = f'/search?q={encoded_name}'
         return url
+
+    def not_results(self, html_content):
+        possibilities = [
+            'no results found',
+        ]
+        return any([p in html_content.lower() for p in possibilities])

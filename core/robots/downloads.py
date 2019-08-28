@@ -91,6 +91,8 @@ def compile_download_links_from_audiovisual_records():
                     audiovisual_record.save()
                 _check_has_downloads(audiovisual_record)
 
+    # empty the domain and tcp port checks cache
+    PhantomBrowsingSession.domain_checks = {}
     sources = get_all_download_sources()
 
     threads = []

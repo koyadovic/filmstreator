@@ -13,3 +13,10 @@ class ThePirateBayDownloadSource(AbstractDownloadSource):
         encoded_name = percent_encoding(name.lower())
         url = f'/search/{encoded_name}/1/'
         return url
+
+    def not_results(self, html_content):
+        possibilities = [
+            'no hits',
+            'try adding an asterisk in you search phrase'
+        ]
+        return any([p in html_content.lower() for p in possibilities])

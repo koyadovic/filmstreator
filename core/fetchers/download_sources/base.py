@@ -26,6 +26,20 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
     def relative_search_string(self) -> str:
         raise NotImplementedError
 
+    def not_results(self, html_content):
+        dom = html.fromstring(html_content)
+        for anchor in dom.xpath(self.anchors_xpath):
+            etree.strip_tags(anchor, 'span', 'p', 'b', 'i', 'small')
+            result = etree.fromstring(etree.tostring(anchor))
+            text = result.text
+            if text is None:
+                continue
+            href = result.get('href')
+            any_found = bool(text) and bool(href)
+            if any_found:
+                return False
+        return True
+
     def __init__(self, audiovisual_record: AudiovisualRecord):
         self.audiovisual_record = audiovisual_record
         self._logger = None
@@ -44,7 +58,7 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
             try:
                 trying += 1
                 self.log(f'Trying to get {self.base_url + self.relative_search_string()}')
-                session.get(self.base_url + self.relative_search_string(), timeout=120)
+                session.get(self.base_url + self.relative_search_string(), timeout=30, logger=logger)
                 self._last_response = response = session.last_response
                 if response is None:
                     self.log(f'Response is None! refreshing identity')
