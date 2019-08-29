@@ -166,11 +166,12 @@ class BrowsingIdentity:
         config = BrowsingIdentity._get_config()
         all_proxies = config.data.get('proxies', [])
         proxy = None
-        while proxy is None:
+        while proxy is None or proxy == '':
             try:
                 proxy = all_proxies[random.randint(0, len(all_proxies))]
             except IndexError:
                 continue
+            proxy = proxy.strip()
             if proxy in config.data['bad']:
                 proxy = None
         self.current_proxies = {
