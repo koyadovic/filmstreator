@@ -1,7 +1,8 @@
 from filmstreator.settings.base import *
-from sentry_sdk.integrations.django import DjangoIntegration
-import sentry_sdk
 from core.tools import logs
+# DISABLED SENTRY BY NOW
+# from sentry_sdk.integrations.django import DjangoIntegration
+# import sentry_sdk
 
 
 DEBUG = False
