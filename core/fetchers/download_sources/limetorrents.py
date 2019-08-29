@@ -13,6 +13,6 @@ class LimeTorrentsSource(AbstractDownloadSource):
         audiovisual_name = self.audiovisual_record.name.lower()
         audiovisual_year = self.audiovisual_record.year
         name = f'{audiovisual_name} {audiovisual_year}'
-        name = re.sub(r'[!\|@\"#\$~%½&½&¬\/{\(\[\)\]}?\\¿\'¡]', '%20', name).replace(' ', '-').replace('=', '-')
+        name = re.sub(r'[:!\|@\"#\$~%½&½&¬\/{\(\[\)\]}?\\¿\'¡]', '%20', name).replace(' ', '-').replace('=', '-')
         url = f'/search/all/{name}/seeds/1/'
         return url

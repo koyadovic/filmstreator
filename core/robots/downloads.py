@@ -25,7 +25,7 @@ def compile_download_links_from_audiovisual_records():
     compile_download_links_from_audiovisual_records.log(f'Current switch interval: {sys.getswitchinterval()}')
 
     def _worker(source_class):
-        with ThreadPoolExecutor(max_workers=6) as executor:
+        with ThreadPoolExecutor(max_workers=3) as executor:
             futures = []
             source_name = source_class.source_name
             compile_download_links_from_audiovisual_records.log(f'Begin to retrieve audovisual records for {source_name}')
@@ -36,7 +36,7 @@ def compile_download_links_from_audiovisual_records():
                 .add_condition(Condition('deleted', Condition.EQUALS, False))
                 .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
                 .add_condition(Condition(f'metadata__downloads_fetch__{source_name}', Condition.EXISTS, False))
-                .search(paginate=True, page_size=20, page=1, sort_by='-global_score')
+                .search(paginate=True, page_size=10, page=1, sort_by='-global_score')
             )['results']
 
             target_audiovisual_records = []
@@ -79,22 +79,16 @@ def compile_download_links_from_audiovisual_records():
                 time.sleep(30)
 
             for future in concurrent.futures.as_completed(futures):
-                future.result(timeout=600)
                 compile_download_links_from_audiovisual_records.log(future.log_msg)
 
                 audiovisual_record = future.audiovisual_record
-                log_message(
-                    f'{audiovisual_record.name} current {audiovisual_record.metadata.get("downloads_fetch")}'
-                )
                 audiovisual_record.refresh()
                 if 'downloads_fetch' not in audiovisual_record.metadata:
                     audiovisual_record.metadata['downloads_fetch'] = {}
                 audiovisual_record.metadata['downloads_fetch'][source_name] = True
-                log_message(
-                    f'{audiovisual_record.name} current {audiovisual_record.metadata.get("downloads_fetch")}'
-                )
                 audiovisual_record.save()
                 _check_has_downloads(audiovisual_record)
+                future.result(timeout=600)
 
     # empty the domain and tcp port checks cache
     PhantomBrowsingSession.domain_checks = {}
@@ -251,6 +245,7 @@ def do_the_refresh():
 
 
 def _refresh_download_results_from_source(audiovisual_record, source_class, logger=None):
+    1/0
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']  # de verdad sólo son estos???
     audiovisual_record.refresh()
     download_source = source_class(audiovisual_record)
@@ -306,12 +301,12 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
                 if logger:
                     logger(f'[{source_class.source_name}] [{audiovisual_record.name}] Not valid link: {result.name}')
 
+                result.deleted = True
                 result.metadata['validation'] = {
                     'valid': False,
                     'reason': f'Detected as invalid link for {audiovisual_record.name}'
                 }
                 result.save()
-                result.delete()
                 continue
 
             real_results.append(result)
@@ -344,11 +339,11 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
                 if logger:
                     logger(f'[{source_class.source_name}] [{audiovisual_record.name}] Not valid link: {result.name}')
 
+                result.deleted = True
                 result.metadata['validation'] = {
                     'valid': False, 'reason': f'Detected as invalid link for {audiovisual_record.name}'
                 }
                 result.save()
-                result.delete()
                 continue
 
             if logger:
