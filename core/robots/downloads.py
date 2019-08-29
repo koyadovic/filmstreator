@@ -105,7 +105,7 @@ def compile_download_links_from_audiovisual_records():
         thread.join()
 
 
-@Ticker.execute_each(interval='3-days')
+@Ticker.execute_each(interval='14-days')
 def recheck_downloads():
     """
     En un principio era por el eliminado de algunos enlaces. Se marcaban las películas para ser rechequeadas.
@@ -245,7 +245,6 @@ def do_the_refresh():
 
 
 def _refresh_download_results_from_source(audiovisual_record, source_class, logger=None):
-    1/0
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']  # de verdad sólo son estos???
     audiovisual_record.refresh()
     download_source = source_class(audiovisual_record)
@@ -312,8 +311,9 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
             real_results.append(result)
             n += 1
 
-        if len(real_results) < 2 and audiovisual_record.year >= str(n_days_ago.year):
-            if audiovisual_record.metadata.get('recheck_downloads_executions', 0) <= 10:
+        if audiovisual_record.has_downloads and len(real_results) < 2 and audiovisual_record.year >= str(n_days_ago.year):
+            max_tryings = len(get_all_download_sources()) * 6  # per download_source
+            if audiovisual_record.metadata.get('recheck_downloads_executions', 0) <= max_tryings:
                 # if the film has less than 3 good downloads and is a recent film, mark it as
                 # recheck downloads again
                 audiovisual_record.refresh()
