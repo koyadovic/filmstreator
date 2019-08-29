@@ -196,8 +196,9 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         )
         if isinstance(download_source_result, MongoDownloadSourceResult):
             return download_source_result
-        if type(download_source_result) == dict:
-            return MongoDownloadSourceResult(**download_source_result)
+        # TODO check if works without this
+        # if type(download_source_result) == dict:
+        #     return MongoDownloadSourceResult(**download_source_result)
         return MongoDownloadSourceResult(
             _id=getattr(download_source_result, '_id') if hasattr(download_source_result, '_id') else None,
             last_check=download_source_result.last_check,
