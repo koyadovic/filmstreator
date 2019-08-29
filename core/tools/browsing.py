@@ -28,7 +28,7 @@ class PhantomBrowsingSession:
             current_proxy = self._identity.current_proxies['https']
             self._logger(f'[PhantomBrowsingSession] [{current_proxy}] {text}')
 
-    def get(self, url, headers=None, timeout=30, logger=None):
+    def get(self, url, headers=None, timeout=30, logger=None, retrieve_index_first=False):
         self._logger = logger
         initial_headers = self._headers
         headers = headers or {}
@@ -44,16 +44,16 @@ class PhantomBrowsingSession:
 
             response = None
             try:
-                # first we get the index page
-                # self.log(f'Get the index page {get_index_url(url)}')
-                # self._session.get(
-                #     get_index_url(url),
-                #     proxies=self._identity.current_proxies,
-                #     headers=headers,
-                #     timeout=timeout
-                # )
-                # self.log('Sleeping ten seconds.')
-                # time.sleep(4)
+                if retrieve_index_first:
+                    self.log(f'Get the index page {get_index_url(url)}')
+                    self._session.get(
+                        get_index_url(url),
+                        proxies=self._identity.current_proxies,
+                        headers=headers,
+                        timeout=timeout
+                    )
+                    self.log('Sleeping ten seconds.')
+                    time.sleep(4)
 
                 # this is the target page
                 self.log(f'Get the target page {url}')
@@ -67,7 +67,7 @@ class PhantomBrowsingSession:
 
             except requests.exceptions.HTTPError as e:
                 """An HTTP error occurred."""
-                log_exception(e, only_file=True)
+                log_message(e, only_file=True)
                 if response is not None:
                     if 400 <= response.status_code <= 500 or response.status_code in [503]:
                         self.log(f'Status {response.status_code}. Refreshing identity.')

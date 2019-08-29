@@ -7,6 +7,7 @@ class ThePirateBayDownloadSource(AbstractDownloadSource):
     base_url = 'https://proxtpb.art'
     language = 'eng'
     anchors_xpath = '//div[@class="detName"]/a'
+    retrieve_index_first = False  # to retrieve the index page first if needed
 
     def relative_search_string(self) -> str:
         name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'

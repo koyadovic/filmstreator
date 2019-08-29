@@ -7,6 +7,7 @@ class I337xDownloadSource(AbstractDownloadSource):
     base_url = 'https://www.1377x.to'
     language = 'eng'
     anchors_xpath = '/html/body/main/div/div/div/div[2]/div[1]/table/tbody/tr/td[1]/a'
+    retrieve_index_first = False  # to retrieve the index page first if needed
 
     def relative_search_string(self) -> str:
         name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'

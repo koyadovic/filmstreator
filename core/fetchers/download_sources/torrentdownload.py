@@ -7,6 +7,7 @@ class TorrentDownloadSource(AbstractDownloadSource):
     base_url = 'https://www.torrentdownload.ch'
     language = 'eng'
     anchors_xpath = '//table[@class="table2"][2]//div[@class="tt-name"]/a'
+    retrieve_index_first = False  # to retrieve the index page first if needed
 
     def relative_search_string(self) -> str:
         name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'

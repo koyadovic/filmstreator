@@ -1,3 +1,5 @@
+import time
+
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
 from typing import List
 
@@ -17,28 +19,28 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
     # Store links as relative links because domains change frequently
     # here you can put the base_url that will be used with relative urls
     base_url = None
-
     language = None  # ISO 639-2 Code, three characters
-
     anchors_xpath = None
+    retrieve_index_first = False  # to retrieve the index page first if needed
 
     @abc.abstractmethod
     def relative_search_string(self) -> str:
         raise NotImplementedError
 
     def not_results(self, html_content):
-        dom = html.fromstring(html_content)
-        for anchor in dom.xpath(self.anchors_xpath):
-            etree.strip_tags(anchor, 'span', 'p', 'b', 'i', 'small')
-            result = etree.fromstring(etree.tostring(anchor))
-            text = result.text
-            if text is None:
-                continue
-            href = result.get('href')
-            any_found = bool(text) and bool(href)
-            if any_found:
-                return False
-        return True
+        raise NotImplementedError
+        # dom = html.fromstring(html_content)
+        # for anchor in dom.xpath(self.anchors_xpath):
+        #     etree.strip_tags(anchor, 'span', 'p', 'b', 'i', 'small')
+        #     result = etree.fromstring(etree.tostring(anchor))
+        #     text = result.text
+        #     if text is None:
+        #         continue
+        #     href = result.get('href')
+        #     any_found = bool(text) and bool(href)
+        #     if any_found:
+        #         return False
+        # return True
 
     def __init__(self, audiovisual_record: AudiovisualRecord):
         self.audiovisual_record = audiovisual_record
@@ -55,7 +57,10 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
         results = None
         try:
             self.log(f'Trying to get {self.base_url + self.relative_search_string()}')
-            session.get(self.base_url + self.relative_search_string(), timeout=30, logger=logger)
+            session.get(
+                self.base_url + self.relative_search_string(),
+                timeout=30, logger=logger, retrieve_index_first=self.retrieve_index_first
+            )
             self._last_response = response = session.last_response
             if response is None:
                 return results

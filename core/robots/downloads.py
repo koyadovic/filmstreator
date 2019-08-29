@@ -83,12 +83,17 @@ def compile_download_links_from_audiovisual_records():
                 compile_download_links_from_audiovisual_records.log(future.log_msg)
 
                 audiovisual_record = future.audiovisual_record
-                with Ticker.threads_lock:
-                    audiovisual_record.refresh()
-                    if 'downloads_fetch' not in audiovisual_record.metadata:
-                        audiovisual_record.metadata['downloads_fetch'] = {}
-                    audiovisual_record.metadata['downloads_fetch'][source_name] = True
-                    audiovisual_record.save()
+                log_message(
+                    f'{audiovisual_record.name} current {audiovisual_record.metadata.get("downloads_fetch")}'
+                )
+                audiovisual_record.refresh()
+                if 'downloads_fetch' not in audiovisual_record.metadata:
+                    audiovisual_record.metadata['downloads_fetch'] = {}
+                audiovisual_record.metadata['downloads_fetch'][source_name] = True
+                log_message(
+                    f'{audiovisual_record.name} current {audiovisual_record.metadata.get("downloads_fetch")}'
+                )
+                audiovisual_record.save()
                 _check_has_downloads(audiovisual_record)
 
     # empty the domain and tcp port checks cache
@@ -206,10 +211,9 @@ def delete_404_links():
                 response = session.last_response
             if response.status_code == 404:
                 log_message(f'Removed link {dr.link} with status code {response.status_code}')
-                with Ticker.threads_lock:
-                    dr.delete()
-                    dr.audiovisual_record.metadata['recheck_downloads'] = True
-                    dr.audiovisual_record.save()
+                dr.delete()
+                dr.audiovisual_record.metadata['recheck_downloads'] = True
+                dr.audiovisual_record.save()
                 _check_has_downloads(audiovisual_record)
             return
 
@@ -302,12 +306,12 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
                 if logger:
                     logger(f'[{source_class.source_name}] [{audiovisual_record.name}] Not valid link: {result.name}')
 
-                # TODO casca
-                # result.metadata['validation'] = {
-                #     'valid': False,
-                #     'reason': f'Detected as invalid link for {audiovisual_record.name}'
-                # }
-                # result.save()
+                result.metadata['validation'] = {
+                    'valid': False,
+                    'reason': f'Detected as invalid link for {audiovisual_record.name}'
+                }
+                result.save()
+                result.delete()
                 continue
 
             real_results.append(result)
@@ -340,11 +344,11 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
                 if logger:
                     logger(f'[{source_class.source_name}] [{audiovisual_record.name}] Not valid link: {result.name}')
 
-                # TODO casca
-                # result.metadata['validation'] = {
-                #     'valid': False, 'reason': f'Detected as invalid link for {audiovisual_record.name}'
-                # }
-                # result.save()
+                result.metadata['validation'] = {
+                    'valid': False, 'reason': f'Detected as invalid link for {audiovisual_record.name}'
+                }
+                result.save()
+                result.delete()
                 continue
 
             if logger:
@@ -353,15 +357,13 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
             n += 1
 
         if len(real_results) > 0:
-            with Ticker.threads_lock:
-                services.save_download_source_results(real_results)
+            services.save_download_source_results(real_results)
 
         remove_bad_links = len(real_results) + number_of_good_quality_links >= 3
 
     if remove_bad_links:
-        with Ticker.threads_lock:
-            for bad_link in poor_quality_links:
-                bad_link.delete()
+        for bad_link in poor_quality_links:
+            bad_link.delete()
 
     if logger:
         logger(f'FINISHED _refresh_download_results_from_source for {audiovisual_record.name} {source_class.source_name}')
@@ -392,10 +394,9 @@ def _check_has_downloads(audiovisual_record):
     )
     has_downloads = len(downloads) > 0
     if audiovisual_record.has_downloads is not has_downloads:
-        with Ticker.threads_lock:
-            audiovisual_record.refresh()
-            audiovisual_record.has_downloads = has_downloads
-            audiovisual_record.save()
+        audiovisual_record.refresh()
+        audiovisual_record.has_downloads = has_downloads
+        audiovisual_record.save()
 
 
 def _get_ts_configuration(key):

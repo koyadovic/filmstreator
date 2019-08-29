@@ -6,10 +6,10 @@ from core.tools import logs
 
 DEBUG = False
 
-sentry_sdk.init(
-    dsn="https://3f87cf408a0042fc929df4e3ec80e390@sentry.io/1505406",
-    integrations=[DjangoIntegration()]
-)
+# sentry_sdk.init(
+#     dsn="https://3f87cf408a0042fc929df4e3ec80e390@sentry.io/1505406",
+#     integrations=[DjangoIntegration()]
+# )
 
 FILMSTREATOR_LOG_FILENAME = BASE_DIR + '/../../logs/filmstreator-debug.log'
 

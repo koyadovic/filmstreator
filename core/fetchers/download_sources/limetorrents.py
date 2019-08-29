@@ -7,6 +7,7 @@ class LimeTorrentsSource(AbstractDownloadSource):
     base_url = 'https://www.limetorrents.info'
     language = 'eng'
     anchors_xpath = '//table[2]//div[@class="tt-name"]/a'
+    retrieve_index_first = False  # to retrieve the index page first if needed
 
     def relative_search_string(self) -> str:
         audiovisual_name = self.audiovisual_record.name.lower()

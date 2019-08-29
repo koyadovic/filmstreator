@@ -7,6 +7,7 @@ class RarBgDownloadSource(AbstractDownloadSource):
     base_url = 'https://rarbgmirror.org'
     language = 'eng'
     anchors_xpath = '//table[@class="lista2t"]//tr[@class="lista2"]//a[1]'
+    retrieve_index_first = False  # to retrieve the index page first if needed
 
     def relative_search_string(self) -> str:
         name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'
