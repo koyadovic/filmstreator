@@ -48,6 +48,7 @@ class DAOMongoDB(DAOInterface):
         collection.insert(many_insert)
 
     def save_download_source_result(self, result: MongoDownloadSourceResult):
+        result = MongoDownloadSourceResult.convert(result)
         dict_obj = dict(result)
         collection = self._get_collection(MongoDownloadSourceResult)
 

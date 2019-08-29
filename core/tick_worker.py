@@ -43,7 +43,6 @@ class TickerFunctionData:
 
 
 class Ticker:
-    threads_lock = threading.RLock()
 
     INTERVALS = {
         '1-minute': {'seconds': 1 * 60, 'functions': []},

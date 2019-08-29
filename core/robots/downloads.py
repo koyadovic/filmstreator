@@ -1,5 +1,6 @@
 import re
 import sys
+import time
 from random import shuffle
 
 from core.fetchers.services import get_all_download_sources
@@ -24,7 +25,7 @@ def compile_download_links_from_audiovisual_records():
     compile_download_links_from_audiovisual_records.log(f'Current switch interval: {sys.getswitchinterval()}')
 
     def _worker(source_class):
-        with ThreadPoolExecutor(max_workers=6) as executor:
+        with ThreadPoolExecutor(max_workers=3) as executor:
             futures = []
             source_name = source_class.source_name
             compile_download_links_from_audiovisual_records.log(f'Begin to retrieve audovisual records for {source_name}')
@@ -35,7 +36,7 @@ def compile_download_links_from_audiovisual_records():
                 .add_condition(Condition('deleted', Condition.EQUALS, False))
                 .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
                 .add_condition(Condition(f'metadata__downloads_fetch__{source_name}', Condition.EXISTS, False))
-                .search(paginate=True, page_size=20, page=1, sort_by='-global_score')
+                .search(paginate=True, page_size=10, page=1, sort_by='-global_score')
             )['results']
 
             target_audiovisual_records = []
@@ -75,20 +76,22 @@ def compile_download_links_from_audiovisual_records():
                 future.audiovisual_record = audiovisual_record
                 future.source_class = source_class
                 futures.append(future)
+                time.sleep(30)
 
             for future in concurrent.futures.as_completed(futures):
-                future.result(timeout=600)
                 compile_download_links_from_audiovisual_records.log(future.log_msg)
 
                 audiovisual_record = future.audiovisual_record
-                with Ticker.threads_lock:
-                    audiovisual_record.refresh()
-                    if 'downloads_fetch' not in audiovisual_record.metadata:
-                        audiovisual_record.metadata['downloads_fetch'] = {}
-                    audiovisual_record.metadata['downloads_fetch'][source_name] = True
-                    audiovisual_record.save()
+                audiovisual_record.refresh()
+                if 'downloads_fetch' not in audiovisual_record.metadata:
+                    audiovisual_record.metadata['downloads_fetch'] = {}
+                audiovisual_record.metadata['downloads_fetch'][source_name] = True
+                audiovisual_record.save()
                 _check_has_downloads(audiovisual_record)
+                future.result(timeout=600)
 
+    # empty the domain and tcp port checks cache
+    PhantomBrowsingSession.domain_checks = {}
     sources = get_all_download_sources()
 
     threads = []
@@ -102,7 +105,7 @@ def compile_download_links_from_audiovisual_records():
         thread.join()
 
 
-@Ticker.execute_each(interval='3-days')
+@Ticker.execute_each(interval='14-days')
 def recheck_downloads():
     """
     En un principio era por el eliminado de algunos enlaces. Se marcaban las películas para ser rechequeadas.
@@ -202,10 +205,9 @@ def delete_404_links():
                 response = session.last_response
             if response.status_code == 404:
                 log_message(f'Removed link {dr.link} with status code {response.status_code}')
-                with Ticker.threads_lock:
-                    dr.delete()
-                    dr.audiovisual_record.metadata['recheck_downloads'] = True
-                    dr.audiovisual_record.save()
+                dr.delete()
+                dr.audiovisual_record.metadata['recheck_downloads'] = True
+                dr.audiovisual_record.save()
                 _check_has_downloads(audiovisual_record)
             return
 
@@ -244,11 +246,15 @@ def do_the_refresh():
 
 def _refresh_download_results_from_source(audiovisual_record, source_class, logger=None):
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']  # de verdad sólo son estos???
+    audiovisual_record.refresh()
     download_source = source_class(audiovisual_record)
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
 
     # get results found by source_class for audiovisual_record
     results = download_source.get_source_results(logger=logger)
+    if results is None:
+        # Do nothing
+        return
 
     poor_quality_links = []
     remove_bad_links = False
@@ -293,9 +299,11 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
             if not _valid_result(result):
                 if logger:
                     logger(f'[{source_class.source_name}] [{audiovisual_record.name}] Not valid link: {result.name}')
+
+                result.deleted = True
                 result.metadata['validation'] = {
                     'valid': False,
-                    'reason': f'Detected as invalid link for \'{audiovisual_record.name}\''
+                    'reason': f'Detected as invalid link for {audiovisual_record.name}'
                 }
                 result.save()
                 continue
@@ -303,8 +311,9 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
             real_results.append(result)
             n += 1
 
-        if len(real_results) < 2 and audiovisual_record.year >= str(n_days_ago.year):
-            if audiovisual_record.metadata.get('recheck_downloads_executions', 0) <= 10:
+        if audiovisual_record.has_downloads and len(real_results) < 2 and audiovisual_record.year >= str(n_days_ago.year):
+            max_tryings = len(get_all_download_sources()) * 6  # per download_source
+            if audiovisual_record.metadata.get('recheck_downloads_executions', 0) <= max_tryings:
                 # if the film has less than 3 good downloads and is a recent film, mark it as
                 # recheck downloads again
                 audiovisual_record.refresh()
@@ -329,9 +338,10 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
             if not _valid_result(result):
                 if logger:
                     logger(f'[{source_class.source_name}] [{audiovisual_record.name}] Not valid link: {result.name}')
+
+                result.deleted = True
                 result.metadata['validation'] = {
-                    'valid': False,
-                    'reason': f'Detected as invalid link for \'{audiovisual_record.name}\''
+                    'valid': False, 'reason': f'Detected as invalid link for {audiovisual_record.name}'
                 }
                 result.save()
                 continue
@@ -342,16 +352,16 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
             n += 1
 
         if len(real_results) > 0:
-            with Ticker.threads_lock:
-                services.save_download_source_results(real_results)
+            services.save_download_source_results(real_results)
 
         remove_bad_links = len(real_results) + number_of_good_quality_links >= 3
 
     if remove_bad_links:
-        with Ticker.threads_lock:
-            for bad_link in poor_quality_links:
-                bad_link.delete()
+        for bad_link in poor_quality_links:
+            bad_link.delete()
 
+    if logger:
+        logger(f'FINISHED _refresh_download_results_from_source for {audiovisual_record.name} {source_class.source_name}')
     _check_has_downloads(audiovisual_record)
 
 
@@ -379,9 +389,9 @@ def _check_has_downloads(audiovisual_record):
     )
     has_downloads = len(downloads) > 0
     if audiovisual_record.has_downloads is not has_downloads:
-        with Ticker.threads_lock:
-            audiovisual_record.has_downloads = has_downloads
-            audiovisual_record.save()
+        audiovisual_record.refresh()
+        audiovisual_record.has_downloads = has_downloads
+        audiovisual_record.save()
 
 
 def _get_ts_configuration(key):

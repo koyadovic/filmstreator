@@ -2,6 +2,12 @@ from filmstreator.settings.base import *
 
 DEBUG = True
 
+try:
+    os.makedirs(BASE_DIR + '/logs/')
+except FileExistsError:
+    pass
+
+
 FILMSTREATOR_LOG_FILENAME = BASE_DIR + '/logs/filmstreator-debug.log'
 
 LOGGING = {
