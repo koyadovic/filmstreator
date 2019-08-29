@@ -14,7 +14,7 @@ def log_message(message: str, only_file=False):
 
 def log_exception(exception: Exception, only_file=False):
     logger.exception(exception)
-    logger.info(traceback.format_exc())
+    logger.error(traceback.format_exc())
     if only_file:
         return
     # capture_exception(exception)
