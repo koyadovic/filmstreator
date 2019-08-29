@@ -6,7 +6,7 @@ from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
 from core.tools.exceptions import GeneralInformationException
-from core.tools.logs import log_exception
+from core.tools.logs import log_exception, log_message
 
 from concurrent.futures.thread import ThreadPoolExecutor
 
@@ -64,7 +64,7 @@ def _update(audiovisual_record, general_information_klass):
         audiovisual_record.save()
 
     except GeneralInformationException as e:
-        log_exception(e, only_file=True)
+        log_message(str(e))
         audiovisual_record.delete()
 
 
