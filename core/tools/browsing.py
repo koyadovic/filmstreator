@@ -98,7 +98,7 @@ class PhantomBrowsingSession:
             except requests.exceptions.Timeout as e:
                 """The request timed out."""
                 self.log(f'{e}')
-                log_exception(e, only_file=True)
+                log_message(e, only_file=True)
                 tryings += 1
 
             except requests.exceptions.RequestException as e:
