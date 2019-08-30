@@ -70,6 +70,10 @@ WSGI_APPLICATION = 'filmstreator.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+DB_USER = os.environ.get('DB_USER')
+DB_PASSWORD = os.environ.get('DB_PASSWORD')
+DB_HOST = '127.0.0.1'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
