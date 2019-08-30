@@ -43,7 +43,6 @@ def landing(request):
     try:
         ordering = get_params.pop('ordering', None)
         conditions = _process_get_params_and_get_conditions(get_params)
-        print(get_params)
         get_params['ordering'] = ordering
 
         search_builder = Search.Builder.new_search(AudiovisualRecord)
@@ -121,8 +120,7 @@ def details(request, slug=None):
 
     # /s/?ft=b&s="{{ person.name }}"
     for person in audiovisual_record.directors + audiovisual_record.writers + audiovisual_record.stars:
-        person.search_url = f'/s/?ft=b&s="{person.name}"'.replace(' ', '+')
-        print(person.search_url)
+        person.search_url = f'/s/?ft=a&s="{person.name}"'.replace(' ', '+')
 
     related_search = Search.Builder.new_search(AudiovisualRecord)
     related_search.add_condition(Condition('deleted', Condition.EQUALS, False))
