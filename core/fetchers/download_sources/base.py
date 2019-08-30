@@ -1,14 +1,14 @@
-import time
-
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
-from typing import List
-
-import abc
-from lxml import html, etree
-
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.logs import log_exception
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
+
+from typing import List
+from lxml import html, etree
+import abc
+
+
+html_parser = etree.HTMLParser()
 
 
 class AbstractDownloadSource(metaclass=abc.ABCMeta):
@@ -77,7 +77,7 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
         download_results = []
         for result in results:
             etree.strip_tags(result, 'span', 'p', 'b', 'i', 'small')
-            result = etree.fromstring(etree.tostring(result))
+            result = etree.fromstring(etree.tostring(result), parser=html_parser)
             text = result.text
             if text is None or len(text) < 4:
                 continue
