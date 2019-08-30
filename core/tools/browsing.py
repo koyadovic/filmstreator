@@ -69,6 +69,11 @@ class PhantomBrowsingSession:
                 """An HTTP error occurred."""
                 log_message(e, only_file=True)
                 if response is not None:
+                    if response.status_code == 404:
+                        # TODO La url puede estar mal construída, revisar
+                        # TODO https://www.1377x.to/search/b%40%20%28batman%20parody%20film%29%202016/1/
+                        # TODO el server retorna 404
+                        return self
                     if 400 <= response.status_code <= 500 or response.status_code in [503]:
                         self.log(f'Status {response.status_code}. Refreshing identity.')
                         self.refresh_identity()
