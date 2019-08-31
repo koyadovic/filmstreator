@@ -90,6 +90,9 @@ def compile_download_links_from_audiovisual_records():
 
             for future in concurrent.futures.as_completed(futures):
                 compile_download_links_from_audiovisual_records.log(future.log_msg)
+                processed = future.result(timeout=600)
+                if not processed:
+                    continue
 
                 audiovisual_record = future.audiovisual_record
                 audiovisual_record.refresh()
@@ -98,7 +101,6 @@ def compile_download_links_from_audiovisual_records():
                 audiovisual_record.metadata['downloads_fetch'][source_name] = True
                 audiovisual_record.save()
                 _check_has_downloads(audiovisual_record)
-                future.result(timeout=600)
 
     # empty the domain and tcp port checks cache
     PhantomBrowsingSession.domain_checks = {}
@@ -268,6 +270,12 @@ def _get_response_filename(audiovisual_record_name, source_class_name):
 
 
 def _refresh_download_results_from_source(audiovisual_record, source_class, logger=None):
+    """
+    :param audiovisual_record:
+    :param source_class:
+    :param logger:
+    :return: True if processed, False if not.
+    """
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']  # de verdad sólo son estos???
     audiovisual_record.refresh()
     download_source = source_class(audiovisual_record)
@@ -277,9 +285,11 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
     results = download_source.get_source_results(logger=logger)
     if results is None:
         # do nothing
-        return
+        return False
     else:
         resp = download_source._last_response
+        if resp is None:
+            return False
         if len(results) == 0 and resp is not None:
             response_filename = _get_response_filename(audiovisual_record.name, source_class.source_name)
             with open(response_filename, 'wb') as f:
@@ -440,6 +450,7 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
     if logger:
         logger(f'FINISHED _refresh_download_results_from_source for {audiovisual_record.name} {source_class.source_name}')
     _check_has_downloads(audiovisual_record)
+    return True
 
 
 def _valid_result(result):
