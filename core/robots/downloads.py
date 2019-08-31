@@ -259,9 +259,10 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
 
     configuration = get_download_source_configuration(source_class)
     if len(results) == 0:
-        configuration.data['zero_results_searches'] += 1
-        configuration.data['audiovisual_names'].append(audiovisual_record.name)
-        configuration.data['audiovisual_ids'].append(audiovisual_record.id)
+        if audiovisual_record.id not in configuration.data['audiovisual_ids']:
+            configuration.data['zero_results_searches'] += 1
+            configuration.data['audiovisual_names'].append(audiovisual_record.name)
+            configuration.data['audiovisual_ids'].append(audiovisual_record.id)
     else:
         configuration.data['zero_results_searches'] = 0
         configuration.data['audiovisual_names'] = []
