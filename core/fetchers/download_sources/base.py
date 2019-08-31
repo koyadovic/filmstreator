@@ -8,7 +8,7 @@ from lxml import html, etree
 import abc
 
 
-html_parser = etree.HTMLParser()
+# html_parser = etree.HTMLParser()
 
 
 class AbstractDownloadSource(metaclass=abc.ABCMeta):
@@ -77,7 +77,7 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
         download_results = []
         for result in results:
             etree.strip_tags(result, 'span', 'p', 'b', 'i', 'small')
-            result = etree.fromstring(etree.tostring(result), parser=html_parser)
+            result = etree.fromstring(etree.tostring(result))
             text = result.text
             if text is None or len(text) < 4:
                 continue

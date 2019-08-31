@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 import time
@@ -19,6 +20,14 @@ from core.tools.exceptions import DownloadSourceException
 from core.tools.logs import log_message
 from core.tools.strings import are_similar_strings
 import threading
+
+
+DOWNLOAD_SOURCES_RESPONSES_ROOT_DIRECTORY = os.path.dirname(__file__) + '/data/download-sources-responses/'
+
+try:
+    os.makedirs(DOWNLOAD_SOURCES_RESPONSES_ROOT_DIRECTORY)
+except FileExistsError:
+    pass
 
 
 @Ticker.execute_each(interval='1-minute')
@@ -245,6 +254,19 @@ def do_the_refresh():
     do_the_refresh.data.set('last_timestamp', now.timestamp())
 
 
+def _get_response_filename(audiovisual_record_name, source_class_name):
+    n = 0
+    response_filename = f'{DOWNLOAD_SOURCES_RESPONSES_ROOT_DIRECTORY}' \
+                        f'{audiovisual_record_name} {source_class_name} {n}'
+    while os.path.isfile(response_filename + '.html'):
+        n += 1
+        response_filename = f'{DOWNLOAD_SOURCES_RESPONSES_ROOT_DIRECTORY}' \
+                            f'{audiovisual_record_name} {source_class_name} {n}'
+    response_filename += '.html'
+    print(f'Response filename: {response_filename}')
+    return response_filename
+
+
 def _refresh_download_results_from_source(audiovisual_record, source_class, logger=None):
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']  # de verdad sólo son estos???
     audiovisual_record.refresh()
@@ -254,8 +276,14 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
     # get results found by source_class for audiovisual_record
     results = download_source.get_source_results(logger=logger)
     if results is None:
-        # Do nothing
+        # do nothing
         return
+    else:
+        resp = download_source._last_response
+        if len(results) == 0 and resp is not None:
+            response_filename = _get_response_filename(audiovisual_record.name, source_class.source_name)
+            with open(response_filename, 'wb') as f:
+                f.write(resp.content)
 
     configuration = get_download_source_configuration(source_class)
     if len(results) == 0:

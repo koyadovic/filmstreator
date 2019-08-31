@@ -114,10 +114,10 @@ class PhantomBrowsingSession:
 
             else:
                 # Everything was okay
-                self.log(f'Everything was okay!')
                 self._identity.proxy_okay()
                 self._last_response = response
                 self._referer = url
+                self.log(f'All OK. Length of the response: {len(response.content)}')
                 return self
 
     def is_all_okay_with_url(self, url):
