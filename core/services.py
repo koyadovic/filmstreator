@@ -57,6 +57,10 @@ def save_configuration(configuration: Configuration):
     return dao_implementation.save_configuration(configuration)
 
 
+def refresh_configuration(configuration: Configuration):
+    return dao_implementation.refresh_configuration(configuration)
+
+
 def delete_configuration(configuration: Configuration):
     return dao_implementation.delete_configuration(configuration)
 

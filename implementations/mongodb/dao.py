@@ -132,6 +132,13 @@ class DAOMongoDB(DAOInterface):
             collection.delete_one({'_id': _id})
         return None
 
+    def refresh_configuration(self, configuration: Configuration):
+        collection = self._get_collection(MongoConfiguration)
+        result = collection.find_one({'key': configuration.key})
+        if result is not None:
+            retrieved = MongoConfiguration.convert(**result)
+            configuration.data = retrieved.data
+
     """
     Private methods
     """

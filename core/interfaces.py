@@ -30,6 +30,9 @@ class DAOInterface:
     def save_configuration(self, configuration: Configuration):
         raise NotImplementedError
 
+    def refresh_configuration(self, configuration: Configuration):
+        raise NotImplementedError
+
     def delete_configuration(self, configuration: Configuration):
         raise NotImplementedError
 
