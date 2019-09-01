@@ -11,13 +11,13 @@ from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
 from core.tools.browsing import PhantomBrowsingSession
 from core import services
-
+from urllib.parse import urlparse
 from datetime import datetime, timezone, timedelta
 from concurrent.futures.thread import ThreadPoolExecutor
 import concurrent
 
 from core.tools.exceptions import DownloadSourceException
-from core.tools.logs import log_message
+from core.tools.logs import log_message, log_exception
 from core.tools.strings import are_similar_strings
 import threading
 
@@ -30,94 +30,154 @@ except FileExistsError:
     pass
 
 
+###################################################################################################################
+#################################################### DOWNLOADS ####################################################
+###################################################################################################################
+
+def _check_zero_results(results, source_class, audiovisual_record, logger):
+    configuration = get_download_source_configuration(source_class)
+
+    if len(results) == 0:
+        if audiovisual_record.id not in configuration.data['audiovisual_ids']:
+            configuration.data['zero_results_searches'] += 1
+            configuration.data['audiovisual_names'].append(audiovisual_record.name)
+            configuration.data['audiovisual_ids'].append(audiovisual_record.id)
+    else:
+        configuration.data['zero_results_searches'] = 0
+        configuration.data['audiovisual_names'] = []
+        configuration.data['audiovisual_ids'] = []
+    configuration.save()
+
+    # if there is a lot of results with 0 length we do this additional check
+    # get last good downloads for this source, get the film and try again
+    # if results now are zero, disable the source.
+    # because the html structure of the web maybe changed
+    if configuration.data['zero_results_searches'] > 100:
+        previous_good_search = (
+            Search
+            .Builder
+            .new_search(DownloadSourceResult)
+            .add_condition(Condition('deleted', Condition.EQUALS, False))
+            .add_condition(Condition('source_name', Condition.EQUALS, source_class.source_name))
+            .search(paginate=True, page_size=1, page=1)
+        )
+        if len(previous_good_search) > 0:
+            previous_good_search = previous_good_search[0]
+            previous_audiovisual_record = previous_good_search.audiovisual_record
+            ds = source_class(previous_audiovisual_record.name, year=previous_audiovisual_record.year)
+            results_check = ds.get_source_results(logger=logger)
+
+            if len(results_check) == 0:
+                configuration.refresh()
+                configuration.data['enabled'] = False
+                configuration.save()
+            else:
+                configuration.refresh()
+                configuration.data['enabled'] = True
+                configuration.data['zero_results_searches'] = 0
+                configuration.data['audiovisual_names'] = []
+                configuration.data['audiovisual_ids'] = []
+                configuration.save()
+        else:
+            configuration.refresh()
+            configuration.data['enabled'] = False
+            configuration.save()
+
+    if not configuration.data['enabled']:
+        raise DownloadSourceException(f'Disabled {source_class.source_name} download source.')
+
+
+def _worker_get_download_links(source_class, audiovisual_record, logger):
+    source = source_class(audiovisual_record.name, year=audiovisual_record.year)
+    try:
+        results = source.get_source_results(logger=logger, sleep_between_requests=60)
+    except DownloadSourceException as e:
+        log_exception(e)
+        # TODO maybe increase an error counter?
+    else:
+        if len(results) == 0:
+            resp = source._last_response
+            if resp is not None:
+                response_filename = _get_response_filename(audiovisual_record.name, source_class.source_name)
+                with open(response_filename, 'wb') as f:
+                    f.write(resp.content)
+
+        # this check for a lot of zero results. If is reached a number, disable de source
+        _check_zero_results(results, source_class, audiovisual_record, logger)
+
+        for result in results:
+            if result.quality == 'Audio':
+                continue
+
+            # if link exists do nothing
+            relative_url = urlparse(result.link).path
+            exists = (
+                Search.Builder.new_search(DownloadSourceResult)
+                .add_condition(Condition('source_name', Condition.EQUALS, source_class.source_name))
+                .add_condition(Condition('link', Condition.ICONTAINS, relative_url))
+                .search()
+            )
+            if len(exists) > 0:
+                continue
+
+            result.audiovisual_record = audiovisual_record
+            result.save()
+            logger(f'+++ Valid result {result.name} {result.link}.')
+        audiovisual_record.refresh()
+        if 'downloads_fetch' not in audiovisual_record.metadata:
+            audiovisual_record.metadata['downloads_fetch'] = {}
+        audiovisual_record.metadata['downloads_fetch'][source_class.source_name] = True
+        audiovisual_record.save()
+        logger(f'Marked {audiovisual_record.name} as reviewed for source {source_class.source_name}')
+        _check_has_downloads(audiovisual_record)
+
+
+def _worker_collect_download_links_for_the_first_time(source_class, logger):
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        source_name = source_class.source_name
+        logger(f'Begin to retrieve audovisual records for {source_name}')
+        audiovisual_records = (
+            Search.Builder.new_search(AudiovisualRecord)
+            .add_condition(Condition('deleted', Condition.EQUALS, False))
+            .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+            .add_condition(Condition(f'metadata__downloads_fetch__{source_name}', Condition.EXISTS, False))
+            .search(paginate=True, page_size=100, page=1, sort_by='-global_score')
+        )['results']
+
+        futures = []
+        for audiovisual_record in audiovisual_records:
+            time.sleep(30)
+            future = executor.submit(_worker_get_download_links, source_class, audiovisual_record, logger)
+            futures.append(future)
+
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
+
+
 @Ticker.execute_each(interval='1-minute')
-def compile_download_links_from_audiovisual_records():
-    compile_download_links_from_audiovisual_records.log(f'Current switch interval: {sys.getswitchinterval()}')
+def collect_download_links_for_the_first_time():
+    logger = collect_download_links_for_the_first_time.log
 
-    def _worker(source_class):
-        with ThreadPoolExecutor(max_workers=3) as executor:
-            futures = []
-            source_name = source_class.source_name
-            compile_download_links_from_audiovisual_records.log(f'Begin to retrieve audovisual records for {source_name}')
-            audiovisual_records = (
-                Search
-                .Builder
-                .new_search(AudiovisualRecord)
-                .add_condition(Condition('deleted', Condition.EQUALS, False))
-                .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-                .add_condition(Condition(f'metadata__downloads_fetch__{source_name}', Condition.EXISTS, False))
-                .search(paginate=True, page_size=10, page=1, sort_by='-global_score')
-            )['results']
-
-            target_audiovisual_records = []
-            for audiovisual_record in audiovisual_records:
-                download_results = (
-                    Search
-                    .Builder
-                    .new_search(DownloadSourceResult)
-                    .add_condition(Condition('source_name', Condition.EQUALS, source_name))
-                    .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
-                    .search()
-                )
-                has_downloads = len(download_results) > 0
-                if not has_downloads:
-                    target_audiovisual_records.append(audiovisual_record)
-                else:
-                    audiovisual_record.refresh()
-                    if 'downloads_fetch' not in audiovisual_record.metadata:
-                        audiovisual_record.metadata['downloads_fetch'] = {}
-                    audiovisual_record.metadata['downloads_fetch'][source_name] = True
-                    audiovisual_record.save()
-                    _check_has_downloads(audiovisual_record)
-                    continue
-
-            compile_download_links_from_audiovisual_records.log(f'Retrieved {len(target_audiovisual_records)} for source {source_name}')
-
-            for audiovisual_record in target_audiovisual_records:
-                compile_download_links_from_audiovisual_records.log(f'For {source_name} launching search for {audiovisual_record.name}')
-                future = executor.submit(
-                    _refresh_download_results_from_source,
-                    audiovisual_record,
-                    source_class,
-                    compile_download_links_from_audiovisual_records.log
-                )
-                future.log_msg = f'Checked {audiovisual_record.name} ({audiovisual_record.year}) with ' \
-                                 f'{source_class.source_name}'
-                future.audiovisual_record = audiovisual_record
-                future.source_class = source_class
-                futures.append(future)
-                time.sleep(30)
-
-            for future in concurrent.futures.as_completed(futures):
-                compile_download_links_from_audiovisual_records.log(future.log_msg)
-                processed = future.result(timeout=600)
-                if not processed:
-                    continue
-
-                audiovisual_record = future.audiovisual_record
-                audiovisual_record.refresh()
-                if 'downloads_fetch' not in audiovisual_record.metadata:
-                    audiovisual_record.metadata['downloads_fetch'] = {}
-                audiovisual_record.metadata['downloads_fetch'][source_name] = True
-                audiovisual_record.save()
-                _check_has_downloads(audiovisual_record)
-
-    # empty the domain and tcp port checks cache
     PhantomBrowsingSession.domain_checks = {}
     sources = get_all_download_sources()
 
     threads = []
     for source_class in sources:
-        thread = threading.Thread(target=_worker, args=[source_class])
+        thread = threading.Thread(target=_worker_collect_download_links_for_the_first_time, args=[source_class, logger])
         thread.start()
-        compile_download_links_from_audiovisual_records.log(f'Start thread for {source_class.source_name}')
+        logger(f'Start thread for {source_class.source_name}')
         threads.append(thread)
 
     for thread in threads:
         thread.join()
 
 
-@Ticker.execute_each(interval='14-days')
+###################################################################################################################
+################################################## END DOWNLOADS ##################################################
+###################################################################################################################
+
+
+# @Ticker.execute_each(interval='14-days')
 def recheck_downloads():
     """
     En un principio era por el eliminado de algunos enlaces. Se marcaban las películas para ser rechequeadas.
@@ -151,7 +211,7 @@ def recheck_downloads():
             audiovisual_record.save()
 
 
-@Ticker.execute_each(interval='3-days')
+# @Ticker.execute_each(interval='3-days')
 def recent_films_without_good_downloads():
     # TODO hay que buscar de cada source, y por cada película, descargas que no sean de buena calidad.
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
@@ -192,7 +252,7 @@ def recent_films_without_good_downloads():
             future.result(timeout=600)
 
 
-@Ticker.execute_each(interval='12-hours')
+# @Ticker.execute_each(interval='12-hours')
 def delete_404_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=60)
     download_results = (
@@ -331,6 +391,7 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
                     configuration.data['enabled'] = False
                 else:
                     configuration.refresh()
+                    configuration.data['enabled'] = True
                     configuration.data['zero_results_searches'] = 0
                     configuration.data['audiovisual_names'] = []
                     configuration.data['audiovisual_ids'] = []
@@ -480,10 +541,3 @@ def _check_has_downloads(audiovisual_record):
         audiovisual_record.refresh()
         audiovisual_record.has_downloads = has_downloads
         audiovisual_record.save()
-
-
-def _get_ts_configuration(key):
-    configuration = Configuration.get_configuration(key=key)
-    if configuration is None:
-        configuration = Configuration(key=key, data={})
-    return configuration
