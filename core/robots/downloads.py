@@ -52,7 +52,7 @@ def _check_zero_results(results, source_class, audiovisual_record, logger):
     # get last good downloads for this source, get the film and try again
     # if results now are zero, disable the source.
     # because the html structure of the web maybe changed
-    if configuration.data['zero_results_searches'] > 100:
+    if configuration.data['zero_results_searches'] > 300:
         previous_good_search = (
             Search
             .Builder
