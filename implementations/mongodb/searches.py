@@ -60,6 +60,15 @@ class SearchMongoDB(SearchInterface):
                 for k, v in result.items():
                     if k == '_id':
                         continue
+
+                    if k in ['writers', 'directors', 'stars']:
+                        result[k] = [MongoPerson(**person) for person in v]
+                        continue
+
+                    elif k in ['genres']:
+                        result[k] = [MongoGenre(**genre) for genre in v]
+                        continue
+
                     if type(v) == ObjectId:
                         # this automate the translation of an object id into the referenced object
                         # from another collection searching similarities between collection names

@@ -18,7 +18,7 @@ footer#sticky-footer {
     background-color: #4c7c93 !important;
 }
 .second-nav {
-    background: #e5ecef !important;
+    background: #eee !important;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 10px 0 rgba(0, 0, 0, 0.19);
 }
 .sidebar {
@@ -132,7 +132,6 @@ footer {
 
 .big-icon {
     font-size: 6em !important;
-    color: black;
     margin: 20px;
 }
 
@@ -279,6 +278,11 @@ footer {
     clear: left;
 }
 
+.main-image {
+    float: right;
+    width: 200px;
+    height: 294px;
+}
 
 a {
     font-weight: 800;
@@ -290,7 +294,21 @@ a:visited {
 }
 
 a:hover {
-    color: #85888c;
+    color: #8c9093;
+    text-decoration: none;
+}
+
+a.secondary {
+    font-weight: 800;
+    color: #84324e;
+}
+
+a.secondary:visited {
+    color: #84324e;
+}
+
+a.secondary:hover {
+    color: #b58494;
     text-decoration: none;
 }
 
@@ -314,8 +332,8 @@ a:hover {
     font-size: 1.5em;
 }
 
-.text_with_2px_border
-{
+.text_with_2px_border {
+    letter-spacing: 5px;
     text-shadow:
         /* first layer at 1px */
         -1px -1px 0px #fff,
@@ -327,23 +345,55 @@ a:hover {
          0px  1px 0px #fff,
          1px  1px 0px #fff,
         /* second layer at 2px */
-        -2px -2px 0px #fff,
-        -1px -2px 0px #fff,
-         0px -2px 0px #fff,
-         1px -2px 0px #fff,
-         2px -2px 0px #fff,
-         2px -1px 0px #fff,
-         2px  0px 0px #fff,
-         2px  1px 0px #fff,
-         2px  2px 0px #fff,
-         1px  2px 0px #fff,
-         0px  2px 0px #fff,
-        -1px  2px 0px #fff,
-        -2px  2px 0px #fff,
-        -2px  1px 0px #fff,
-        -2px  0px 0px #fff,
-        -2px -1px 0px #fff !important;
+        -2px -2px 0px #fff7,
+        -1px -2px 0px #fff7,
+         0px -2px 0px #fff7,
+         1px -2px 0px #fff7,
+         2px -2px 0px #fff7,
+         2px -1px 0px #fff7,
+         2px  0px 0px #fff7,
+         2px  1px 0px #fff7,
+         2px  2px 0px #fff7,
+         1px  2px 0px #fff7,
+         0px  2px 0px #fff7,
+        -1px  2px 0px #fff7,
+        -2px  2px 0px #fff7,
+        -2px  1px 0px #fff7,
+        -2px  0px 0px #fff7,
+        -2px -1px 0px #fff7 !important;
     color: #343a40 !important;
+    font-size: 1.5em;
+}
+.text_with_2px_border_inverted {
+    letter-spacing: 5px;
+    text-shadow:
+        /* first layer at 1px */
+        -1px -1px 0px #000,
+         0px -1px 0px #000,
+         1px -1px 0px #000,
+        -1px  0px 0px #000,
+         1px  0px 0px #000,
+        -1px  1px 0px #000,
+         0px  1px 0px #000,
+         1px  1px 0px #000,
+        /* second layer at 2px */
+        -2px -2px 0px #0007,
+        -1px -2px 0px #0007,
+         0px -2px 0px #0007,
+         1px -2px 0px #0007,
+         2px -2px 0px #0007,
+         2px -1px 0px #0007,
+         2px  0px 0px #0007,
+         2px  1px 0px #0007,
+         2px  2px 0px #0007,
+         1px  2px 0px #0007,
+         0px  2px 0px #0007,
+        -1px  2px 0px #0007,
+        -2px  2px 0px #0007,
+        -2px  1px 0px #0007,
+        -2px  0px 0px #0007,
+        -2px -1px 0px #0007 !important;
+    color: #000 !important;
     font-size: 1.5em;
 }
 
@@ -711,9 +761,9 @@ div.audiovisual-item-container {
     position:relative;
     padding: 5px;
     overflow: hidden;
-    height: 200px;
-    width: 45%;
-    max-width: 170px;
+    height: 220px;
+    width: 49%;
+    max-width: 180px;
     display: inline-block;
     transition: transform .2s ease;
 }
@@ -745,10 +795,14 @@ div.audiovisual-item-container:hover {
         position: static;
     }
     .notbody.navbar * {
-        font-size: .750rem;
-    }
-    footer * {
         font-size: .950rem;
+        letter-spacing: initial;
+    }
+    * {
+        font-size: .900rem;
+    }
+    h1, h2, h3 {
+        font-size: 1.5rem;
     }
     footer {
         position: static;
@@ -796,5 +850,13 @@ div.audiovisual-item-container:hover {
         margin-bottom: 50px;
         padding-left: 10px;
         padding-right: 10px;
+    }
+    .main-image {
+        float: right;
+        width: 150px;
+        height: 224px;
+    }
+    .second-nav.details, .second-nav.dmca, .second-nav.terms {
+        display: none;
     }
 }

@@ -1,12 +1,14 @@
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
-from typing import List
-
-import abc
-from lxml import html
-
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.logs import log_exception
-from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector, ratio_of_containing_similar_string, are_similar_strings
+from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector
+
+from typing import List
+from lxml import html, etree
+import abc
+
+
+# html_parser = etree.HTMLParser()
 
 
 class AbstractDownloadSource(metaclass=abc.ABCMeta):
@@ -17,71 +19,92 @@ class AbstractDownloadSource(metaclass=abc.ABCMeta):
     # Store links as relative links because domains change frequently
     # here you can put the base_url that will be used with relative urls
     base_url = None
-
     language = None  # ISO 639-2 Code, three characters
-
     anchors_xpath = None
+    retrieve_index_first = False  # to retrieve the index page first if needed
 
     @abc.abstractmethod
     def relative_search_string(self) -> str:
         raise NotImplementedError
 
+    def not_results(self, html_content):
+        raise NotImplementedError
+        # dom = html.fromstring(html_content)
+        # for anchor in dom.xpath(self.anchors_xpath):
+        #     etree.strip_tags(anchor, 'span', 'p', 'b', 'i', 'small')
+        #     result = etree.fromstring(etree.tostring(anchor))
+        #     text = result.text
+        #     if text is None:
+        #         continue
+        #     href = result.get('href')
+        #     any_found = bool(text) and bool(href)
+        #     if any_found:
+        #         return False
+        # return True
+
     def __init__(self, audiovisual_record: AudiovisualRecord):
         self.audiovisual_record = audiovisual_record
+        self._logger = None
+        self._last_response = None
 
-    def get_source_results(self) -> List[DownloadSourceResult]:
+    def log(self, text):
+        if self._logger:
+            self._logger(f'[{self.source_name}] [{self.audiovisual_record.name}] => ' + text)
+
+    def get_source_results(self, logger=None) -> List[DownloadSourceResult]:
+        self._logger = logger
         session = PhantomBrowsingSession(referer=self.base_url + '/')
         results = None
-        trying = 0
-        while results is None or len(results) == 0:
-            try:
-                trying += 1
-                session.get(self.base_url + self.relative_search_string(), timeout=30)
-                response = session.last_response
-                if response is None:
-                    session.refresh_identity()
-                    continue
-                base_tree = html.fromstring(response.content)
-                results = base_tree.xpath(self.anchors_xpath)
-                if len(results) == 0:
-                    if trying > 4:
-                        return []
-                    session.refresh_identity()
-            except Exception as e:
-                log_exception(e)
-        download_results = self._translate(results)
-        return download_results
+        try:
+            self.log(f'Trying to get {self.base_url + self.relative_search_string()}')
+            session.get(
+                self.base_url + self.relative_search_string(),
+                timeout=30, logger=logger, retrieve_index_first=self.retrieve_index_first
+            )
+            self._last_response = response = session.last_response
+            if response is None:
+                return results
+            base_tree = html.fromstring(response.content)
+            results = base_tree.xpath(self.anchors_xpath)
+            if len(results) == 0:
+                return []
+            download_results = self._translate(results)
+            return download_results
+        except Exception as e:
+            log_exception(e)
 
     def _translate(self, results):
         download_results = []
         for result in results:
+            etree.strip_tags(result, 'span', 'p', 'b', 'i', 'small')
+            result = etree.fromstring(etree.tostring(result))
             text = result.text
             if text is None or len(text) < 4:
                 continue
 
             href = result.get('href')
-            name_remover = RemoveAudiovisualRecordNameFromString(self.audiovisual_record.name)
+            audiovisual_name = self.audiovisual_record.name
+            name_remover = RemoveAudiovisualRecordNameFromString(audiovisual_name)
             text_without_name = name_remover.replace_name_from_string(text)
             quality_detector = VideoQualityInStringDetector(text_without_name)
 
             source_name = self.source_name
-            name = text
+            name = text.strip()
             quality = quality_detector.quality
-            link = self.base_url + href
+            if not href.lower().startswith('http'):
+                link = self.base_url + href
+            else:
+                link = href
+            self.log(f'+++ extracted {text} with link {link}. Quality: {quality}')
             audiovisual_record = self.audiovisual_record
-
-            audiovisual_name = self.audiovisual_record.name
-            similar_audiovisual_name = name.replace(text_without_name, '')
-            if not are_similar_strings(audiovisual_name.lower(), similar_audiovisual_name.lower()):
-                continue
-
-            download_results.append(DownloadSourceResult(
+            result = DownloadSourceResult(
                 source_name=source_name,
                 name=name,
                 link=link,
                 quality=quality,
                 lang=self.language,
                 audiovisual_record=audiovisual_record
-            ))
+            )
+            download_results.append(result)
 
         return download_results

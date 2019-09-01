@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from typing import List
+from urllib.parse import urlparse
 
 
 def utc_now():
@@ -274,6 +275,9 @@ class DownloadSourceResult(EqualityMixin):
     quality: str
     lang: str  # ISO 639-2 Code, three characters
     audiovisual_record: AudiovisualRecord
+    metadata: dict
+
+    _download_sources_ = {}
 
     def __init__(self, **kwargs):
         self.last_check = kwargs.pop('last_check', datetime.utcnow().replace(tzinfo=timezone.utc))
@@ -284,6 +288,7 @@ class DownloadSourceResult(EqualityMixin):
         self.quality = kwargs.pop('quality', '')
         self.lang = kwargs.pop('lang', '')
         self.audiovisual_record = kwargs.pop('audiovisual_record', None)
+        self.metadata = kwargs.pop('metadata', dict())
 
     def save(self):
         from core import services
@@ -292,3 +297,24 @@ class DownloadSourceResult(EqualityMixin):
     def delete(self):
         self.deleted = True
         self.save()
+
+    @property
+    def source_base_url(self):
+        self._precache_download_sources()
+        return self._download_sources_[self.source_name].base_url
+
+    @property
+    def relative_link(self):
+        return urlparse(self.link).path
+
+    @property
+    def source_base_url_plus_relative_link(self):
+        self._precache_download_sources()
+        return self.source_base_url + self.relative_link
+
+    @classmethod
+    def _precache_download_sources(cls):
+        if cls._download_sources_ == {}:
+            from core.fetchers.services import get_all_download_sources
+            for source_cls in get_all_download_sources():
+                cls._download_sources_[source_cls.source_name] = source_cls

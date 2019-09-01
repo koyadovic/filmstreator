@@ -30,3 +30,7 @@ class Configuration:
     def delete(self):
         from core import services
         return services.delete_configuration(self)
+
+    def refresh(self):
+        from core import services
+        services.refresh_configuration(self)

@@ -70,6 +70,10 @@ WSGI_APPLICATION = 'filmstreator.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+DB_USER = os.environ.get('DB_USER')
+DB_PASSWORD = os.environ.get('DB_PASSWORD')
+DB_HOST = '127.0.0.1'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -111,7 +115,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR + '/static/'
+MEDIA_URL = '/media/'
+STATIC_ROOT = BASE_DIR + '/../static/'
+MEDIA_ROOT = BASE_DIR + '/../media/'
 
 
 REST_FRAMEWORK = {

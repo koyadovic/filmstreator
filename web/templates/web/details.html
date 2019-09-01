@@ -4,18 +4,13 @@
 {% block title %}Filmstreator - Download {{ audiovisual_record.name }} torrent{% endblock %}
     {% block head_extra %}
     {{ block.super }}
-    <meta name="description" content="Download {{ audiovisual_record.name }} torrent. {{ audiovisual_record.name }} was Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.{% if audiovisual_record.summary %} Summary: {{ audiovisual_record.summary }}{% endif %}">
-    <meta property="og:title" content="Download {{ audiovisual_record.name }} torrent. {{ audiovisual_record.name }} was Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.{% if audiovisual_record.summary %} Summary: {{ audiovisual_record.summary }}{% endif %}"/>
+    <meta name="description" content="{% if audiovisual_record.summary %} Summary: {{ audiovisual_record.summary }}. {% endif %}{{ audiovisual_record.name }} was Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.">
+    <meta property="og:title" content="{{ audiovisual_record.name }} Downloads.">
     <meta name="keywords" content="{{ audiovisual_record.name }} download torrent magnet links">
     <meta property="og:type" content="video.movie" />
     <meta property="og:url" content="{{ request.build_absolute_uri }}" />
     <meta property="og:image" content="{{ audiovisual_record.images.0 }}" />
     <link rel="canonical" href="/{{ audiovisual_record.slug }}/">
-    <style>
-    .main-container.container {
-        margin-top: 0px;
-    }
-    </style>
     {% endblock %}
 
 {% block content %}
@@ -27,21 +22,69 @@
             <h1>{{ audiovisual_record.name }} ({{ audiovisual_record.year }}) Torrents {% if request.user.is_superuser %}<a href="#" onclick="removeFilm('{{ audiovisual_record.id }}');" style="color: white;" class="btn btn-secondary">Remove entire film</a>{% endif %}</h1>
         {% endif %}
 
-        <div style="float: right;width: 200px; height: 294px;">
+        <div class="main-image">
             <img style="height: 100%; width: 100%;" src="{{ audiovisual_record.images.0 }}" alt="Main cover of {{ audiovisual_record.name }}">
         </div>
 
         <h5>Genres:</h5>
-        <p class="light-text"><b>{{ audiovisual_record.genres | map:"name" | join:", " }}.</b></p>
+        {% if audiovisual_record.genres %}
+        <p class="light-text">
+            {% for genre in audiovisual_record.genres %}
+                {% if forloop.last %}
+                    <a class="secondary" href="/s/?ft=a&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}.</b></a>
+                {% else %}
+                    <a class="secondary" href="/s/?ft=a&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}, </b></a>
+                {% endif %}
+            {% endfor %}
+        </p>
+        {% else %}
+        <p class="light-text"><b>Unavailable.</b></p>
+        {% endif %}
 
         <h5>Directors:</h5>
-        <p class="light-text"><b>{{ audiovisual_record.directors | map:"name" | join:", " }}.</b></p>
+        {% if audiovisual_record.directors %}
+        <p class="light-text">
+            {% for person in audiovisual_record.directors %}
+                {% if forloop.last %}
+                    <a class="secondary" href="{{ person.search_url }}"><b>{{ person.name }}.</b></a>
+                {% else %}
+                    <a class="secondary" href="{{ person.search_url }}"><b>{{ person.name }}, </b></a>
+                {% endif %}
+            {% endfor %}
+        </p>
+        {% else %}
+        <p class="light-text"><b>Unavailable.</b></p>
+        {% endif %}
 
         <h5>Writers:</h5>
-        <p class="light-text"><b>{{ audiovisual_record.writers | map:"name" | join:", " }}.</b></p>
+        {% if audiovisual_record.writers %}
+        <p class="light-text">
+            {% for person in audiovisual_record.writers %}
+                {% if forloop.last %}
+                    <a class="secondary" href="{{ person.search_url }}"><b>{{ person.name }}.</b></a>
+                {% else %}
+                    <a class="secondary" href="{{ person.search_url }}"><b>{{ person.name }}, </b></a>
+                {% endif %}
+            {% endfor %}
+        </p>
+        {% else %}
+        <p class="light-text"><b>Unavailable.</b></p>
+        {% endif %}
 
         <h5>Stars:</h5>
-        <p class="light-text"><b>{{ audiovisual_record.stars | map:"name" | join:", " }}.</b></p>
+        {% if audiovisual_record.stars %}
+        <p class="light-text">
+            {% for person in audiovisual_record.stars %}
+                {% if forloop.last %}
+                    <a class="secondary" href="{{ person.search_url }}"><b>{{ person.name }}.</b></a>
+                {% else %}
+                    <a class="secondary" href="{{ person.search_url }}"><b>{{ person.name }}, </b></a>
+                {% endif %}
+            {% endfor %}
+        </p>
+        {% else %}
+        <p class="light-text"><b>Unavailable.</b></p>
+        {% endif %}
 
         {% if audiovisual_record.summary %}
         <h5>Summary:</h5>
@@ -81,10 +124,10 @@
 
             {% for download in downloads %}
                 <tr class="light-text">
-                    <td class="text-center" onclick="window.open('{{ download.link }}', target='_blank');">{{ download.quality }}</td>
-                    <td class="text-center" onclick="window.open('{{ download.link }}', target='_blank');"><img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></td>
-                    <td class="text-center" onclick="window.open('{{ download.link }}', target='_blank');">{{ download.source_name }}</td>
-                    <td onclick="window.open('{{ download.link }}', target='_blank');">{{ download.name }}</td>
+                    <td class="text-center" onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');">{{ download.quality }}</td>
+                    <td class="text-center" onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');"><img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></td>
+                    <td class="text-center" onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');">{{ download.source_name }}</td>
+                    <td onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');">{{ download.name }}</td>
                     {% if request.user.is_superuser %}
                     <td>
                         <a href="#" onclick="removeDownloadLink('{{ download.id }}');" style="color: white;" class="btn btn-secondary">Remove</a>
@@ -99,7 +142,7 @@
             <hr>
             {% for download in downloads %}
             <div class="download-element-container">
-                <p><span class="dark-text">Download:</span><a class="light-text" href="{{ download.link }}" target="_blank"> {{ download.name }}</a></p>
+                <p><span class="dark-text">Download:</span><a class="secondary" href="{{ download.source_base_url_plus_relative_link }}" target="_blank"> {{ download.name }}</a></p>
                 <p><span class="dark-text">Quality:</span> {{ download.quality }}</p>
                 <p><span class="dark-text">Source Language:</span> <img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></p>
                 <p><span class="dark-text">Source:</span> {{ download.source_name }}</p>

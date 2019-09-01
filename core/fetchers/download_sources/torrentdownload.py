@@ -1,23 +1,22 @@
 from core.fetchers.download_sources.base import AbstractDownloadSource
-from core.tools.urls import percent_encoding
+import urllib.parse
 
 
-class I337xDownloadSource(AbstractDownloadSource):
-    source_name = '1337x'
-    base_url = 'https://www.1377x.to'
+class TorrentDownloadSource(AbstractDownloadSource):
+    source_name = 'TorrentDownload'
+    base_url = 'https://www.torrentdownload.ch'
     language = 'eng'
-    anchors_xpath = '/html/body/main/div/div/div/div[2]/div[1]/table/tbody/tr/td[1]/a'
+    anchors_xpath = '//table[@class="table2"][2]//div[@class="tt-name"]/a'
     retrieve_index_first = False  # to retrieve the index page first if needed
 
     def relative_search_string(self) -> str:
         name = f'{self.audiovisual_record.name} {self.audiovisual_record.year}'
-        encoded_name = percent_encoding(name.lower())
-        url = f'/search/{encoded_name}/1/'
+        encoded_name = urllib.parse.quote_plus(name.lower())
+        url = f'/search?q={encoded_name}'
         return url
 
     def not_results(self, html_content):
         possibilities = [
-            'no results were returned',
-            'refine your search'
+            'no results found',
         ]
         return any([p in html_content.lower() for p in possibilities])

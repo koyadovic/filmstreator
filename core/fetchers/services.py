@@ -46,7 +46,12 @@ def get_all_download_sources():
             if klass != AbstractDownloadSource and issubclass(klass, AbstractDownloadSource):
                 klasses.append(klass)
 
-    return _update_base_urls(klasses)
+    _update_base_urls(klasses)
+
+    # only return enabled sources
+    klasses = [klass for klass in klasses if get_download_source_configuration(klass).data['enabled']]
+
+    return klasses
 
 
 def get_all_new_additions_sources():
@@ -70,4 +75,18 @@ def _update_base_urls(klasses):
     for klass in klasses:
         if klass.source_name in data:
             klass.base_url = data[klass.source_name]
-    return klasses
+
+
+def get_download_source_configuration(klass):
+    k = f'download_source_configuration_{klass.source_name}'
+    configuration = Configuration.get_configuration(k)
+    if configuration is None:
+        data = {
+            'enabled': True,
+            'zero_results_searches': 0,
+            'audiovisual_names': [],
+            'audiovisual_ids': [],
+        }
+        configuration = Configuration(key=k, data=data)
+        configuration.save()
+    return configuration

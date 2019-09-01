@@ -13,8 +13,7 @@ from core import robots
 import sys
 
 
-# if not doing this, CPU is all the time over 100%
-sys.setswitchinterval(20000)
+sys.setswitchinterval(0.5)
 
 
 class TickerFunctionData:
@@ -44,6 +43,7 @@ class TickerFunctionData:
 
 
 class Ticker:
+
     INTERVALS = {
         '1-minute': {'seconds': 1 * 60, 'functions': []},
         '5-minutes': {'seconds': 5 * 60, 'functions': []},
