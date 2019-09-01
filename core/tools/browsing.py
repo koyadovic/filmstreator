@@ -28,7 +28,7 @@ class PhantomBrowsingSession:
             current_proxy = self._identity.current_proxies['https']
             self._logger(f'[PhantomBrowsingSession] [{current_proxy}] {text}')
 
-    def get(self, url, headers=None, timeout=30, logger=None, retrieve_index_first=False):
+    def get(self, url, headers=None, timeout=30, logger=None, retrieve_index_first=False, sleep_between_requests=None):
         self._logger = logger
         initial_headers = self._headers
         headers = headers or {}
@@ -119,6 +119,10 @@ class PhantomBrowsingSession:
                 self._referer = url
                 self.log(f'All OK. Length of the response: {len(response.content)}')
                 return self
+
+            if sleep_between_requests is not None:
+                self.log(f'Sleeping {sleep_between_requests} seconds.')
+                time.sleep(sleep_between_requests)
 
     def is_all_okay_with_url(self, url):
         domain = get_domain_from_url(url)

@@ -29,10 +29,10 @@ class DownloadSource(metaclass=abc.ABCMeta):
         if self._logger is not None:
             self._logger(text)
 
-    def get_source_results(self, logger=None):
+    def get_source_results(self, logger=None, sleep_between_requests=30):
         self._logger = logger
 
-        response = self._get_http_response()
+        response = self._get_http_response(sleep_between_requests)
         if response is None:
             raise DownloadSourceException('Response from session was None')
 
@@ -66,9 +66,10 @@ class DownloadSource(metaclass=abc.ABCMeta):
             )
 
             if not self._valid_result(result):
-                self.log(f'--- Not valid result {name} {link}. Dropping it.')
+                # self.log(f'--- Not valid result {name} {link}. Dropping it.')
+                pass
             else:
-                self.log(f'+++ Valid result {name} {link}.')
+                self.log(f'??? Possible valid result {name} {link}.')
                 results.append(result)
 
         return self.post_process_results(results)
@@ -97,12 +98,13 @@ class DownloadSource(metaclass=abc.ABCMeta):
             search_string += f' {self._year}'
         return search_string
 
-    def _get_http_response(self):
+    def _get_http_response(self, sleep_between_requests):
         search_string = self._get_search_string()
         session = PhantomBrowsingSession(referer=self.base_url + '/')
         session.get(
             self.base_url + self.relative_search_string(search_string),
-            timeout=30, logger=self._logger, retrieve_index_first=self.retrieve_index_first
+            timeout=30, logger=self._logger, retrieve_index_first=self.retrieve_index_first,
+            sleep_between_requests=sleep_between_requests
         )
         self._last_response = response = session.last_response
         return response
