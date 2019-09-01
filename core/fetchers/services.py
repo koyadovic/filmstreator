@@ -1,5 +1,5 @@
 from core.fetchers import download_sources, general_information, scoring_sources, new_additions
-from core.fetchers.download_sources.base import AbstractDownloadSource
+from core.fetchers.download_sources.base import DownloadSource
 from core.fetchers.general_information.base import AbstractGeneralInformation
 from core.fetchers.new_additions.base import AbstractNewAdditions
 from core.fetchers.scoring_sources.base import AbstractScoringSource
@@ -43,7 +43,7 @@ def get_all_download_sources():
     for submodule in package.modules:
         module = ModuleDiscover(submodule)
         for klass in module.classes:
-            if klass != AbstractDownloadSource and issubclass(klass, AbstractDownloadSource):
+            if klass != DownloadSource and issubclass(klass, DownloadSource):
                 klasses.append(klass)
 
     _update_base_urls(klasses)
