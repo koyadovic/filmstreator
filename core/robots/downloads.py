@@ -30,7 +30,11 @@ except FileExistsError:
     pass
 
 
-@Ticker.execute_each(interval='1-minute')
+def compile_download_links_v2():
+    pass
+
+
+# @Ticker.execute_each(interval='1-minute')
 def compile_download_links_from_audiovisual_records():
     compile_download_links_from_audiovisual_records.log(f'Current switch interval: {sys.getswitchinterval()}')
 
@@ -117,7 +121,7 @@ def compile_download_links_from_audiovisual_records():
         thread.join()
 
 
-@Ticker.execute_each(interval='14-days')
+# @Ticker.execute_each(interval='14-days')
 def recheck_downloads():
     """
     En un principio era por el eliminado de algunos enlaces. Se marcaban las películas para ser rechequeadas.
@@ -151,7 +155,7 @@ def recheck_downloads():
             audiovisual_record.save()
 
 
-@Ticker.execute_each(interval='3-days')
+# @Ticker.execute_each(interval='3-days')
 def recent_films_without_good_downloads():
     # TODO hay que buscar de cada source, y por cada película, descargas que no sean de buena calidad.
     good_qualities = ['BluRayRip', 'DVDRip', 'HDTV']
@@ -192,7 +196,7 @@ def recent_films_without_good_downloads():
             future.result(timeout=600)
 
 
-@Ticker.execute_each(interval='12-hours')
+# @Ticker.execute_each(interval='12-hours')
 def delete_404_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=60)
     download_results = (
@@ -235,7 +239,7 @@ def delete_404_links():
             future.result(timeout=600)
 
 
-@Ticker.execute_each(interval='60-minutes')
+# @Ticker.execute_each(interval='60-minutes')
 def do_the_refresh():
     last_timestamp = do_the_refresh.data.get('last_timestamp')
     now = datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -331,6 +335,7 @@ def _refresh_download_results_from_source(audiovisual_record, source_class, logg
                     configuration.data['enabled'] = False
                 else:
                     configuration.refresh()
+                    configuration.data['enabled'] = True
                     configuration.data['zero_results_searches'] = 0
                     configuration.data['audiovisual_names'] = []
                     configuration.data['audiovisual_ids'] = []
