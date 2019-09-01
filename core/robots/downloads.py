@@ -34,6 +34,58 @@ except FileExistsError:
 #################################################### DOWNLOADS ####################################################
 ###################################################################################################################
 
+def _check_zero_results(results, source_class, audiovisual_record, logger):
+    configuration = get_download_source_configuration(source_class)
+
+    if len(results) == 0:
+        if audiovisual_record.id not in configuration.data['audiovisual_ids']:
+            configuration.data['zero_results_searches'] += 1
+            configuration.data['audiovisual_names'].append(audiovisual_record.name)
+            configuration.data['audiovisual_ids'].append(audiovisual_record.id)
+    else:
+        configuration.data['zero_results_searches'] = 0
+        configuration.data['audiovisual_names'] = []
+        configuration.data['audiovisual_ids'] = []
+    configuration.save()
+
+    # if there is a lot of results with 0 length we do this additional check
+    # get last good downloads for this source, get the film and try again
+    # if results now are zero, disable the source.
+    # because the html structure of the web maybe changed
+    if configuration.data['zero_results_searches'] > 100:
+        previous_good_search = (
+            Search
+            .Builder
+            .new_search(DownloadSourceResult)
+            .add_condition(Condition('deleted', Condition.EQUALS, False))
+            .add_condition(Condition('source_name', Condition.EQUALS, source_class.source_name))
+            .search(paginate=True, page_size=1, page=1)
+        )
+        if len(previous_good_search) > 0:
+            previous_good_search = previous_good_search[0]
+            previous_audiovisual_record = previous_good_search.audiovisual_record
+            ds = source_class(previous_audiovisual_record.name, year=previous_audiovisual_record.year)
+            results_check = ds.get_source_results(logger=logger)
+
+            if len(results_check) == 0:
+                configuration.refresh()
+                configuration.data['enabled'] = False
+                configuration.save()
+            else:
+                configuration.refresh()
+                configuration.data['enabled'] = True
+                configuration.data['zero_results_searches'] = 0
+                configuration.data['audiovisual_names'] = []
+                configuration.data['audiovisual_ids'] = []
+                configuration.save()
+        else:
+            configuration.refresh()
+            configuration.data['enabled'] = False
+            configuration.save()
+
+    if not configuration.data['enabled']:
+        raise DownloadSourceException(f'Disabled {source_class.source_name} download source.')
+
 
 def _worker_get_download_links(source_class, audiovisual_record, logger):
     source = source_class(audiovisual_record.name, year=audiovisual_record.year)
@@ -49,6 +101,9 @@ def _worker_get_download_links(source_class, audiovisual_record, logger):
                 response_filename = _get_response_filename(audiovisual_record.name, source_class.source_name)
                 with open(response_filename, 'wb') as f:
                     f.write(resp.content)
+
+        # this check for a lot of zero results. If is reached a number, disable de source
+        _check_zero_results(results, source_class, audiovisual_record, logger)
 
         for result in results:
             if result.quality == 'Audio':
@@ -118,7 +173,7 @@ def collect_download_links_for_the_first_time():
 
 
 ###################################################################################################################
-#################################################### DOWNLOADS ####################################################
+################################################## END DOWNLOADS ##################################################
 ###################################################################################################################
 
 
