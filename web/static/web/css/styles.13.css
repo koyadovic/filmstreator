@@ -100,7 +100,9 @@ nav.top-nav {
 
 
 table.downloads-table {
-    border: 1px solid #eee;
+    border-left: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    border-right: 1px solid #eee;
     table-layout: auto;
     max-width: 100% !important;
 }
@@ -859,4 +861,27 @@ div.audiovisual-item-container:hover {
     .second-nav.details, .second-nav.dmca, .second-nav.terms {
         display: none;
     }
+}
+
+
+
+#language-tabs li {
+    position: relative;
+    width: 5em;
+}
+
+#language-tabs li a {
+    height: 100%;
+    width: 100%;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    display: inline-block;
+}
+
+#language-tabs li a.active {
+    background-color: #4c7c93;
+    color: white;
+}
+.nav-tabs {
+    border-bottom: 0px;
 }
