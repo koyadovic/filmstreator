@@ -18,6 +18,8 @@ class DownloadSource(metaclass=abc.ABCMeta):
     language = None  # ISO 639-2 Code, three characters
     retrieve_index_first = False  # to retrieve the index page first if needed
 
+    enabled = True
+
     def __init__(self, audiovisual_record_name, year='', retrieve_index_first=False):
         self._name = audiovisual_record_name
         self._year = year

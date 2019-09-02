@@ -163,6 +163,8 @@ def collect_download_links_for_the_first_time():
 
     threads = []
     for source_class in sources:
+        if not source_class.enabled:
+            continue
         thread = threading.Thread(target=_worker_collect_download_links_for_the_first_time, args=[source_class, logger])
         thread.start()
         logger(f'Start thread for {source_class.source_name}')

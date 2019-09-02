@@ -48,8 +48,8 @@ def get_all_download_sources():
 
     _update_base_urls(klasses)
 
-    # only return enabled sources
-    klasses = [klass for klass in klasses if get_download_source_configuration(klass).data['enabled']]
+    for klass in klasses:
+        klass.enabled = get_download_source_configuration(klass).data['enabled']
 
     return klasses
 
@@ -82,7 +82,7 @@ def get_download_source_configuration(klass):
     configuration = Configuration.get_configuration(k)
     if configuration is None:
         data = {
-            'enabled': True,
+            'enabled': klass.enabled,
             'zero_results_searches': 0,
             'audiovisual_names': [],
             'audiovisual_ids': [],
