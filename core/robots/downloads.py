@@ -117,6 +117,12 @@ def _worker_get_download_links(source_class, audiovisual_record, logger):
                 .add_condition(Condition('link', Condition.ICONTAINS, relative_url))
                 .search()
             )
+            exists += (
+                Search.Builder.new_search(DownloadSourceResult)
+                .add_condition(Condition('source_name', Condition.EQUALS, source_class.source_name))
+                .add_condition(Condition('name', Condition.EQUALS, result.name))
+                .search()
+            )
             if len(exists) > 0:
                 continue
 
