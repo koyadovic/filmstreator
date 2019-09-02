@@ -245,7 +245,7 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
         self.metadata = kwargs.pop('metadata', dict())
 
     def __str__(self):
-        return f'AudiovisualRecord {self.name} ({self.year})'
+        return f'{self.__class__.__name__} {self.name} ({self.year})'
 
     def __repr__(self):
         return self.__str__()
@@ -318,3 +318,6 @@ class DownloadSourceResult(EqualityMixin):
             from core.fetchers.services import get_all_download_sources
             for source_cls in get_all_download_sources():
                 cls._download_sources_[source_cls.source_name] = source_cls
+
+    def __str__(self):
+        return f'{self.__class__.__name__} {self.name} ({self.link})'
