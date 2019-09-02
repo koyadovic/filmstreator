@@ -13,9 +13,9 @@ class LimeTorrentsSource(DownloadSource):
         return url
 
     def _translate_string_search(self, text):
-        text = text.replace(' ', '-')
+        text = text.lower().replace(' ', '-')
         return ''.join(
-            [c if c in 'abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ0123456789-_' else '%20' for c in text]
+            [c if c in 'abcdefghijklmnñopqrstuvwxyz0123456789-_' else '%20' for c in text]
         )
 
     def post_process_results(self, results):
