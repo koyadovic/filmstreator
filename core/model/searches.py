@@ -12,16 +12,18 @@ class Condition:
     NOT_IN = 'nin'
     CONTAINS = 'contains'
     ICONTAINS = 'icontains'  # case insensitive
+    EXISTS = 'exists'  # accept boolean values
+    SIMILAR = 'simil'
 
-    ALL_OPERATORS = (EQUALS, NON_EQUALS, LESS_THAN, LESS_OR_EQUAL_THAN,
-                     GREAT_THAN, GREAT_OR_EQUAL_THAN, IN, NOT_IN, CONTAINS, ICONTAINS)
+    ALL_OPERATORS = (EQUALS, NON_EQUALS, LESS_THAN, LESS_OR_EQUAL_THAN, GREAT_THAN,
+                     GREAT_OR_EQUAL_THAN, IN, NOT_IN, CONTAINS, ICONTAINS, SIMILAR, EXISTS)
 
     def __init__(self, field_path, operator, value):
         try:
             assert operator in Condition.ALL_OPERATORS, 'Invalid operator provided'
         except AssertionError as e:
             raise Condition.InvalidOperator(e)
-        self.field_path = field_path
+        self.field_path = field_path  # when is "search", this is a special field that means all text attributes
         self.operator = operator
         self.value = value
 

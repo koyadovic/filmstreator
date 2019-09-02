@@ -9,6 +9,8 @@ import operator
 
 CONFIG_KEY = 'audiovisual_records_grouped_by_genres'
 
+CONFIG_KEY_GENRES_WITH_FILMS = 'genres_with_films'
+
 
 # @Ticker.execute_each(interval='12-hours')
 # def audiovisual_records_grouped_by_genres():
@@ -69,9 +71,33 @@ def _group_by_genres():
     return groups
 
 
-def _get_or_create_configuration():
-    configuration = Configuration.get_configuration(CONFIG_KEY)
+def _get_or_create_configuration(config_key):
+    configuration = Configuration.get_configuration(config_key)
     if configuration is None:
-        configuration = Configuration(key=CONFIG_KEY, data={})
+        configuration = Configuration(key=config_key, data={})
         configuration.save()
     return configuration
+
+
+@Ticker.execute_each(interval='24-hours')
+def calculate_genres_with_films():
+    search_builder = Search.Builder.new_search(Genre)
+    genres = search_builder.search(sort_by='name')
+
+    genre_names_with_films = []
+
+    for genre in genres:
+        search_builder = Search.Builder.new_search(AudiovisualRecord)
+        search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
+        search_builder.add_condition(Condition('has_downloads', Condition.EQUALS, True))
+        search_builder.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+        search_builder.add_condition(Condition('genres__name', Condition.EQUALS, genre.name))
+        search = search_builder.search(
+            paginate=True, page_size=1, page=1,
+        )
+        if len(search['results']) > 0:
+            genre_names_with_films.append(genre.name)
+
+    configuration = _get_or_create_configuration(CONFIG_KEY_GENRES_WITH_FILMS)
+    configuration.data = genre_names_with_films
+    configuration.save()

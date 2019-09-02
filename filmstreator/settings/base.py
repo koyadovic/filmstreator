@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'request',
     'core',
     'implementations',
     'web',
@@ -43,7 +42,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'request.middleware.RequestMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -71,6 +69,10 @@ WSGI_APPLICATION = 'filmstreator.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+
+DB_USER = os.environ.get('DB_USER')
+DB_PASSWORD = os.environ.get('DB_PASSWORD')
+DB_HOST = '127.0.0.1'
 
 DATABASES = {
     'default': {
@@ -113,7 +115,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR + '/static/'
+MEDIA_URL = '/media/'
+STATIC_ROOT = BASE_DIR + '/../static/'
+MEDIA_ROOT = BASE_DIR + '/../media/'
 
 
 REST_FRAMEWORK = {
@@ -123,18 +127,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
-
-
-# from django-request application
-REQUEST_IGNORE_PATHS = (
-    r'^ad/',
-    r'^favicon\.',
-)
-REQUEST_IGNORE_USER_AGENTS = (
-    r'^$',  # ignore requests with no user agent string set
-    r'Googlebot',
-    r'Baiduspider',
-)
 
 
 # from core application

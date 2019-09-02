@@ -1,7 +1,10 @@
+import urllib
+
 from bson import ObjectId
 from django.http import HttpResponse
 
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
+from core.model.configurations import Configuration
 from core.model.searches import Search, Condition
 from core.robots.downloads import _check_has_downloads
 from core.tools.strings import VideoQualityInStringDetector
@@ -9,7 +12,7 @@ from web.serializers import AudiovisualRecordSerializer, GenreSerializer
 from django.shortcuts import render, redirect
 from django.utils import timezone
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 import re
 
 
@@ -20,8 +23,9 @@ Normal Views
 
 def landing(request):
     get_params = dict(request.GET)
-    page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
+    get_params = {k: v[0] for k, v in get_params.items()}
 
+    page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
     last_records = (
         Search.Builder
         .new_search(AudiovisualRecord)
@@ -30,21 +34,31 @@ def landing(request):
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
         .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 6.0))
         .search(
-            sort_by=['-year', '-created_date', '-global_score'],
-            page_size=20, page=1, paginate=True
+            sort_by=['-year', '-global_score', '-created_date'],
+            page_size=30, page=1, paginate=True
         )
     )['results']
 
     # filtering by users
     try:
-        conditions = _get_params_to_conditions(get_params)
+        ordering = get_params.pop('ordering', None)
+        conditions = _process_get_params_and_get_conditions(get_params)
+        get_params['ordering'] = ordering
+
         search_builder = Search.Builder.new_search(AudiovisualRecord)
         for condition in conditions:
             search_builder.add_condition(condition)
 
         search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
         search_builder.add_condition(Condition('has_downloads', Condition.EQUALS, True))
-        search = search_builder.search(paginate=True, page_size=20, page=page)
+        search_kwargs = {
+            'paginate': True,
+            'page_size': 20,
+            'page': page
+        }
+        if ordering is not None:
+            search_kwargs['sort_by'] = ordering
+        search = search_builder.search(**search_kwargs)
         """
         {
             'current_page': page,
@@ -67,11 +81,14 @@ def landing(request):
 
     context = {
         # 'genres': genres,
+        'context_class': 'landing',
+        'is_landing': True,
         'last_records': last_records,
         'search': search,
-        'filter_params': {k: v[0] for k, v in get_params.items()},
+        'filter_params': get_params,
         'genres_names': _get_genres(),
-        'qualities': VideoQualityInStringDetector.our_qualities
+        'qualities': VideoQualityInStringDetector.our_qualities,
+        'year_range': [str(y) for y in range(1970, int(datetime.utcnow().strftime('%Y')) + 1)]
     }
     return render(request, 'web/landing.html', context=context)
 
@@ -80,6 +97,7 @@ def details(request, slug=None):
     now = timezone.now()
     try:
         referer_uri = request.META['HTTP_REFERER']
+        referer_uri = urllib.parse.unquote(referer_uri)
         get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
     except (IndexError, KeyError):
         get_params = {}
@@ -100,6 +118,10 @@ def details(request, slug=None):
 
     audiovisual_record = audiovisual_records[0]
 
+    # /s/?ft=b&s="{{ person.name }}"
+    for person in audiovisual_record.directors + audiovisual_record.writers + audiovisual_record.stars:
+        person.search_url = f'/s/?ft=a&s="{person.name}"'.replace(' ', '+')
+
     related_search = Search.Builder.new_search(AudiovisualRecord)
     related_search.add_condition(Condition('deleted', Condition.EQUALS, False))
     related_search.add_condition(Condition('has_downloads', Condition.EQUALS, True))
@@ -119,7 +141,7 @@ def details(request, slug=None):
 
     related_search.add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
     for genre in audiovisual_record.genres:
-        related_search.add_condition(Condition('genres__name', Condition.EQUALS, genre['name']))
+        related_search.add_condition(Condition('genres__name', Condition.EQUALS, genre.name))
 
     related_records = related_search.search(
         sort_by=['-global_score'],
@@ -133,13 +155,33 @@ def details(request, slug=None):
         .add_condition(Condition('deleted', Condition.EQUALS, False))
         .search(sort_by='quality')
     )
+
+    # TODO
+    lang_downloads = []
+    # for lang in ['eng', 'spa', 'hin', 'deu', 'fra', 'ita', 'jpn']:
+    #     ds = [d for d in downloads if d.lang == lang]
+    #     if len(ds) > 0:
+    #         lang_downloads.append(
+    #             (lang, ds)
+    #         )
+    #     else:
+    #         lang_downloads.append(
+    #             (lang, ds)
+    #         )
+    #
+    # print(lang_downloads)
+
     context = {
+        'context_class': 'details',
+        'is_landing': True,
         'audiovisual_record': audiovisual_record,
         'downloads': downloads,
+        'lang_downloads': lang_downloads,
         'filter_params': get_params,
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
-        'related_records': related_records
+        'related_records': related_records,
+        'year_range': [str(y) for y in range(1970, int(datetime.utcnow().strftime('%Y')) + 1)]
     }
     return render(request, 'web/details.html', context=context)
 
@@ -147,9 +189,10 @@ def details(request, slug=None):
 def genre_view(request, genre=None):
     try:
         referer_uri = request.META['HTTP_REFERER']
-        get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
+        # get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
     except (IndexError, KeyError):
-        get_params = {}
+        pass
+        # get_params = {}
     page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
 
     search_builder = Search.Builder.new_search(AudiovisualRecord)
@@ -166,11 +209,14 @@ def genre_view(request, genre=None):
     _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
 
     context = {
-        'filter_params': get_params,
+        # 'filter_params': get_params,
+        'context_class': 'genre_view',
+        'is_landing': True,
         'current_genre': genre,
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
         'search': search,
+        'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
     }
 
     return render(request, 'web/genre.html', context=context)
@@ -226,12 +272,22 @@ def remove_film(request, object_id):
 
 
 def dmca(request):
-    context = {'genres_names': _get_genres()}
+    context = {
+        'context_class': 'dmca',
+        'is_landing': False,
+        'genres_names': _get_genres(),
+        'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
+    }
     return render(request, 'web/dmca.html', context=context)
 
 
 def terms_and_conditions(request):
-    context = {'genres_names': _get_genres()}
+    context = {
+        'context_class': 'terms',
+        'is_landing': False,
+        'genres_names': _get_genres(),
+        'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
+    }
     return render(request, 'web/terms_and_conditions.html', context=context)
 
 
@@ -271,25 +327,28 @@ def _add_previous_and_next_navigation_uris_to_search(raw_uri, search):
                 search['next_page'] = raw_uri + f'?page={search["next_page"]}'
 
 
-def _get_params_to_conditions(params):
+def _process_get_params_and_get_conditions(params):
     conditions = []
     for k, v in params.items():
-        if k in ['formtype', 'page']:
+        if k in ['ft', 'page']:
             continue
-
-        value = v[0]
+        value = v
         if value == '':
             continue
-        k_parts = k.split('__')
-        f_name = '__'.join(k_parts[:-1])
-        comparator = k_parts[-1]
-        if comparator in [Condition.IN, Condition.NOT_IN]:
-            value = value.split(',')
+        if k == 's':
+            condition = Condition('search', Condition.SIMILAR, value)
+            conditions.append(condition)
+        else:
+            k_parts = k.split('__')
+            f_name = '__'.join(k_parts[:-1])
+            comparator = k_parts[-1]
+            if comparator in [Condition.IN, Condition.NOT_IN]:
+                value = value.split(',')
 
-        value = _translate_value_datatype(f_name, value)
-        condition = Condition(f_name, comparator, value)
-        # print(condition)
-        conditions.append(condition)
+            value = _translate_value_datatype(f_name, value)
+            params[k] = value
+            condition = Condition(f_name, comparator, value)
+            conditions.append(condition)
     return conditions
 
 
@@ -301,7 +360,11 @@ def _translate_value_datatype(f_name, value):
 
 
 def _get_genres():
-    search_builder = Search.Builder.new_search(Genre)
-    genres = search_builder.search(sort_by='name')
-    serializer = GenreSerializer(genres, many=True)
-    return [e['name'] for e in serializer.data]
+    configuration = Configuration.get_configuration('genres_with_films')
+    if configuration is None:
+        search_builder = Search.Builder.new_search(Genre)
+        genres = search_builder.search(sort_by='name')
+        serializer = GenreSerializer(genres, many=True)
+        return [e['name'] for e in serializer.data]
+    else:
+        return configuration.data

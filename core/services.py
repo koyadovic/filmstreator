@@ -24,6 +24,10 @@ def delete_audiovisual_record(audiovisual_record):
     return dao_implementation.delete_audiovisual_record(audiovisual_record)
 
 
+def refresh_audiovisual_record(audiovisual_record):
+    return dao_implementation.refresh_audiovisual_record(audiovisual_record)
+
+
 """
 Download source results
 """
@@ -52,6 +56,10 @@ def get_configuration(key: str):
 
 def save_configuration(configuration: Configuration):
     return dao_implementation.save_configuration(configuration)
+
+
+def refresh_configuration(configuration: Configuration):
+    return dao_implementation.refresh_configuration(configuration)
 
 
 def delete_configuration(configuration: Configuration):

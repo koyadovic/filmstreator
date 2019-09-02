@@ -10,6 +10,10 @@ from core.services import get_configuration
 from core.tools.logs import log_exception
 from core.tools.packages import PackageDiscover, ModuleDiscover
 from core import robots
+import sys
+
+
+sys.setswitchinterval(0.5)
 
 
 class TickerFunctionData:
@@ -39,6 +43,7 @@ class TickerFunctionData:
 
 
 class Ticker:
+
     INTERVALS = {
         '1-minute': {'seconds': 1 * 60, 'functions': []},
         '5-minutes': {'seconds': 5 * 60, 'functions': []},
@@ -115,9 +120,9 @@ class Ticker:
         interval_slugs = self._get_applying_intervals(ts)
         for interval_slug in interval_slugs:
             for function in Ticker.INTERVALS[interval_slug]['functions']:
-                if not Ticker._can_acquire_lock(function):
-                    continue
                 if not function.data.get('enabled'):
+                    continue
+                if not Ticker._can_acquire_lock(function):
                     continue
                 thread = threading.Thread(target=Ticker._thread_executed_function, args=[function])
                 thread.start()

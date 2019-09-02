@@ -1,5 +1,5 @@
 from core.fetchers import download_sources, general_information, scoring_sources, new_additions
-from core.fetchers.download_sources.base import AbstractDownloadSource
+from core.fetchers.download_sources.base import DownloadSource
 from core.fetchers.general_information.base import AbstractGeneralInformation
 from core.fetchers.new_additions.base import AbstractNewAdditions
 from core.fetchers.scoring_sources.base import AbstractScoringSource
@@ -43,10 +43,15 @@ def get_all_download_sources():
     for submodule in package.modules:
         module = ModuleDiscover(submodule)
         for klass in module.classes:
-            if klass != AbstractDownloadSource and issubclass(klass, AbstractDownloadSource):
+            if klass != DownloadSource and issubclass(klass, DownloadSource):
                 klasses.append(klass)
 
-    return _update_base_urls(klasses)
+    _update_base_urls(klasses)
+
+    for klass in klasses:
+        klass.enabled = get_download_source_configuration(klass).data['enabled']
+
+    return klasses
 
 
 def get_all_new_additions_sources():
@@ -70,4 +75,18 @@ def _update_base_urls(klasses):
     for klass in klasses:
         if klass.source_name in data:
             klass.base_url = data[klass.source_name]
-    return klasses
+
+
+def get_download_source_configuration(klass):
+    k = f'download_source_configuration_{klass.source_name}'
+    configuration = Configuration.get_configuration(k)
+    if configuration is None:
+        data = {
+            'enabled': klass.enabled,
+            'zero_results_searches': 0,
+            'audiovisual_names': [],
+            'audiovisual_ids': [],
+        }
+        configuration = Configuration(key=k, data=data)
+        configuration.save()
+    return configuration

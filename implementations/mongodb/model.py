@@ -1,3 +1,5 @@
+import pymongo
+
 from core.model.audiovisual import Genre, Person, AudiovisualRecord, DownloadSourceResult
 from slugify import slugify
 
@@ -28,10 +30,11 @@ class MongoGenre(Genre):
             name=genre.name,
         )
 
+    is_searchable = True
     @classmethod
     def check_collection(cls, db):
         collection = db[cls.collection_name]
-        collection.create_index([('name', 'text')])
+        collection.create_index([('name', pymongo.TEXT)])
 
 
 class MongoPerson(Person):
@@ -58,10 +61,11 @@ class MongoPerson(Person):
             name=person.name,
         )
 
+    is_searchable = True
     @classmethod
     def check_collection(cls, db):
         collection = db[cls.collection_name]
-        collection.create_index([('name', 'text')])
+        collection.create_index([('name', pymongo.TEXT)])
 
 
 class MongoAudiovisualRecord(AudiovisualRecord):
@@ -83,6 +87,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
         yield 'name', self.name
         yield 'genres', [dict(_) for _ in self.genres]
         yield 'year', self.year
+        yield 'summary', self.summary
         yield 'directors', [dict(_) for _ in self.directors]
         yield 'writers', [dict(_) for _ in self.writers]
         yield 'stars', [dict(_) for _ in self.stars]
@@ -111,6 +116,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
 
             genres=[MongoGenre.convert(g) for g in audiovisual_record.genres],
             year=audiovisual_record.year,
+            summary=audiovisual_record.summary,
 
             directors=[MongoPerson.convert(p) for p in audiovisual_record.directors],
             writers=[MongoPerson.convert(p) for p in audiovisual_record.writers],
@@ -138,12 +144,23 @@ class MongoAudiovisualRecord(AudiovisualRecord):
             'value': score.value,
         }
 
+    is_searchable = True
     @classmethod
     def check_collection(cls, db):
         MongoGenre.check_collection(db)
         MongoPerson.check_collection(db)
         collection = db[cls.collection_name]
-        collection.create_index([('name', 'text')])
+        collection.create_index(
+            [
+                ('name', pymongo.TEXT),
+                ('year', pymongo.TEXT),
+                ('summary', pymongo.TEXT),
+                ('directors.name', pymongo.TEXT),
+                ('writers.name', pymongo.TEXT),
+                ('stars.name', pymongo.TEXT),
+            ],
+            weights={'name': 10, 'year': 9, 'directors.name': 3, 'writers.name': 3, 'stars.name': 3}
+        )
 
     @property
     def id(self):
@@ -170,6 +187,7 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         yield 'quality', self.quality
         yield 'lang', self.lang
         yield 'audiovisual_record', getattr(self.audiovisual_record, '_id')
+        yield 'metadata', self.metadata
 
     @classmethod
     def convert(cls, download_source_result):
@@ -178,8 +196,9 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         )
         if isinstance(download_source_result, MongoDownloadSourceResult):
             return download_source_result
-        if type(download_source_result) == dict:
-            return MongoDownloadSourceResult(**download_source_result)
+        # TODO check if works without this
+        # if type(download_source_result) == dict:
+        #     return MongoDownloadSourceResult(**download_source_result)
         return MongoDownloadSourceResult(
             _id=getattr(download_source_result, '_id') if hasattr(download_source_result, '_id') else None,
             last_check=download_source_result.last_check,
@@ -190,12 +209,21 @@ class MongoDownloadSourceResult(DownloadSourceResult):
             quality=download_source_result.quality,
             lang=download_source_result.lang,
             audiovisual_record=download_source_result.audiovisual_record,
+            metadata=download_source_result.metadata,
         )
 
+    is_searchable = True
     @classmethod
     def check_collection(cls, db):
         collection = db[cls.collection_name]
-        collection.create_index([('name', 'text')])
+        collection.create_index(
+            [
+                ('name', pymongo.TEXT),
+                ('source_name', pymongo.TEXT),
+                ('quality', pymongo.TEXT),
+            ],
+            weights={'name': 5, 'source_name': 1, 'quality': 2}
+        )
 
     @property
     def id(self):
@@ -223,6 +251,7 @@ class MongoConfiguration(Configuration):
             data=configuration.data,
         )
 
+    is_searchable = False
     @classmethod
     def check_collection(cls, db):
         collection = db[cls.collection_name]

@@ -1,19 +1,18 @@
 from filmstreator.settings.base import *
-from sentry_sdk.integrations.django import DjangoIntegration
-import sentry_sdk
 from core.tools import logs
+# DISABLED SENTRY BY NOW
+# from sentry_sdk.integrations.django import DjangoIntegration
+# import sentry_sdk
 
 
 DEBUG = False
 
-sentry_sdk.init(
-    dsn="https://3f87cf408a0042fc929df4e3ec80e390@sentry.io/1505406",
-    integrations=[DjangoIntegration()]
-)
+# sentry_sdk.init(
+#     dsn="https://3f87cf408a0042fc929df4e3ec80e390@sentry.io/1505406",
+#     integrations=[DjangoIntegration()]
+# )
 
 FILMSTREATOR_LOG_FILENAME = BASE_DIR + '/../../logs/filmstreator-debug.log'
-
-STATIC_ROOT = BASE_DIR + '/../static/'
 
 LOGGING = {
     'version': 1,
@@ -38,9 +37,14 @@ LOGGING = {
         },
     },
     'loggers': {
+        '': {
+            'handlers': ['filmstreator'],
+            'level': 'WARNING'
+        },
         'core.tools.logs': {
             'handlers': ['filmstreator'],
-            'level': 'DEBUG'
+            'level': 'DEBUG',
+            'propagate': False,
         },
     }
 }
