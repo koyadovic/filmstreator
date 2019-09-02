@@ -70,8 +70,7 @@ class DownloadSource(metaclass=abc.ABCMeta):
 
             valid_result, ratio = self._valid_result(result)
             if not valid_result:
-                # self.log(f'--- Not valid result {name} {link}. Dropping it.')
-                pass
+                self.log(f'--- Not valid result {name} {link}. Dropping it. {ratio}')
             else:
                 self.log(f'??? Possible valid result {name} {link}. Ratio: {ratio}')
                 results.append(result)
@@ -90,7 +89,7 @@ class DownloadSource(metaclass=abc.ABCMeta):
         audiovisual_name = self._name.strip()
         search = re.search(r'(.*)(19\d{2}|20\d{2})(.*)', result.name)
         if search is None:
-            return False
+            return False, 0.0
         else:
             similar_audiovisual_name = search.group(1).strip()
         return are_similar_strings_with_ratio(audiovisual_name.lower(), similar_audiovisual_name.lower())
