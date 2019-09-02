@@ -140,9 +140,12 @@ def _worker_get_download_links(source_class, audiovisual_record, logger):
 
 
 def _worker_collect_download_links_for_the_first_time(source_class, logger):
+    """
+    This search for download links for has_downloads or not has_downloads audiovisual_records
+    """
     with ThreadPoolExecutor(max_workers=2) as executor:
         source_name = source_class.source_name
-        logger(f'Begin to retrieve audovisual records for {source_name}')
+        logger(f'Begin to retrieve audiovisual records for {source_name}')
         audiovisual_records = (
             Search.Builder.new_search(AudiovisualRecord)
             .add_condition(Condition('deleted', Condition.EQUALS, False))
