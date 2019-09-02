@@ -39,6 +39,9 @@ class DownloadSource(metaclass=abc.ABCMeta):
         if response is None:
             raise DownloadSourceException('Response from session was None')
 
+        if response.status_code == 404:
+            return []
+
         html_dom = HTML(html=response.content)
         results = []
         for a in html_dom.find('a'):
