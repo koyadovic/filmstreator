@@ -179,10 +179,10 @@ def _translate_search_to_mongodb_dict_index_search(search):
             elif operator == Condition.NOT_IN:
                 dict_condition[field_path]['$nin'] = value
             elif operator == Condition.CONTAINS:
-                value = re.sub(r'([\-\[\]])', r'\\\1', value)
+                value = re.sub(r'([\-\[\]\(\)\+\$\^\*\?\.])', r'\\\1', value)
                 dict_condition[field_path] = re.compile(value)
             elif operator == Condition.ICONTAINS:
-                value = re.sub(r'([\-\[\]])', r'\\\1', value)
+                value = re.sub(r'([\-\[\]\(\)\+\$\^\*\?\.])', r'\\\1', value)
                 dict_condition[field_path] = re.compile(value, re.IGNORECASE)
             elif operator == Condition.EXISTS:
                 dict_condition[field_path] = {}
