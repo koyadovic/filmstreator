@@ -156,20 +156,26 @@ def details(request, slug=None):
         .search(sort_by='quality')
     )
 
-    # TODO
+    lang_translations = {
+        'eng': 'English',
+        'spa': 'Spanish',
+        'hin': 'Hindu',
+        'deu': 'German',
+        'ita': 'Italian',
+        'jpn': 'Japanese',
+        'fra': 'French'
+    }
     lang_downloads = []
-    # for lang in ['eng', 'spa', 'hin', 'deu', 'fra', 'ita', 'jpn']:
-    #     ds = [d for d in downloads if d.lang == lang]
-    #     if len(ds) > 0:
-    #         lang_downloads.append(
-    #             (lang, ds)
-    #         )
-    #     else:
-    #         lang_downloads.append(
-    #             (lang, ds)
-    #         )
-    #
-    # print(lang_downloads)
+    for lang in ['eng', 'spa', 'hin', 'deu', 'fra', 'ita', 'jpn']:
+        ds = [d for d in downloads if d.lang == lang]
+        if len(ds) > 0:
+            lang_downloads.append(
+                (lang, ds, lang_translations[lang])
+            )
+        # else:
+        #     lang_downloads.append(
+        #         (lang, ds, lang_translations[lang])
+        #     )
 
     context = {
         'context_class': 'details',
