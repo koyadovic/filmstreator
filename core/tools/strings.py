@@ -29,7 +29,7 @@ def ratio_of_containing_similar_string(container_string, text_string, min_length
     return max_ratio
 
 
-POSSIBLE_SEPARATORS = [' ', '.', '-', '_', '[', ']', '(', ')']
+POSSIBLE_SEPARATORS = [' ', '.', '-', '_', '[', ']', '(', ')', '/', '\\', '{', '}', '<', '>', '~']
 LANGUAGES = {
     # 'eng': ['en', 'eng', 'english'],
     'spa': ['es', 'spa', 'esp', 'spanish'],
