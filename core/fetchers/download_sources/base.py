@@ -2,7 +2,7 @@ from core.model.audiovisual import DownloadSourceResult
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.exceptions import DownloadSourceException
 from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector, are_similar_strings, \
-    are_similar_strings_with_ratio
+    are_similar_strings_with_ratio, guess_language
 
 from requests_html import HTML
 
@@ -59,12 +59,14 @@ class DownloadSource(metaclass=abc.ABCMeta):
             if not link.lower().startswith('http'):
                 link = self.base_url + link
 
+            language = guess_language(name, default=self.language)
+
             result = DownloadSourceResult(
                 source_name=source_name,
                 name=name,
                 link=link,
                 quality=quality,
-                lang=self.language,
+                lang=language,
                 audiovisual_record=None
             )
 

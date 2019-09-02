@@ -29,6 +29,35 @@ def ratio_of_containing_similar_string(container_string, text_string, min_length
     return max_ratio
 
 
+POSSIBLE_SEPARATORS = [' ', '.', '-', '_', '[', ']', '(', ')']
+LANGUAGES = {
+    # 'eng': ['en', 'eng', 'english'],
+    'spa': ['es', 'spa', 'esp', 'spanish'],
+    'jpn': ['ja', 'jpn', 'japanese'],
+    'fra': ['fr', 'fra', 'french'],
+    'hin': ['hi', 'hin', 'hindi'],
+    'ita': ['it', 'ita', 'italian'],
+    'deu': ['deu', 'de', 'ger', 'german'],
+}
+
+
+def guess_language(name, default=None):
+    name = name.lower()
+    for lang, possibilities in LANGUAGES.items():
+        for possibility in possibilities:
+            if possibility in name:
+                idx = name.index(possibility)
+                try:
+                    if (
+                            name[idx - 1] in POSSIBLE_SEPARATORS and
+                            name[idx + len(possibility)] in POSSIBLE_SEPARATORS
+                    ):
+                        return lang
+                except IndexError:
+                    continue
+    return 'eng' if default is None else default
+
+
 class VideoQualityInStringDetector:  # TODO hay que repensar esto
     """
     Algorithm will sort by 'possibility' length

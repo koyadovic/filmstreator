@@ -129,6 +129,7 @@ def _worker_get_download_links(source_class, audiovisual_record, logger):
             result.audiovisual_record = audiovisual_record
             result.save()
             logger(f'+++ Valid result {result.name} {result.link}.')
+
         audiovisual_record.refresh()
         if 'downloads_fetch' not in audiovisual_record.metadata:
             audiovisual_record.metadata['downloads_fetch'] = {}
