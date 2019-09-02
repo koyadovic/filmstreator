@@ -155,11 +155,28 @@ def details(request, slug=None):
         .add_condition(Condition('deleted', Condition.EQUALS, False))
         .search(sort_by='quality')
     )
+
+    # TODO
+    lang_downloads = []
+    # for lang in ['eng', 'spa', 'hin', 'deu', 'fra', 'ita', 'jpn']:
+    #     ds = [d for d in downloads if d.lang == lang]
+    #     if len(ds) > 0:
+    #         lang_downloads.append(
+    #             (lang, ds)
+    #         )
+    #     else:
+    #         lang_downloads.append(
+    #             (lang, ds)
+    #         )
+    #
+    # print(lang_downloads)
+
     context = {
         'context_class': 'details',
         'is_landing': True,
         'audiovisual_record': audiovisual_record,
         'downloads': downloads,
+        'lang_downloads': lang_downloads,
         'filter_params': get_params,
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
