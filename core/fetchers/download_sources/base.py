@@ -69,8 +69,9 @@ class DownloadSource(metaclass=abc.ABCMeta):
             )
 
             valid_result, ratio = self._valid_result(result)
-            if not valid_result:
-                self.log(f'--- Not valid result {name} {link}. Dropping it. {ratio}')
+            if ratio < 0.8:
+                # self.log(f'--- Not valid result {name} {link}. Dropping it. {ratio}')
+                pass
             else:
                 self.log(f'??? Possible valid result {name} {link}. Ratio: {ratio}')
                 results.append(result)

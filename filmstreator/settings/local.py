@@ -33,9 +33,14 @@ LOGGING = {
         },
     },
     'loggers': {
+        '': {
+            'handlers': ['filmstreator'],
+            'level': 'WARNING'
+        },
         'core.tools.logs': {
             'handlers': ['filmstreator'],
-            'level': 'DEBUG'
+            'level': 'DEBUG',
+            'propagate': False,
         },
     }
 }

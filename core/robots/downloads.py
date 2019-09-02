@@ -157,8 +157,6 @@ def _worker_collect_download_links_for_the_first_time(source_class, logger):
 @Ticker.execute_each(interval='1-minute')
 def collect_download_links_for_the_first_time():
     logger = collect_download_links_for_the_first_time.log
-
-    PhantomBrowsingSession.domain_checks = {}
     sources = get_all_download_sources()
 
     threads = []
@@ -177,6 +175,11 @@ def collect_download_links_for_the_first_time():
 ###################################################################################################################
 ################################################## END DOWNLOADS ##################################################
 ###################################################################################################################
+
+
+@Ticker.execute_each(interval='24-hours')
+def clean_domain_caches_of_phantom_browsing_session_class():
+    PhantomBrowsingSession.domain_checks = {}
 
 
 # @Ticker.execute_each(interval='14-days')
