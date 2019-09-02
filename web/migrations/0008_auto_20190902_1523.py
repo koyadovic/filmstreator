@@ -18,15 +18,12 @@ def execute(apps, schema_editor):
     for result in results:
         n += 1
         if result.audiovisual_record is None:
-            print(f'[{n}/{total}] Skipping {result.name}')
             continue
         qd = VideoQualityInStringDetector(result.name)
         if qd.quality != result.quality:
             result.quality = qd.quality
             result.save()
             print(f'[{n}/{total}] Saved {result.name} with new quality ://\t{result.quality}')
-        else:
-            print(f'[{n}/{total}] Skipping {result.name}')
 
 
 class Migration(migrations.Migration):
