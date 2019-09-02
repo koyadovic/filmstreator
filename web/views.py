@@ -159,7 +159,7 @@ def details(request, slug=None):
     lang_translations = {
         'eng': 'English',
         'spa': 'Spanish',
-        'hin': 'Hindu',
+        'hin': 'Hindi',
         'deu': 'German',
         'ita': 'Italian',
         'jpn': 'Japanese',
