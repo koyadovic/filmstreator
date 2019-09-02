@@ -1,7 +1,8 @@
 from core.model.audiovisual import DownloadSourceResult
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.exceptions import DownloadSourceException
-from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector, are_similar_strings
+from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector, are_similar_strings, \
+    are_similar_strings_with_ratio
 
 from requests_html import HTML
 
@@ -67,11 +68,12 @@ class DownloadSource(metaclass=abc.ABCMeta):
                 audiovisual_record=None
             )
 
-            if not self._valid_result(result):
+            valid_result, ratio = self._valid_result(result)
+            if not valid_result:
                 # self.log(f'--- Not valid result {name} {link}. Dropping it.')
                 pass
             else:
-                self.log(f'??? Possible valid result {name} {link}.')
+                self.log(f'??? Possible valid result {name} {link}. Ratio: {ratio}')
                 results.append(result)
 
         return self.post_process_results(results)
@@ -91,7 +93,7 @@ class DownloadSource(metaclass=abc.ABCMeta):
             return False
         else:
             similar_audiovisual_name = search.group(1).strip()
-        return are_similar_strings(audiovisual_name.lower(), similar_audiovisual_name.lower())
+        return are_similar_strings_with_ratio(audiovisual_name.lower(), similar_audiovisual_name.lower())
 
     def _get_search_string(self):
         # search string is {name} or {name} {year} if year is available

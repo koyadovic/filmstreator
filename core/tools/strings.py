@@ -9,6 +9,11 @@ def are_similar_strings(str1, str2):
     return current_ratio > 0.7
 
 
+def are_similar_strings_with_ratio(str1, str2):
+    current_ratio = SequenceMatcher(None, str1, str2).ratio()
+    return current_ratio > 0.7, current_ratio
+
+
 def ratio_of_containing_similar_string(container_string, text_string, min_length=None):
     idx = 0
     length = len(text_string)
