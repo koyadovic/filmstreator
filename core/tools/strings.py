@@ -88,6 +88,7 @@ class VideoQualityInStringDetector:
         {'possibility': 'PPVRip', 'tag': 'PPVRip'},
         {'possibility': 'DVDSCR', 'tag': 'DVDScreener'},
         {'possibility': 'DVDRip', 'tag': 'DVDRip'},
+        {'possibility': 'DVD-R', 'tag': 'DVDRip'},
         {'possibility': 'DVD5', 'tag': 'DVDRip'},
         {'possibility': 'DVD9', 'tag': 'DVDRip'},
         {'possibility': 'DVDMux', 'tag': 'DVDRip'},
