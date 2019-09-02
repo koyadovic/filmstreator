@@ -115,6 +115,9 @@ class DownloadSource(metaclass=abc.ABCMeta):
         self._last_response = response = session.last_response
         return response
 
+    def __str__(self):
+        return f'{self.__class__.__name__} {self.source_name}'
+
 
 # class AbstractDownloadSource(metaclass=abc.ABCMeta):
 #
