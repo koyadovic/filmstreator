@@ -172,10 +172,6 @@ def details(request, slug=None):
             lang_downloads.append(
                 (lang, ds, lang_translations[lang])
             )
-        # else:
-        #     lang_downloads.append(
-        #         (lang, ds, lang_translations[lang])
-        #     )
 
     context = {
         'context_class': 'details',

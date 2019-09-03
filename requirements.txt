@@ -11,6 +11,7 @@ cssselect==1.1.0
 decorator==4.4.0
 Django==2.2.3
 djangorestframework==3.10.1
+dnspython==1.16.0
 fake-useragent==0.1.11
 idna==2.8
 ipdb==0.12
