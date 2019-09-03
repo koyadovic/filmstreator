@@ -26,7 +26,7 @@ class BaseModel:
         self.updated_date = kwargs.pop('updated_date', utc_now())
 
 
-class Genre(BaseModel, EqualityMixin):
+class Genre(BaseModel, EqualityMixin, SearchMixin):
     @property
     def name(self):
         return self._name

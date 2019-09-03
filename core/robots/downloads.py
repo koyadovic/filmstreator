@@ -4,7 +4,6 @@ import time
 
 from core.fetchers.services import get_all_download_sources, get_download_source_configuration
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
-from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
 from core.tools.browsing import PhantomBrowsingSession
 from urllib.parse import urlparse
@@ -147,7 +146,7 @@ def _worker_collect_download_links_for_the_first_time(source_class, logger):
             {'deleted': False, 'general_information_fetched': True,
              f'metadata__downloads_fetch__{source_name}__exists': False},
             paginate=True, page_size=100, page=1, sort_by='-global_score'
-        )['results']
+        ).get('results')
 
         futures = []
         for audiovisual_record in audiovisual_records:

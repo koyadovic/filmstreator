@@ -5,7 +5,7 @@ from django.http import HttpResponse
 
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
 from core.model.configurations import Configuration
-from core.model.searches import Search, Condition
+from core.model.searches import Condition
 from core.robots.downloads import _check_has_downloads
 from core.tools.strings import VideoQualityInStringDetector
 from web.serializers import AudiovisualRecordSerializer, GenreSerializer
@@ -26,22 +26,19 @@ def landing(request):
     get_params = {k: v[0] for k, v in get_params.items()}
 
     page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
-    last_records = (
-        Search.Builder
-        .new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .add_condition(Condition('has_downloads', Condition.EQUALS, True))
-        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 6.0))
-        .search(
-            sort_by=['-year', '-global_score', '-created_date'],
-            page_size=30, page=1, paginate=True
-        )
-    )['results']
+    last_records = AudiovisualRecord.search(
+        {
+            'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
+            'global_score__gte': 6.0
+        },
+        sort_by=['-year', '-global_score', '-created_date'],
+        page_size=30, page=1, paginate=True
+    ).get('results')
 
     # filtering by users
     try:
         ordering = get_params.pop('ordering', None)
+        # TODO
         conditions = _process_get_params_and_get_conditions(get_params)
         get_params['ordering'] = ordering
 

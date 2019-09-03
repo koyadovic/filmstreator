@@ -2,48 +2,25 @@ from datetime import datetime, timezone, timedelta
 
 from core.model.audiovisual import Genre, AudiovisualRecord
 from core.model.configurations import Configuration
-from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
 import operator
 
 
 CONFIG_KEY = 'audiovisual_records_grouped_by_genres'
-
 CONFIG_KEY_GENRES_WITH_FILMS = 'genres_with_films'
 
 
-# @Ticker.execute_each(interval='12-hours')
-# def audiovisual_records_grouped_by_genres():
-#     groups = _group_by_genres()
-#     configuration = _get_or_create_configuration()
-#     configuration.data = groups
-#     configuration.save()
-#
-#
-# @Ticker.execute_each(interval='1-minute')
-# def generate_the_first_audiovisual_records_grouped_by_genres():
-#     if Configuration.get_configuration(key=CONFIG_KEY) is None:
-#         groups = _group_by_genres()
-#         configuration = _get_or_create_configuration()
-#         configuration.data = groups
-#         configuration.save()
-#
-
 def _group_by_genres():
     six_month_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
-    all_genres = Search.Builder.new_search(Genre).search()
+    all_genres = Genre.search()
     groups = {}
     for genre in all_genres:
-        audiovisual_records = (
-            Search.Builder
-            .new_search(AudiovisualRecord)
-            .add_condition(Condition('deleted', Condition.EQUALS, False))
-            .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-            .add_condition(Condition('has_downloads', Condition.EQUALS, True))
-            .add_condition(Condition('created_date', Condition.GREAT_THAN, six_month_ago))
-            .add_condition(Condition('genres__name', Condition.EQUALS, genre.name))
-            .search()
-        )
+
+        audiovisual_records = AudiovisualRecord.search({
+            'deleted': False, 'general_information_fetched': True, 'has_downloads': True,
+            'created_date__gt': six_month_ago, 'genres__name': genre.name
+        })
+
         for ar in audiovisual_records:
             scores = [float(s['value']) for s in ar.scores]
             score = sum(scores) / len(scores) if len(scores) > 0 else 0
@@ -81,23 +58,16 @@ def _get_or_create_configuration(config_key):
 
 @Ticker.execute_each(interval='24-hours')
 def calculate_genres_with_films():
-    search_builder = Search.Builder.new_search(Genre)
-    genres = search_builder.search(sort_by='name')
-
+    genres = Genre.search(sort_by='name')
     genre_names_with_films = []
-
     for genre in genres:
-        search_builder = Search.Builder.new_search(AudiovisualRecord)
-        search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
-        search_builder.add_condition(Condition('has_downloads', Condition.EQUALS, True))
-        search_builder.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        search_builder.add_condition(Condition('genres__name', Condition.EQUALS, genre.name))
-        search = search_builder.search(
+        results = AudiovisualRecord.search(
+            {'deleted': False, 'has_downloads': True, 'general_information_fetched': True, 'genres__name': genre.name},
             paginate=True, page_size=1, page=1,
-        )
-        if len(search['results']) > 0:
-            genre_names_with_films.append(genre.name)
+        ).get('results')
 
+        if len(results) > 0:
+            genre_names_with_films.append(genre.name)
     configuration = _get_or_create_configuration(CONFIG_KEY_GENRES_WITH_FILMS)
     configuration.data = genre_names_with_films
     configuration.save()

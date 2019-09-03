@@ -16,7 +16,7 @@ def compile_scores_from_audiovisual_records():
             audiovisual_records = AudiovisualRecord.search({
                 'deleted': False, 'general_information_fetched': True,
                 'scores__source_name__nin': [klass.source_name]
-            }, paginate=True, page_size=100, page=1)['results']
+            }, paginate=True, page_size=100, page=1).get('results')
 
             for audiovisual_record in audiovisual_records:
                 future = executor.submit(_refresh_score, klass, audiovisual_record)
