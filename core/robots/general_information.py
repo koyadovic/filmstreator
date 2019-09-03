@@ -3,7 +3,6 @@ from urllib.error import HTTPError
 
 from core.fetchers.services import get_all_general_information_sources
 from core.model.audiovisual import AudiovisualRecord
-from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
 from core.tools.exceptions import GeneralInformationException
 from core.tools.logs import log_exception, log_message
@@ -16,12 +15,11 @@ import urllib.request
 
 @Ticker.execute_each(interval='5-minutes')
 def autocomplete_general_information_for_empty_audiovisual_records():
-    audiovisual_records = (
-        Search.Builder.new_search(AudiovisualRecord)
-                      .add_condition(Condition('deleted', Condition.EQUALS, False))
-                      .add_condition(Condition('general_information_fetched', Condition.EQUALS, False))
-                      .search(paginate=True, page_size=100, page=1)
-    )['results']
+
+    audiovisual_records = AudiovisualRecord.search({
+        'deleted': False, 'general_information_fetched': False,
+    }, paginate=True, page_size=100, page=1).get('results')
+
     with ThreadPoolExecutor(max_workers=3) as executor:
         futures = []
         for audiovisual_record in audiovisual_records:
@@ -49,11 +47,7 @@ def _update(audiovisual_record, general_information_klass):
         audiovisual_record.genres = general_information.genres
         audiovisual_record.is_a_film = general_information.is_a_film
         if audiovisual_record.name != general_information.name:
-            exists = len(
-                Search.Builder.new_search(AudiovisualRecord)
-                .add_condition(Condition('name', Condition.EQUALS, general_information.name))
-                .search()
-            ) > 0
+            exists = len(AudiovisualRecord.search({'name': general_information.name})) > 0
             if not exists:
                 audiovisual_record.name = general_information.name
                 audiovisual_record.slug = None
@@ -70,12 +64,10 @@ def _update(audiovisual_record, general_information_klass):
 
 @Ticker.execute_each(interval='1-minute')
 def autocomplete_missing_summaries():
-    audiovisual_records_without_summary_key = (
-        Search.Builder.new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .add_condition(Condition('summary', Condition.EXISTS, False))
-        .search(paginate=True, page_size=100, page=1)
-    )['results']
+    audiovisual_records_without_summary_key = AudiovisualRecord.search(
+        {'deleted': False, 'summary__exists': False},
+        paginate=True, page_size=100, page=1
+    ).get('results')
 
     with ThreadPoolExecutor(max_workers=3) as executor:
         futures = []
@@ -116,14 +108,13 @@ def save_audiovisual_images_locally():
         web_server_root_path = '/media/ai/'
         save_audiovisual_images_locally.data.set('web_server_root_path', web_server_root_path)
 
-    audiovisual_records = (
-        Search.Builder.new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        .add_condition(Condition('has_downloads', Condition.EQUALS, True))
-        .add_condition(Condition('metadata__local_image', Condition.EXISTS, False))
-        .search(paginate=True, page_size=10, page=1, sort_by='-global_score')
-    )['results']
+    audiovisual_records = AudiovisualRecord.search(
+        {
+            'deleted': False, 'general_information_fetched': True,
+            'has_downloads': True, 'metadata__local_image__exists': False
+        },
+        paginate=True, page_size=10, page=1, sort_by='-global_score'
+    ).get('results')
 
     with ThreadPoolExecutor(max_workers=3) as executor:
         futures = []

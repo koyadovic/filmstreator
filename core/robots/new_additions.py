@@ -66,12 +66,7 @@ def search_for_new_additions():
             current_native_dt + timedelta(days=1)
         )
         for audiovisual_record in audiovisual_records_new:
-            results = (
-                Search.Builder
-                .new_search(AudiovisualRecord)
-                .add_condition(Condition('name', Condition.EQUALS, audiovisual_record.name))
-                .search()
-            )
+            results = AudiovisualRecord.search({'name': audiovisual_record.name})
             if len(results) == 0:
                 search_for_new_additions.log(f'Adding new {audiovisual_record.name}')
                 audiovisual_record.save()

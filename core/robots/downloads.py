@@ -4,7 +4,6 @@ import time
 
 from core.fetchers.services import get_all_download_sources, get_download_source_configuration
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult
-from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
 from core.tools.browsing import PhantomBrowsingSession
 from urllib.parse import urlparse
@@ -45,14 +44,11 @@ def _check_zero_results(results, source_class, audiovisual_record, logger):
     # if results now are zero, disable the source.
     # because the html structure of the web maybe changed
     if configuration.data['zero_results_searches'] > 300:
-        previous_good_search = (
-            Search
-            .Builder
-            .new_search(DownloadSourceResult)
-            .add_condition(Condition('deleted', Condition.EQUALS, False))
-            .add_condition(Condition('source_name', Condition.EQUALS, source_class.source_name))
-            .search(paginate=True, page_size=1, page=1)
-        )
+
+        previous_good_search = DownloadSourceResult.search({
+            'deleted': False, 'source_name': source_class.source_name
+        }, paginate=True, page_size=1, page=1)
+
         if len(previous_good_search) > 0:
             previous_good_search = previous_good_search[0]
             previous_audiovisual_record = previous_good_search.audiovisual_record
@@ -118,18 +114,10 @@ def _worker_get_download_links(source_class, audiovisual_record, logger):
 
             # if link exists do nothing
             relative_url = urlparse(result.link).path
-            exists = (
-                Search.Builder.new_search(DownloadSourceResult)
-                .add_condition(Condition('source_name', Condition.EQUALS, source_class.source_name))
-                .add_condition(Condition('link', Condition.ICONTAINS, relative_url))
-                .search()
-            )
-            exists += (
-                Search.Builder.new_search(DownloadSourceResult)
-                .add_condition(Condition('source_name', Condition.EQUALS, source_class.source_name))
-                .add_condition(Condition('name', Condition.EQUALS, result.name))
-                .search()
-            )
+            exists = DownloadSourceResult.search(
+                {'source_name': source_class.source_name, 'link__icontains': relative_url})
+            exists += DownloadSourceResult.search({'source_name': source_class.source_name, 'name': result.name})
+
             if len(exists) > 0:
                 continue
 
@@ -153,13 +141,12 @@ def _worker_collect_download_links_for_the_first_time(source_class, logger):
     with ThreadPoolExecutor(max_workers=2) as executor:
         source_name = source_class.source_name
         logger(f'Begin to retrieve audiovisual records for {source_name}')
-        audiovisual_records = (
-            Search.Builder.new_search(AudiovisualRecord)
-            .add_condition(Condition('deleted', Condition.EQUALS, False))
-            .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-            .add_condition(Condition(f'metadata__downloads_fetch__{source_name}', Condition.EXISTS, False))
-            .search(paginate=True, page_size=100, page=1, sort_by='-global_score')
-        )['results']
+
+        audiovisual_records = AudiovisualRecord.search(
+            {'deleted': False, 'general_information_fetched': True,
+             f'metadata__downloads_fetch__{source_name}__exists': False},
+            paginate=True, page_size=100, page=1, sort_by='-global_score'
+        ).get('results')
 
         futures = []
         for audiovisual_record in audiovisual_records:
@@ -197,16 +184,10 @@ def clean_domain_caches_of_phantom_browsing_session_class():
 @Ticker.execute_each(interval='14-days')
 def recent_films_search_again_for_download_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
-    audiovisual_records = (
-        Search
-        .Builder
-        .new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        .add_condition(Condition('metadata__downloads_fetch', Condition.EXISTS, True))
-        .add_condition(Condition('year', Condition.GREAT_OR_EQUAL_THAN, n_days_ago.strftime('%Y')))
-        .search()
-    )
+    audiovisual_records = AudiovisualRecord.search({
+        'deleted': False, 'general_information_fetched': True,
+        'metadata__downloads_fetch__exists': True, 'year__gte': n_days_ago.strftime('%Y')
+    })
     for audiovisual_record in audiovisual_records:
         audiovisual_record.refresh()
         audiovisual_record.metadata['downloads_fetch'] = {}
@@ -217,14 +198,10 @@ def recent_films_search_again_for_download_links():
 def delete_404_links():
     logger = delete_404_links.log
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=60)
-    download_results = (
-        Search
-        .Builder
-        .new_search(DownloadSourceResult)
-        .add_condition(Condition('last_check', Condition.LESS_THAN, n_days_ago))
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .search()
-    )
+    download_results = DownloadSourceResult.search({
+        'last_check__lt': n_days_ago,
+        'deleted': False
+    })
     logger(f'{len(download_results)} download results need to be checked')
     download_sources_map = {ds.source_name: ds for ds in get_all_download_sources() if ds.enabled}
 
@@ -280,14 +257,9 @@ def _valid_result(result):
 
 
 def _check_has_downloads(audiovisual_record):
-    downloads = (
-        Search
-        .Builder
-        .new_search(DownloadSourceResult)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
-        .search()
-    )
+    downloads = DownloadSourceResult.search({
+        'deleted': False, 'audiovisual_record': audiovisual_record
+    })
     has_downloads = len(downloads) > 0
     if audiovisual_record.has_downloads is not has_downloads:
         audiovisual_record.refresh()

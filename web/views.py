@@ -5,7 +5,7 @@ from django.http import HttpResponse
 
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
 from core.model.configurations import Configuration
-from core.model.searches import Search, Condition
+from core.model.searches import Condition
 from core.robots.downloads import _check_has_downloads
 from core.tools.strings import VideoQualityInStringDetector
 from web.serializers import AudiovisualRecordSerializer, GenreSerializer
@@ -26,65 +26,50 @@ def landing(request):
     get_params = {k: v[0] for k, v in get_params.items()}
 
     page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
-    last_records = (
-        Search.Builder
-        .new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .add_condition(Condition('has_downloads', Condition.EQUALS, True))
-        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        .add_condition(Condition('global_score', Condition.GREAT_OR_EQUAL_THAN, 6.0))
-        .search(
-            sort_by=['-year', '-global_score', '-created_date'],
-            page_size=30, page=1, paginate=True
-        )
-    )['results']
+    last_records = AudiovisualRecord.search(
+        {
+            'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
+            'global_score__gte': 6.0
+        },
+        sort_by=['-year', '-global_score', '-created_date'],
+        page_size=30, page=1, paginate=True
+    ).get('results')
 
     # filtering by users
     try:
         ordering = get_params.pop('ordering', None)
-        conditions = _process_get_params_and_get_conditions(get_params)
-        get_params['ordering'] = ordering
 
-        search_builder = Search.Builder.new_search(AudiovisualRecord)
-        for condition in conditions:
-            search_builder.add_condition(condition)
-
-        search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
-        search_builder.add_condition(Condition('has_downloads', Condition.EQUALS, True))
-        search_kwargs = {
+        filter_dict = _process_get_params_and_get_filter_dict(get_params)
+        filter_dict['deleted'] = False
+        filter_dict['has_downloads'] = True
+        additional_kwargs = {
             'paginate': True,
             'page_size': 20,
             'page': page
         }
         if ordering is not None:
-            search_kwargs['sort_by'] = ordering
-        search = search_builder.search(**search_kwargs)
-        """
-        {
-            'current_page': page,
-            'total_pages': math.ceil(n_items / float(page_size)),
-            'results': search_results
-        }
-        """
-        serializer = AudiovisualRecordSerializer(search.get('results', []), many=True)
-        search['results'] = serializer.data
+            additional_kwargs['sort_by'] = ordering
+
+        paginator = AudiovisualRecord.search(filter_dict, **additional_kwargs)
+        serializer = AudiovisualRecordSerializer(paginator.get('results', []), many=True)
+        paginator['results'] = serializer.data
 
     except Condition.InvalidOperator:
-        search = {
+        paginator = {
             'current_page': 1,
             'total_pages': 1,
             'results': []
         }
 
     # here we translate next page number and previous page number into urls
-    _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
+    _add_previous_and_next_navigation_uris_to_search(raw_uri, paginator)
 
     context = {
         # 'genres': genres,
         'context_class': 'landing',
         'is_landing': True,
         'last_records': last_records,
-        'search': search,
+        'search': paginator,
         'filter_params': get_params,
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
@@ -102,16 +87,9 @@ def details(request, slug=None):
     except (IndexError, KeyError):
         get_params = {}
 
-    audiovisual_records = (
-        Search.Builder
-        .new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .add_condition(Condition('has_downloads', Condition.EQUALS, True))
-        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        .add_condition(Condition('slug', Condition.EQUALS, slug))
-        .search()
-    )
-    audiovisual_records = list(audiovisual_records)
+    audiovisual_records = AudiovisualRecord.search({
+        'deleted': False, 'has_downloads': True, 'general_information_fetched': True, 'slug': slug
+    })
     if len(audiovisual_records) == 0:
         context = {'genres_names': _get_genres()}
         return render(request, 'web/404.html', status=404, context=context)
@@ -122,38 +100,30 @@ def details(request, slug=None):
     for person in audiovisual_record.directors + audiovisual_record.writers + audiovisual_record.stars:
         person.search_url = f'/s/?ft=a&s="{person.name}"'.replace(' ', '+')
 
-    related_search = Search.Builder.new_search(AudiovisualRecord)
-    related_search.add_condition(Condition('deleted', Condition.EQUALS, False))
-    related_search.add_condition(Condition('has_downloads', Condition.EQUALS, True))
-    related_search.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-    related_search.add_condition(Condition('name', Condition.NON_EQUALS, audiovisual_record.name))
-    related_search.add_condition(
-        Condition(
-            'year', Condition.IN, [
-                str(int(audiovisual_record.year) - 2),
-                str(int(audiovisual_record.year) - 1),
-                audiovisual_record.year,
-                str(int(audiovisual_record.year) + 1),
-                str(int(audiovisual_record.year) + 2),
-            ]
-        )
-    )
-
-    related_search.add_condition(Condition('created_date', Condition.GREAT_OR_EQUAL_THAN, now - timedelta(days=120)))
+    # related audiovisual records
+    related_filter = {
+        'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
+        'name__neq': audiovisual_record.name, 'created_date__gte': now - timedelta(days=120),
+        'year__in': [
+            str(int(audiovisual_record.year) - 2),
+            str(int(audiovisual_record.year) - 1),
+            audiovisual_record.year,
+            str(int(audiovisual_record.year) + 1),
+            str(int(audiovisual_record.year) + 2),
+        ]
+    }
     for genre in audiovisual_record.genres:
-        related_search.add_condition(Condition('genres__name', Condition.EQUALS, genre.name))
+        related_filter['genres__name'] = genre.name
 
-    related_records = related_search.search(
-        sort_by=['-global_score'],
-        page_size=10, page=1, paginate=True
-    )['results']
+    related_records = AudiovisualRecord.search(
+        related_filter,
+        page_size=10, page=1, paginate=True, sort_by=['-global_score']
+    ).get('results')
 
-    downloads = (
-        Search.Builder
-        .new_search(DownloadSourceResult)
-        .add_condition(Condition('audiovisual_record', Condition.EQUALS, audiovisual_record))
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .search(sort_by='quality')
+    # downloads
+    downloads = DownloadSourceResult.search(
+        {'audiovisual_record': audiovisual_record, 'deleted': False},
+        sort_by='quality'
     )
 
     lang_translations = {
@@ -197,18 +167,14 @@ def genre_view(request, genre=None):
         # get_params = {}
     page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
 
-    search_builder = Search.Builder.new_search(AudiovisualRecord)
-    search_builder.add_condition(Condition('deleted', Condition.EQUALS, False))
-    search_builder.add_condition(Condition('has_downloads', Condition.EQUALS, True))
-    search_builder.add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-    search_builder.add_condition(Condition('genres__name', Condition.EQUALS, genre))
-    search = search_builder.search(
-        paginate=True, page_size=20, page=page,
-        sort_by=['-year', '-created_date', '-global_score']
+    paginator = AudiovisualRecord.search(
+        {'deleted': False, 'has_downloads': True, 'general_information_fetched': True, 'genres__name': genre},
+        paginate=True, page_size=20, page=page, sort_by=['-year', '-created_date', '-global_score']
     )
-    serializer = AudiovisualRecordSerializer(search.get('results', []), many=True)
-    search['results'] = serializer.data
-    _add_previous_and_next_navigation_uris_to_search(raw_uri, search)
+
+    serializer = AudiovisualRecordSerializer(paginator.get('results', []), many=True)
+    paginator['results'] = serializer.data
+    _add_previous_and_next_navigation_uris_to_search(raw_uri, paginator)
 
     context = {
         # 'filter_params': get_params,
@@ -217,7 +183,7 @@ def genre_view(request, genre=None):
         'current_genre': genre,
         'genres_names': _get_genres(),
         'qualities': VideoQualityInStringDetector.our_qualities,
-        'search': search,
+        'search': paginator,
         'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
     }
 
@@ -229,17 +195,10 @@ def remove_download(request, object_id):
         return HttpResponse(status=403)
     _id = ObjectId(object_id)
     try:
-        download = (
-            Search.Builder
-            .new_search(DownloadSourceResult)
-            .add_condition(Condition('_id', Condition.EQUALS, _id))
-            .search()
-        )[0]
+        download = DownloadSourceResult.search({'_id': _id})[0]
         download.delete()
-
         download.audiovisual_record.metadata['recheck_downloads'] = True
         download.audiovisual_record.save()
-
         _check_has_downloads(download.audiovisual_record)
     except IndexError:
         pass
@@ -256,12 +215,7 @@ def remove_film(request, object_id):
         return HttpResponse(status=403)
     _id = ObjectId(object_id)
     try:
-        audiovisual_record = (
-            Search.Builder
-            .new_search(AudiovisualRecord)
-            .add_condition(Condition('_id', Condition.EQUALS, _id))
-            .search()
-        )[0]
+        audiovisual_record = AudiovisualRecord.search({'_id': _id})[0]
         audiovisual_record.delete()
     except IndexError:
         pass
@@ -329,29 +283,20 @@ def _add_previous_and_next_navigation_uris_to_search(raw_uri, search):
                 search['next_page'] = raw_uri + f'?page={search["next_page"]}'
 
 
-def _process_get_params_and_get_conditions(params):
-    conditions = []
+def _process_get_params_and_get_filter_dict(params):
+    filter_dict = {}
     for k, v in params.items():
         if k in ['ft', 'page']:
             continue
-        value = v
-        if value == '':
-            continue
-        if k == 's':
-            condition = Condition('search', Condition.SIMILAR, value)
-            conditions.append(condition)
-        else:
-            k_parts = k.split('__')
-            f_name = '__'.join(k_parts[:-1])
-            comparator = k_parts[-1]
-            if comparator in [Condition.IN, Condition.NOT_IN]:
-                value = value.split(',')
+        k_parts = k.split('__')
+        if k_parts[-1] in ['in', 'nin']:
+            v = [v]
 
-            value = _translate_value_datatype(f_name, value)
-            params[k] = value
-            condition = Condition(f_name, comparator, value)
-            conditions.append(condition)
-    return conditions
+        if k == 's':
+            filter_dict['search__simil'] = v
+        else:
+            filter_dict[k] = v
+    return filter_dict
 
 
 def _translate_value_datatype(f_name, value):
@@ -364,8 +309,7 @@ def _translate_value_datatype(f_name, value):
 def _get_genres():
     configuration = Configuration.get_configuration('genres_with_films')
     if configuration is None:
-        search_builder = Search.Builder.new_search(Genre)
-        genres = search_builder.search(sort_by='name')
+        genres = Genre.search(sort_by='name')
         serializer = GenreSerializer(genres, many=True)
         return [e['name'] for e in serializer.data]
     else:

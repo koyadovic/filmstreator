@@ -1,5 +1,4 @@
 from core.model.audiovisual import AudiovisualRecord
-from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
 from core.tools.browsing import PhantomBrowsingSession
 
@@ -7,17 +6,15 @@ from requests_html import HTML
 import urllib.parse
 
 
-@Ticker.execute_each(interval='30-seconds')
+#@Ticker.execute_each(interval='30-seconds')
 def compile_trailers_for_audiovisual_records_in_youtube():
     logger = compile_trailers_for_audiovisual_records_in_youtube.log
-    audiovisual_record = (
-        Search.Builder.new_search(AudiovisualRecord)
-        .add_condition(Condition('deleted', Condition.EQUALS, False))
-        .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-        .add_condition(Condition('has_downloads', Condition.EQUALS, True))
-        .add_condition(Condition('metadata__searched_trailers__youtube', Condition.EXISTS, False))
-        .search(paginate=True, page_size=1, page=1, sort_by='-global_score')
-    )['results'][0]
+
+    audiovisual_record = AudiovisualRecord.search({
+        'deleted': False, 'general_information_fetched': True, 'has_downloads': True,
+        'metadata__searched_trailers__youtube__exists': False
+    }, paginate=True, page_size=1, page=1, sort_by='-global_score').get('results')[0]
+
     logger(f'Searching: {audiovisual_record.name}')
     search_string = f'{audiovisual_record.name.lower()} {audiovisual_record.year} official trailer'
     video_id = _search(audiovisual_record.name.lower(), audiovisual_record.year, search_string, logger)
