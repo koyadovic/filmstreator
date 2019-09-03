@@ -83,9 +83,24 @@ def _worker_get_download_links(source_class, audiovisual_record, logger):
     source = source_class(audiovisual_record.name, year=audiovisual_record.year)
     try:
         results = source.get_source_results(logger=logger, sleep_between_requests=60)
+
     except DownloadSourceException as e:
         log_exception(e)
         # TODO maybe increase an error counter?
+
+    except PhantomBrowsingSession.DomainError as e:
+        # domain cannot be resolved to IP address
+        # disable the source
+        configuration = get_download_source_configuration(source_class)
+        configuration.data['enabled'] = False
+        configuration.save()
+        log_exception(e)
+
+    except PhantomBrowsingSession.RemoteServerError as e:
+        # cannot connect to ports 80 / 443
+        log_exception(e)
+        # TODO maybe increase an error counter?
+
     else:
         if len(results) == 0:
             resp = source._last_response
