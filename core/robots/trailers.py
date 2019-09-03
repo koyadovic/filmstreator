@@ -6,7 +6,7 @@ from requests_html import HTML
 import urllib.parse
 
 
-@Ticker.execute_each(interval='30-seconds')
+#@Ticker.execute_each(interval='30-seconds')
 def compile_trailers_for_audiovisual_records_in_youtube():
     logger = compile_trailers_for_audiovisual_records_in_youtube.log
 
