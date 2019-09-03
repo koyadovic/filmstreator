@@ -129,18 +129,18 @@ class PhantomBrowsingSession:
         if domain in PhantomBrowsingSession.domain_checks:
             return PhantomBrowsingSession.domain_checks[domain]
         else:
-            domain_check = domain_exists(domain) and any([is_tcp_port_open(domain, 443), is_tcp_port_open(domain, 80)])
-            if domain_check:
-                text = f'ConnectionError but domain {domain} exists and has ports 443 or 80 opened. Proxy Error'
-                self.log(text)
-                log_message(text, only_file=True)
-            else:
-                text = f'ConnectionError with domain {domain} maybe domain blocked? has 80 or 443 ports opened?'
-                self.log(text)
-                log_message(text, only_file=True)
+            if not domain_exists(domain):
+                raise PhantomBrowsingSession.DomainError(f'Domain {domain} cannot be resolved to an IP address')
 
-            PhantomBrowsingSession.domain_checks[domain] = domain_check
-            return domain_check
+            if not any([is_tcp_port_open(domain, 443), is_tcp_port_open(domain, 80)]):
+                raise PhantomBrowsingSession.RemoteServerError(f'Cannot connect to {domain} ports 80 or 443')
+
+            text = f'ConnectionError but domain {domain} exists and has ports 443 or 80 opened. Proxy Error'
+            self.log(text)
+            log_message(text, only_file=True)
+
+            PhantomBrowsingSession.domain_checks[domain] = True
+            return True
 
     @property
     def last_response(self):
@@ -150,6 +150,12 @@ class PhantomBrowsingSession:
         self._referer = self._initial_referer
         self._session = requests.Session()
         self._identity = BrowsingIdentity()
+
+    class DomainError(CoreException):
+        pass
+
+    class RemoteServerError(CoreException):
+        pass
 
 
 class BrowsingIdentity:

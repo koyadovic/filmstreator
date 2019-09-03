@@ -1,6 +1,6 @@
-from core.tools.timeouts import timeout
 import socket
 import urllib.parse
+import dns.resolver
 
 
 def get_domain_from_url(url):
@@ -8,11 +8,22 @@ def get_domain_from_url(url):
 
 
 def domain_exists(domain):
-    try:
-        socket.gethostbyname(domain)
-        return True
-    except socket.error:
-        return False
+    domain_name_servers = [
+        '1.1.1.1', '8.8.8.8', '8.8.4.4'
+    ]
+    any_valid = False
+    for d in domain_name_servers:
+        resolver = dns.resolver.Resolver(configure=False)
+        resolver.nameservers = [d]
+        try:
+            resolver.query(domain, 'A')
+            any_valid = True
+        except dns.resolver.NXDOMAIN:
+            pass
+
+        if any_valid:
+            return True
+    return any_valid
 
 
 def is_tcp_port_open(ip_address, tcp_port):
