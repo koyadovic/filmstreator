@@ -14,11 +14,13 @@ def compile_trailers_for_audiovisual_records_in_youtube():
         Search.Builder.new_search(AudiovisualRecord)
         .add_condition(Condition('deleted', Condition.EQUALS, False))
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
+        .add_condition(Condition('has_downloads', Condition.EQUALS, True))
         .add_condition(Condition('metadata__searched_trailers__youtube', Condition.EXISTS, False))
         .search(paginate=True, page_size=1, page=1, sort_by='-global_score')
     )['results'][0]
+    print(f'Searching: {audiovisual_record.name}')
     search_string = f'{audiovisual_record.name.lower()} {audiovisual_record.year} official trailer'
-    video_id = _search(search_string)
+    video_id = _search(audiovisual_record.name.lower(), search_string)
 
     _mark_as_searched(audiovisual_record, 'youtube')
     if video_id is None:
@@ -31,30 +33,32 @@ def compile_trailers_for_audiovisual_records_in_youtube():
     audiovisual_record.save()
 
 
-def _search(text):
+def _search(film_name, search_text):
     headers = {'Accept-Language': 'en,es;q=0.9,pt;q=0.8'}
-    encoded = urllib.parse.quote_plus(text.strip().lower())
-    response = requests.get(f'https://www.youtube.com/results?search_query={encoded}', headers=headers)
+    encoded = urllib.parse.quote_plus(search_text.strip().lower())
+    response = requests.get(f'https://www.youtube.com/results?search_query={encoded}&sp=CAMSAhgB', headers=headers)
+    if response.status_code != 200:
+        raise Exception(f'Status code {response.status_code}')
     html_dom = HTML(html=response.content)
 
-    max_ratio = 0.0
+    selected_name = None
     selected_link = None
     for a in html_dom.find('a'):
         name = a.text
         if len(name) < 4:
             continue
         link = list(a.links)[0] if len(a.links) > 0 else ''
-        if link == '':
+        if link == '' or not link.startswith('/watch'):
             continue
 
-        current_ratio = SequenceMatcher(None, name.lower(), text.lower()).ratio()
-        if current_ratio > max_ratio:
-            max_ratio = current_ratio
+        if name.lower().startswith(film_name.lower()):
+            selected_name = name
             selected_link = link
-    if selected_link is None:
+            print(f'Found! {film_name} https://youtube.com{link}')
+            break
+    if selected_name is None:
         return None
-    if max_ratio >= 0.8:
-        return _extract_video_id(selected_link)
+    return _extract_video_id(selected_link)
 
 
 def _extract_video_id(href):

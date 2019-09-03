@@ -98,12 +98,16 @@
             </div>
         {% endfor %}
 
-        {% if audiovisual_record.metadata.trailers.youtube %}
-        <iframe width="420" height="345" src="{{ audiovisual_record.metadata.trailers.youtube }}">
-        </iframe>
-        {% endif %}
-
         <div class="float-restore"></div>
+        {% if audiovisual_record.metadata.trailers.youtube %}
+        <br>
+        <div class="text-center">
+            <iframe frameBorder="0"
+                style="box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19); width: 100%; max-width: 600px; height: 350px;" src="{{ audiovisual_record.metadata.trailers.youtube }}">
+            </iframe>
+        </div>
+        <br>
+        {% endif %}
         <br>
         <div class="text-center">
             <a href="javascript:history.back()" class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back</a>
