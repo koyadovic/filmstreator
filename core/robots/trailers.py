@@ -10,16 +10,11 @@ import requests
 
 #@Ticker.execute_each(interval='1-minute')
 def compile_trailers_for_audiovisual_records_in_youtube():
-    """
-    <iframe width="420" height="345" src="https://www.youtube.com/embed/tgbNymZ7vqY">
-    </iframe>
-    """
     audiovisual_record = (
         Search.Builder.new_search(AudiovisualRecord)
         .add_condition(Condition('deleted', Condition.EQUALS, False))
         .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
         .add_condition(Condition(f'metadata__searched_trailers__youtube', Condition.EXISTS, False))
-        .add_condition(Condition(f'metadata__trailers__youtube', Condition.EXISTS, False))
         .search(paginate=True, page_size=1, page=1, sort_by='-global_score')
     )['results'][0]
     search_string = f'{audiovisual_record.name.lower()} {audiovisual_record.year} official trailer'

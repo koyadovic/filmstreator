@@ -98,6 +98,11 @@
             </div>
         {% endfor %}
 
+        {% if audiovisual_record.metadata.trailers.youtube %}
+        <iframe width="420" height="345" src="{{ audiovisual_record.metadata.trailers.youtube }}">
+        </iframe>
+        {% endif %}
+
         <div class="float-restore"></div>
         <br>
         <div class="text-center">
