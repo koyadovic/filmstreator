@@ -149,6 +149,7 @@ class VideoQualityInStringDetector:
         {'possibility': 'soundtrack', 'tag': 'Audio'},
         {'possibility': 'mp3', 'tag': 'Audio'},
         {'possibility': 'ogg', 'tag': 'Audio'},
+        {'possibility': 'flac', 'tag': 'Audio'},
         {'possibility': 'UHDrip', 'tag': 'UHDrip'},
         {'possibility': 'UHD rip', 'tag': 'UHDrip'},
         {'possibility': 'UltraHD', 'tag': 'UHDrip'},
