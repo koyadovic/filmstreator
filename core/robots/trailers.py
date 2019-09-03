@@ -1,15 +1,15 @@
 from core.model.audiovisual import AudiovisualRecord
 from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
-from difflib import SequenceMatcher
+from core.tools.browsing import PhantomBrowsingSession
+
 from requests_html import HTML
-
 import urllib.parse
-import requests
 
 
-#@Ticker.execute_each(interval='1-minute')
+@Ticker.execute_each(interval='30-seconds')
 def compile_trailers_for_audiovisual_records_in_youtube():
+    logger = compile_trailers_for_audiovisual_records_in_youtube.log
     audiovisual_record = (
         Search.Builder.new_search(AudiovisualRecord)
         .add_condition(Condition('deleted', Condition.EQUALS, False))
@@ -18,9 +18,9 @@ def compile_trailers_for_audiovisual_records_in_youtube():
         .add_condition(Condition('metadata__searched_trailers__youtube', Condition.EXISTS, False))
         .search(paginate=True, page_size=1, page=1, sort_by='-global_score')
     )['results'][0]
-    print(f'Searching: {audiovisual_record.name}')
+    logger(f'Searching: {audiovisual_record.name}')
     search_string = f'{audiovisual_record.name.lower()} {audiovisual_record.year} official trailer'
-    video_id = _search(audiovisual_record.name.lower(), search_string)
+    video_id = _search(audiovisual_record.name.lower(), audiovisual_record.year, search_string, logger)
 
     _mark_as_searched(audiovisual_record, 'youtube')
     if video_id is None:
@@ -33,12 +33,16 @@ def compile_trailers_for_audiovisual_records_in_youtube():
     audiovisual_record.save()
 
 
-def _search(film_name, search_text):
+def _search(film_name, year, search_text, logger):
     headers = {'Accept-Language': 'en,es;q=0.9,pt;q=0.8'}
     encoded = urllib.parse.quote_plus(search_text.strip().lower())
-    response = requests.get(f'https://www.youtube.com/results?search_query={encoded}&sp=CAMSAhgB', headers=headers)
+    session = PhantomBrowsingSession(headers=headers)
+    session.get(f'https://www.youtube.com/results?search_query={encoded}&sp=CAMSAhgB')
+    response = session.last_response
+    if response is None:
+        raise Exception(f'Response searching trailer for {film_name} was None')
     if response.status_code != 200:
-        raise Exception(f'Status code {response.status_code}')
+        raise Exception(f'Status code searching trailer for {film_name} was {response.status_code}')
     html_dom = HTML(html=response.content)
 
     selected_name = None
@@ -51,10 +55,10 @@ def _search(film_name, search_text):
         if link == '' or not link.startswith('/watch'):
             continue
 
-        if name.lower().startswith(film_name.lower()):
+        if name.lower().startswith(film_name.lower()) and (year in name or 'trailer' in name.lower()):
             selected_name = name
             selected_link = link
-            print(f'Found! {film_name} https://youtube.com{link}')
+            logger(f'Found! {film_name} https://youtube.com{link}')
             break
     if selected_name is None:
         return None
