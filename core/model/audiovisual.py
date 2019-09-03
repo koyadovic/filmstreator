@@ -2,6 +2,8 @@ from datetime import datetime, timezone
 from typing import List
 from urllib.parse import urlparse
 
+from core.model.searches import SearchMixin
+
 
 def utc_now():
     return datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -85,7 +87,7 @@ class ScoringSource(EqualityMixin):
         self._value = kwargs.pop('value')
 
 
-class AudiovisualRecord(BaseModel, EqualityMixin):
+class AudiovisualRecord(BaseModel, EqualityMixin, SearchMixin):
 
     @property
     def name(self) -> str:
@@ -266,7 +268,7 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
         services.refresh_audiovisual_record(self)
 
 
-class DownloadSourceResult(EqualityMixin):
+class DownloadSourceResult(EqualityMixin, SearchMixin):
     last_check: datetime
     deleted: bool
     source_name: str
