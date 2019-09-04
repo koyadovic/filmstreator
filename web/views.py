@@ -139,7 +139,7 @@ def details(request, slug=None):
         'gre': 'Greek',
     }
     lang_downloads = []
-    for lang in ['eng', 'rus', 'spa', 'deu', 'fra', 'ita', 'hin', 'jpn', 'kor']:
+    for lang in ['eng', 'rus', 'spa', 'deu', 'fra', 'ita', 'gre', 'hin', 'jpn', 'kor']:
         ds = [d for d in downloads if d.lang == lang]
         if len(ds) > 0:
             lang_downloads.append(
