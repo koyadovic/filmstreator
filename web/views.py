@@ -128,6 +128,7 @@ def details(request, slug=None):
 
     lang_translations = {
         'eng': 'English',
+        'rus': 'Russian',
         'spa': 'Spanish',
         'hin': 'Hindi',
         'deu': 'German',
@@ -137,7 +138,7 @@ def details(request, slug=None):
         'kor': 'Korean',
     }
     lang_downloads = []
-    for lang in ['eng', 'spa', 'hin', 'deu', 'fra', 'ita', 'jpn', 'kor']:
+    for lang in ['eng', 'rus', 'spa', 'hin', 'deu', 'fra', 'ita', 'jpn', 'kor']:
         ds = [d for d in downloads if d.lang == lang]
         if len(ds) > 0:
             lang_downloads.append(
