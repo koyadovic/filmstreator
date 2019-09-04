@@ -112,7 +112,7 @@ class DownloadSource(metaclass=abc.ABCMeta):
         session = PhantomBrowsingSession(referer=self.base_url + '/')
         session.get(
             self.base_url + self.relative_search_string(search_string),
-            timeout=30, logger=self._logger, retrieve_index_first=self.retrieve_index_first,
+            timeout=60, logger=self._logger, retrieve_index_first=self.retrieve_index_first,
             sleep_between_requests=sleep_between_requests
         )
         self._last_response = response = session.last_response
