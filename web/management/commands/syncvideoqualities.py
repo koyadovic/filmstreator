@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         page = 1
         has_next = True
-        page_size = 50
+        page_size = 500
         while has_next:
             paginator = DownloadSourceResult.search({'deleted': False}, paginate=True, page_size=page_size, page=page)
             total_pages = paginator.get('total_pages')

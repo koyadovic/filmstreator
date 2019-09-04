@@ -39,14 +39,15 @@ class SearchMongoDB(SearchInterface):
             results = collection.find(mongodb_search)
 
         # sorting
-        mongo_sort_by = tuple()
-        if is_searchable:
-            mongo_sort_by = mongo_sort_by + tuple([('_textScoreValue', {'$meta': 'textScore'})])
-        additional_sort = _translate_sort_by_to_mongo_dict(sort_by) if sort_by is not None else tuple()
-        additional_sort = additional_sort or tuple()
-        mongo_sort_by = mongo_sort_by + additional_sort
-        if len(mongo_sort_by) > 0:
-            results = results.sort(mongo_sort_by)
+        if sort_by is not None:
+            mongo_sort_by = tuple()
+            if is_searchable:
+                mongo_sort_by = mongo_sort_by + tuple([('_textScoreValue', {'$meta': 'textScore'})])
+            additional_sort = _translate_sort_by_to_mongo_dict(sort_by) if sort_by is not None else tuple()
+            additional_sort = additional_sort or tuple()
+            mongo_sort_by = mongo_sort_by + additional_sort
+            if len(mongo_sort_by) > 0:
+                results = results.sort(mongo_sort_by)
 
         # pagination
         if paginate:

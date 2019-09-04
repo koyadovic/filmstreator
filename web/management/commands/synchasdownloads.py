@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         page = 1
         has_next_page = True
-        page_size = 50
+        page_size = 500
         while has_next_page:
             paginator = AudiovisualRecord.search({'deleted': False}, paginate=True, page_size=page_size, page=page)
             total_pages = paginator.get('total_pages')
