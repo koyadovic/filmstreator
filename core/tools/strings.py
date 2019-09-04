@@ -40,7 +40,8 @@ LANGUAGES = {
     'ita': ['it', 'ita', 'italian'],
     'deu': ['deu', 'de', 'ger', 'german'],
     'kor': ['kor', 'ko', 'korean'],
-    'rus': ['rus', 'ru', 'russian']
+    'rus': ['rus', 'ru', 'russian'],
+    'gre': ['gre', 'greek'],
 }
 
 
