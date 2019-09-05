@@ -5,15 +5,15 @@ from core.model.audiovisual import AudiovisualRecord
 from core.tick_worker import Ticker
 from core.tools.browsing import PhantomBrowsingSession
 
-from core.tools.strings import are_similar_strings
-from concurrent.futures.thread import ThreadPoolExecutor
-from datetime import datetime, timezone, timedelta
+# from core.tools.strings import are_similar_strings
+# from concurrent.futures.thread import ThreadPoolExecutor
+# from datetime import datetime, timezone, timedelta
 
 from requests_html import HTML
 import urllib.parse
 
 
-@Ticker.execute_each(interval='30-seconds')
+@Ticker.execute_each(interval='1-minute')
 def compile_trailers_for_audiovisual_records_in_youtube():
     logger = compile_trailers_for_audiovisual_records_in_youtube.log
 
