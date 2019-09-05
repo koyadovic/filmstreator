@@ -6,7 +6,6 @@ from django.http import HttpResponse
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
 from core.model.configurations import Configuration
 from core.model.searches import Condition
-from core.robots.downloads import _check_has_downloads
 from core.tools.strings import VideoQualityInStringDetector
 from web.serializers import AudiovisualRecordSerializer, GenreSerializer
 from django.shortcuts import render, redirect
@@ -203,7 +202,6 @@ def remove_download(request, object_id):
         download.delete()
         download.audiovisual_record.metadata['recheck_downloads'] = True
         download.audiovisual_record.save()
-        _check_has_downloads(download.audiovisual_record)
     except IndexError:
         pass
     finally:

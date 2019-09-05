@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 
 from core.model.audiovisual import AudiovisualRecord
-from core.robots.downloads import _check_has_downloads
 
 
 class Command(BaseCommand):
@@ -16,6 +15,6 @@ class Command(BaseCommand):
             total_pages = paginator.get('total_pages')
             print(f'Checking audiovisual records: {(page - 1) * page_size}/{page * page_size} / Page: {page}/{total_pages}')
             for ar in paginator.get('results'):
-                _check_has_downloads(ar)
+                ar.calculate_has_downloads()
             has_next_page = paginator.get('next_page', False)
             page += 1

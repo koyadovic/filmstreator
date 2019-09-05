@@ -131,7 +131,6 @@ def _worker_get_download_links(source_class, audiovisual_record, logger):
         audiovisual_record.metadata['downloads_fetch'][source_class.source_name] = True
         audiovisual_record.save()
         logger(f'Marked {audiovisual_record.name} as reviewed for source {source_class.source_name}')
-        _check_has_downloads(audiovisual_record)
 
 
 def _worker_collect_download_links_for_the_first_time(source_class, logger):
@@ -235,7 +234,6 @@ def _check_download_result_existence(dr, download_sources_map, logger):
                 audiovisual_record.save()
             except KeyError:
                 pass
-        _check_has_downloads(audiovisual_record)
     if response is None:
         raise DownloadSourceException(f'Cannot check {dr}. Response was None')
     else:
@@ -256,16 +254,6 @@ def _valid_result(result):
         similar_audiovisual_name = search.group(1).strip()
     return are_similar_strings(audiovisual_name.lower(), similar_audiovisual_name.lower())
 
-
-def _check_has_downloads(audiovisual_record):
-    downloads = DownloadSourceResult.search({
-        'deleted': False, 'audiovisual_record': audiovisual_record
-    })
-    has_downloads = len(downloads) > 0
-    if audiovisual_record.has_downloads is not has_downloads:
-        audiovisual_record.refresh()
-        audiovisual_record.has_downloads = has_downloads
-        audiovisual_record.save()
 
 
 def _get_response_filename(audiovisual_record_name, source_class_name):

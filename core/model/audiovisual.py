@@ -267,6 +267,16 @@ class AudiovisualRecord(BaseModel, EqualityMixin, SearchMixin):
         from core import services
         services.refresh_audiovisual_record(self)
 
+    def calculate_has_downloads(self):
+        downloads = DownloadSourceResult.search({
+            'deleted': False, 'audiovisual_record': self
+        })
+        has_downloads = len(downloads) > 0
+        if self.has_downloads is not has_downloads:
+            self.refresh()
+            self.has_downloads = has_downloads
+            self.save()
+
 
 class DownloadSourceResult(EqualityMixin, SearchMixin):
     last_check: datetime
@@ -294,11 +304,19 @@ class DownloadSourceResult(EqualityMixin, SearchMixin):
 
     def save(self):
         from core import services
-        return services.save_download_source_result(self)
+        result = services.save_download_source_result(self)
+        self._check_if_audiovisual_record_has_downloads()
+        return result
 
     def delete(self):
         self.deleted = True
         self.save()
+
+    def _check_if_audiovisual_record_has_downloads(self):
+        audiovisual_record = self.audiovisual_record
+        if audiovisual_record is None:
+            return
+        audiovisual_record.calculate_has_downloads()
 
     @property
     def source_base_url(self):
