@@ -49,7 +49,8 @@ def guess_language(name, default=None, remove_first=None):
     remove_first = remove_first or []
     name = name.lower()
     for token in remove_first:
-        name = re.sub(re.compile(token), '', name, flags=re.IGNORECASE)
+        pattern = re.compile(token, flags=re.IGNORECASE)
+        name = re.sub(pattern, '', name)
     name = name.strip()
     for lang, possibilities in LANGUAGES.items():
         for possibility in possibilities:
