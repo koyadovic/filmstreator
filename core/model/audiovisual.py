@@ -2,6 +2,8 @@ from datetime import datetime, timezone
 from typing import List
 from urllib.parse import urlparse
 
+from core.model.searches import SearchMixin
+
 
 def utc_now():
     return datetime.utcnow().replace(tzinfo=timezone.utc)
@@ -24,7 +26,7 @@ class BaseModel:
         self.updated_date = kwargs.pop('updated_date', utc_now())
 
 
-class Genre(BaseModel, EqualityMixin):
+class Genre(BaseModel, EqualityMixin, SearchMixin):
     @property
     def name(self):
         return self._name
@@ -85,7 +87,7 @@ class ScoringSource(EqualityMixin):
         self._value = kwargs.pop('value')
 
 
-class AudiovisualRecord(BaseModel, EqualityMixin):
+class AudiovisualRecord(BaseModel, EqualityMixin, SearchMixin):
 
     @property
     def name(self) -> str:
@@ -265,8 +267,18 @@ class AudiovisualRecord(BaseModel, EqualityMixin):
         from core import services
         services.refresh_audiovisual_record(self)
 
+    def calculate_has_downloads(self):
+        downloads = DownloadSourceResult.search({
+            'deleted': False, 'audiovisual_record': self
+        })
+        has_downloads = len(downloads) > 0
+        if self.has_downloads is not has_downloads:
+            self.refresh()
+            self.has_downloads = has_downloads
+            self.save()
 
-class DownloadSourceResult(EqualityMixin):
+
+class DownloadSourceResult(EqualityMixin, SearchMixin):
     last_check: datetime
     deleted: bool
     source_name: str
@@ -292,11 +304,19 @@ class DownloadSourceResult(EqualityMixin):
 
     def save(self):
         from core import services
-        return services.save_download_source_result(self)
+        result = services.save_download_source_result(self)
+        self._check_if_audiovisual_record_has_downloads()
+        return result
 
     def delete(self):
         self.deleted = True
         self.save()
+
+    def _check_if_audiovisual_record_has_downloads(self):
+        audiovisual_record = self.audiovisual_record
+        if audiovisual_record is None:
+            return
+        audiovisual_record.calculate_has_downloads()
 
     @property
     def source_base_url(self):

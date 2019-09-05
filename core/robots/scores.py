@@ -13,14 +13,10 @@ def compile_scores_from_audiovisual_records():
     with ThreadPoolExecutor(max_workers=3) as executor:
         futures = []
         for klass in get_all_scoring_sources():
-            audiovisual_records = (
-                Search.Builder
-                      .new_search(AudiovisualRecord)
-                      .add_condition(Condition('deleted', Condition.EQUALS, False))
-                      .add_condition(Condition('general_information_fetched', Condition.EQUALS, True))
-                      .add_condition(Condition('scores__source_name', Condition.NOT_IN, [klass.source_name]))
-                      .search(paginate=True, page_size=100, page=1)
-            )['results']
+            audiovisual_records = AudiovisualRecord.search({
+                'deleted': False, 'general_information_fetched': True,
+                'scores__source_name__nin': [klass.source_name]
+            }, paginate=True, page_size=100, page=1).get('results')
 
             for audiovisual_record in audiovisual_records:
                 future = executor.submit(_refresh_score, klass, audiovisual_record)

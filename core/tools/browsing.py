@@ -98,9 +98,15 @@ class PhantomBrowsingSession:
 
             except requests.exceptions.Timeout as e:
                 """The request timed out."""
-                self.log(f'{e}')
-                log_message(e, only_file=True)
-                tryings += 1
+                # TODO think to do different things if the domain and url is okay or not.
+                if self.is_all_okay_with_url(url):
+                    self.log(f'{e}')
+                    log_message(e, only_file=True)
+                    tryings += 1
+                else:
+                    self.log(f'{e}')
+                    log_message(e, only_file=True)
+                    tryings += 1
 
             except requests.exceptions.RequestException as e:
                 """An general requests error occurred."""
@@ -126,15 +132,13 @@ class PhantomBrowsingSession:
 
     def is_all_okay_with_url(self, url):
         domain = get_domain_from_url(url)
+        if not domain_exists(domain):
+            raise PhantomBrowsingSession.DomainError(f'Domain {domain} cannot be resolved to an IP address')
         if domain in PhantomBrowsingSession.domain_checks:
             return PhantomBrowsingSession.domain_checks[domain]
         else:
-            if not domain_exists(domain):
-                raise PhantomBrowsingSession.DomainError(f'Domain {domain} cannot be resolved to an IP address')
-
             if not any([is_tcp_port_open(domain, 443), is_tcp_port_open(domain, 80)]):
                 raise PhantomBrowsingSession.RemoteServerError(f'Cannot connect to {domain} ports 80 or 443')
-
             text = f'ConnectionError but domain {domain} exists and has ports 443 or 80 opened. Proxy Error'
             self.log(text)
             log_message(text, only_file=True)

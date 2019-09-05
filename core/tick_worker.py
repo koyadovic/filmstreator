@@ -45,6 +45,7 @@ class TickerFunctionData:
 class Ticker:
 
     INTERVALS = {
+        '30-seconds': {'seconds': 30, 'functions': []},
         '1-minute': {'seconds': 1 * 60, 'functions': []},
         '5-minutes': {'seconds': 5 * 60, 'functions': []},
         '30-minutes': {'seconds': 30 * 60, 'functions': []},

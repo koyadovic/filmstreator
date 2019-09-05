@@ -96,3 +96,28 @@ class Search:
 
             """
             return services.search(self._search, sort_by=sort_by, paginate=paginate, page_size=page_size, page=page)
+
+
+class SearchMixin:
+    """
+    This facilitates the search process
+    AudiovisualRecord.search({'deleted': False, "name__icontains": "lalala"})
+    """
+    @classmethod
+    def search(cls, search_dict=None, sort_by=None, paginate=False, page_size=20, page=1):
+        search_dict = search_dict or {}
+        conditions = []
+        for k, v in search_dict.items():
+            k_parts = k.split('__')
+            possible_comparator = k_parts[-1]
+            if possible_comparator in Condition.ALL_OPERATORS:
+                attr_path = '__'.join(k_parts[0:-1])
+                comparator = possible_comparator
+            else:
+                attr_path = '__'.join(k_parts)
+                comparator = Condition.EQUALS
+            conditions.append((attr_path, comparator, v))
+        search = Search.Builder.new_search(cls)
+        for attr, com, val in conditions:
+            search.add_condition(Condition(attr, com, val))
+        return search.search(sort_by=sort_by, paginate=paginate, page_size=page_size, page=page)

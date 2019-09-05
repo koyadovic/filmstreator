@@ -29,16 +29,19 @@ def ratio_of_containing_similar_string(container_string, text_string, min_length
     return max_ratio
 
 
-POSSIBLE_SEPARATORS = [' ', '.', '-', '_', '[', ']', '(', ')', '/', '\\', '{', '}', '<', '>', '~']
+POSSIBLE_SEPARATORS = [' ', '.', '-', '_', '[', ']', '(', ')', '/', '\\', '{', '}', '<', '>', '~', '+']
 
 LANGUAGES = {
-    # 'eng': ['en', 'eng', 'english'],
     'spa': ['es', 'spa', 'esp', 'spanish'],
     'jpn': ['ja', 'jpn', 'japanese'],
     'fra': ['fr', 'fra', 'french'],
     'hin': ['hi', 'hin', 'hindi'],
     'ita': ['it', 'ita', 'italian'],
     'deu': ['deu', 'de', 'ger', 'german'],
+    'kor': ['kor', 'ko', 'korean'],
+    'rus': ['rus', 'ru', 'russian'],
+    'gre': ['gre', 'greek'],
+    'pol': ['pl', 'pol', 'polish'],
 }
 
 
