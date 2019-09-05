@@ -1,7 +1,7 @@
 {% extends "web/base_with_menu_and_footer.html" %}
 {% load static %}
 {% load miscellaneous %}
-{% block title %}Filmstreator - Download {{ audiovisual_record.name }} torrent{% endblock %}
+{% block title %}Filmstreator - Download {{ audiovisual_record.name }} torrent -{% for lang, downloads, translation in  lang_downloads %} {{ translation }}{% endfor %}{% endblock %}
     {% block head_extra %}
     {{ block.super }}
     <meta name="description" content="{% if audiovisual_record.summary %}Summary: {{ audiovisual_record.summary }}. {% endif %}{{ audiovisual_record.name }} was Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.">
