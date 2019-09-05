@@ -2,7 +2,7 @@
 {% load static %}
 {% load miscellaneous %}
 
-{% block title %}Filmstreator - Download {{ audiovisual_record.name }} {% for lang, downloads, translation in lang_downloads %}- {{ translation }}{% endfor %}{% endblock %}
+{% block title %}Filmstreator - Download {{ audiovisual_record.name }}{% for lang, downloads, translation in lang_downloads %} - {{ translation }}{% endfor %}{% endblock %}
 
 {% block head_extra %}
 {{ block.super }}
