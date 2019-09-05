@@ -67,7 +67,7 @@ def _search(film_name, year, search_text, logger, original_audiovisual_record=No
 
         ar = original_audiovisual_record
         people = ar.directors + ar.writers + ar.stars
-        if name.lower().startswith(film_name.lower()) and (year in name or 'trailer' in name.lower()):
+        if name.lower().startswith(film_name.lower()) and year in name and 'trailer' in name.lower():
             # it's okay, more checks:
             modified_name = name.lower()
 
