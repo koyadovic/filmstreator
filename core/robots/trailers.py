@@ -4,7 +4,10 @@ from difflib import SequenceMatcher
 from core.model.audiovisual import AudiovisualRecord
 from core.tick_worker import Ticker
 from core.tools.browsing import PhantomBrowsingSession
+
 from core.tools.strings import are_similar_strings
+from concurrent.futures.thread import ThreadPoolExecutor
+from datetime import datetime, timezone, timedelta
 
 from requests_html import HTML
 import urllib.parse
@@ -103,3 +106,34 @@ def _mark_as_searched(audiovisual_record, source_name):
         audiovisual_record.metadata['searched_trailers'] = {}
     audiovisual_record.metadata['searched_trailers'][source_name] = True
     audiovisual_record.save()
+
+#
+# @Ticker.execute_each(interval='24-hours')
+# def check_youtube_trailer_links():
+#     logger = check_youtube_trailer_links.log
+#     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=60)
+#     audiovisual_records = AudiovisualRecord.search({
+#         'updated_date__lt': n_days_ago,
+#         'deleted': False,
+#         'metadata__searched_trailers__youtube__exists': True
+#     })
+#
+#     logger(f'{len(audiovisual_records)} audiovisual records need to be checked')
+#
+#     with ThreadPoolExecutor(max_workers=3) as executor:
+#         futures = []
+#         for audiovisual_record in audiovisual_records:
+#             future = executor.submit(_check_download_result_existence, download_result, download_sources_map, logger)
+#             future.log_msg = f'Checking download result {download_result.name}'
+#             futures.append(future)
+#         # wait until completed
+#         for future in concurrent.futures.as_completed(futures):
+#             logger(future.log_msg)
+#             future.result(timeout=600)
+#
+#
+# def _check_youtube_video():
+#     pass
+#
+
+# <div class="reason style-scope yt-player-error-message-renderer">El vídeo no está disponible</div>
