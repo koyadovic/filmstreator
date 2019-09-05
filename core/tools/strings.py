@@ -49,6 +49,7 @@ def guess_language(name, default=None, remove_first=None):
     remove_first = remove_first or []
     name = name.lower()
     for token in remove_first:
+        token = token.strip()
         pattern = re.compile(token, flags=re.IGNORECASE)
         name = re.sub(pattern, '', name)
     name = name.strip()
