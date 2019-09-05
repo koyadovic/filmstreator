@@ -73,7 +73,6 @@ def _search(film_name, year, search_text, logger, original_audiovisual_record=No
             modified_name = re.sub(r'[\W]+', ' ', modified_name)
             modified_name = re.sub(r'[\d]+', '', modified_name)
             modified_name = modified_name.strip()
-            logger(f'Comparing {modified_name} with {film_name.lower()}')
             current_ratio = SequenceMatcher(None, modified_name, film_name.lower()).ratio()
             if (max_ratio is None or current_ratio > max_ratio) and current_ratio > 0.7:
                 selected_name = name
