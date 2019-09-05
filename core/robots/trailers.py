@@ -42,12 +42,16 @@ def _search(film_name, year, search_text, logger, original_audiovisual_record=No
     headers = {'Accept-Language': 'en,es;q=0.9,pt;q=0.8'}
     encoded = urllib.parse.quote_plus(search_text.strip().lower())
     session = PhantomBrowsingSession(headers=headers)
-    session.get(f'https://www.youtube.com/results?search_query={encoded}&sp=CAMSAhgB')
+    session.get(f'https://www.youtube.com/results?search_query={encoded}&sp=CAMSAhgB', logger=logger)
     response = session.last_response
     if response is None:
+        logger(f'Response searching trailer for {film_name} was None')
         raise Exception(f'Response searching trailer for {film_name} was None')
     if response.status_code != 200:
+        logger(f'Status code searching trailer for {film_name} was {response.status_code}')
         raise Exception(f'Status code searching trailer for {film_name} was {response.status_code}')
+
+    logger('Parsing response from Youtube')
     html_dom = HTML(html=response.content)
 
     selected_name = None
@@ -83,6 +87,7 @@ def _search(film_name, year, search_text, logger, original_audiovisual_record=No
                 max_ratio = current_ratio
 
     if selected_name is None:
+        logger(f'No trailer was found for {original_audiovisual_record.name}')
         return None
     else:
         logger(f'Found! {film_name} https://youtube.com{selected_link}')
