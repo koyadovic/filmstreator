@@ -44,10 +44,9 @@ def landing(request):
         additional_kwargs = {
             'paginate': True,
             'page_size': 20,
-            'page': page
+            'page': page,
+            'sort_by': ordering
         }
-        if ordering is not None:
-            additional_kwargs['sort_by'] = ordering
 
         paginator = AudiovisualRecord.search(filter_dict, **additional_kwargs)
         serializer = AudiovisualRecordSerializer(paginator.get('results', []), many=True)
