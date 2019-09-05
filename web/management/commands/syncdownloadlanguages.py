@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
                 ar = ds.audiovisual_record
                 people = ar.directors + ar.writers + ar.stars
-                remove_first = [person.name.lower() for person in people]
+                remove_first = [person['name'].lower() for person in people]
 
                 new_lang = guess_language(ds.name, remove_first=remove_first)
                 if new_lang != ds.lang:
