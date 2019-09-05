@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
                 new_lang = guess_language(ds.name, remove_first=remove_first)
                 if new_lang != ds.lang:
-                    ds.lang = guess_language(ds.name)
+                    ds.lang = new_lang
                     ds.save()
             has_next_page = paginator.get('next_page', None)
             page += 1
