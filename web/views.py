@@ -99,24 +99,26 @@ def details(request, slug=None):
         person.search_url = f'/s/?ft=a&s="{person.name}"'.replace(' ', '+')
 
     # related audiovisual records
-    related_filter = {
-        'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
-        'name__neq': audiovisual_record.name, 'created_date__gte': now - timedelta(days=120),
-        'year__in': [
-            str(int(audiovisual_record.year) - 2),
-            str(int(audiovisual_record.year) - 1),
-            audiovisual_record.year,
-            str(int(audiovisual_record.year) + 1),
-            str(int(audiovisual_record.year) + 2),
-        ]
-    }
-    for genre in audiovisual_record.genres:
-        related_filter['genres__name'] = genre.name
-
     related_records = AudiovisualRecord.search(
-        related_filter,
+        {
+            'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
+            'name__neq': audiovisual_record.name,
+            'stars__name__in': [person.name for person in audiovisual_record.stars],
+        },
         page_size=10, page=1, paginate=True, sort_by=['-global_score']
     ).get('results')
+
+    more = AudiovisualRecord.search(
+        {
+            'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
+            'name__neq': audiovisual_record.name,
+            'name__simil': audiovisual_record.name,
+            '_id__nin': [r.id for r in related_records]
+        },
+        page_size=10, page=1, paginate=True, sort_by=['-global_score']
+    ).get('results')
+
+    related_records = related_records + more
 
     # downloads
     downloads = DownloadSourceResult.search(
