@@ -21,11 +21,12 @@ class DownloadSource(metaclass=abc.ABCMeta):
 
     enabled = True
 
-    def __init__(self, audiovisual_record_name, year='', retrieve_index_first=False):
+    def __init__(self, audiovisual_record_name, year='', retrieve_index_first=False, remove_first=None):
         self._name = audiovisual_record_name
         self._year = year
         self._logger = None
         self._last_response = None
+        self._remove_first = remove_first
         self.retrieve_index_first = retrieve_index_first
 
     def log(self, text):
@@ -62,7 +63,7 @@ class DownloadSource(metaclass=abc.ABCMeta):
             if not link.lower().startswith('http'):
                 link = self.base_url + link
 
-            language = guess_language(name, default=self.language)
+            language = guess_language(name, default=self.language, remove_first=self._remove_first)
 
             result = DownloadSourceResult(
                 source_name=source_name,

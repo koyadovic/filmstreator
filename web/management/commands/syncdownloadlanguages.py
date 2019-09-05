@@ -20,7 +20,11 @@ class Command(BaseCommand):
                 if ds.audiovisual_record is None:
                     continue
 
-                new_lang = guess_language(ds.name)
+                ar = ds.audiovisual_record
+                people = ar.directors + ar.writers + ar.stars
+                remove_first = [person.name.lower() for person in people]
+
+                new_lang = guess_language(ds.name, remove_first=remove_first)
                 if new_lang != ds.lang:
                     ds.lang = guess_language(ds.name)
                     ds.save()

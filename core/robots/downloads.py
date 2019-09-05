@@ -53,7 +53,11 @@ def _check_zero_results(results, source_class, audiovisual_record, logger):
             previous_good_search = previous_good_search[0]
             previous_audiovisual_record = previous_good_search.audiovisual_record
             ds = source_class(previous_audiovisual_record.name, year=previous_audiovisual_record.year)
-            results_check = ds.get_source_results(logger=logger)
+
+            ar = previous_audiovisual_record
+            people = ar.directors + ar.writers + ar.stars
+            remove_first = [person.name.lower() for person in people]
+            results_check = ds.get_source_results(logger=logger, remove_first=remove_first)
 
             if len(results_check) == 0:
                 configuration.refresh()
@@ -77,8 +81,13 @@ def _check_zero_results(results, source_class, audiovisual_record, logger):
 
 def _worker_get_download_links(source_class, audiovisual_record, logger):
     source = source_class(audiovisual_record.name, year=audiovisual_record.year)
+
+    ar = audiovisual_record
+    people = ar.directors + ar.writers + ar.stars
+    remove_first = [person.name.lower() for person in people]
+
     try:
-        results = source.get_source_results(logger=logger, sleep_between_requests=60)
+        results = source.get_source_results(logger=logger, sleep_between_requests=60, remove_first=remove_first)
 
     except DownloadSourceException as e:
         log_exception(e)

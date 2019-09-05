@@ -45,8 +45,11 @@ LANGUAGES = {
 }
 
 
-def guess_language(name, default=None):
+def guess_language(name, default=None, remove_first=None):
+    remove_first = remove_first or []
     name = name.lower()
+    for token in remove_first:
+        name = name.replace(token, '')
     for lang, possibilities in LANGUAGES.items():
         for possibility in possibilities:
             if possibility in name:
