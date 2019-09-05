@@ -6,12 +6,12 @@ from django.http import HttpResponse
 from core.model.audiovisual import AudiovisualRecord, DownloadSourceResult, Genre
 from core.model.configurations import Configuration
 from core.model.searches import Condition
+from core.tools.debug import view_function_timer
 from core.tools.strings import VideoQualityInStringDetector
 from web.serializers import AudiovisualRecordSerializer, GenreSerializer
 from django.shortcuts import render, redirect
-from django.utils import timezone
 
-from datetime import timedelta, datetime
+from datetime import datetime
 import re
 
 
@@ -20,6 +20,7 @@ Normal Views
 """
 
 
+@view_function_timer()
 def landing(request):
     get_params = dict(request.GET)
     get_params = {k: v[0] for k, v in get_params.items()}
@@ -76,8 +77,8 @@ def landing(request):
     return render(request, 'web/landing.html', context=context)
 
 
+@view_function_timer()
 def details(request, slug=None):
-    now = timezone.now()
     try:
         referer_uri = request.META['HTTP_REFERER']
         referer_uri = urllib.parse.unquote(referer_uri)
@@ -94,7 +95,7 @@ def details(request, slug=None):
 
     audiovisual_record = audiovisual_records[0]
 
-    # /s/?ft=b&s="{{ person.name }}"
+    # Add to each person the search url to be used later in the template
     for person in audiovisual_record.directors + audiovisual_record.writers + audiovisual_record.stars:
         person.search_url = f'/s/?ft=a&s="{person.name}"'.replace(' ', '+')
 
@@ -108,15 +109,17 @@ def details(request, slug=None):
         page_size=10, page=1, paginate=True, sort_by=['-global_score']
     ).get('results')
 
-    more = AudiovisualRecord.search(
-        {
-            'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
-            'name__neq': audiovisual_record.name,
-            'name__simil': audiovisual_record.name,
-            '_id__nin': [r.id for r in related_records]
-        },
-        page_size=10, page=1, paginate=True, sort_by=['-global_score']
-    ).get('results')
+    # disabled by now.
+    # more = AudiovisualRecord.search(
+    #     {
+    #         'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
+    #         'name__neq': audiovisual_record.name,
+    #         'name__simil': audiovisual_record.name,
+    #         '_id__nin': [r.id for r in related_records]
+    #     },
+    #     page_size=10, page=1, paginate=True, sort_by=['-global_score']
+    # ).get('results')
+    more = []
 
     related_records = related_records + more
 
@@ -162,6 +165,7 @@ def details(request, slug=None):
     return render(request, 'web/details.html', context=context)
 
 
+@view_function_timer()
 def genre_view(request, genre=None):
     try:
         referer_uri = request.META['HTTP_REFERER']
