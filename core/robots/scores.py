@@ -35,7 +35,7 @@ def compile_missing_votes():
             audiovisual_records = AudiovisualRecord.search({
                 'deleted': False, 'general_information_fetched': True,
                 'scores__source_name': klass.source_name,
-                f'scores__source_name__{klass.source_name}__votes__exists': False
+                'scores__votes__exists': False
             }, paginate=True, page_size=100, page=1, sort_by='-global_score').get('results')
 
             for audiovisual_record in audiovisual_records:
