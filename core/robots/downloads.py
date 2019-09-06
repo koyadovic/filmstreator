@@ -1,4 +1,5 @@
 import os
+import random
 import re
 import time
 
@@ -154,7 +155,7 @@ def _worker_collect_download_links_for_the_first_time(source_class, logger):
             {'deleted': False, 'general_information_fetched': True,
              f'metadata__downloads_fetch__{source_name}__exists': False,
              'global_score__gte': 5.0},
-            paginate=True, page_size=100, page=1, sort_by='-global_score'
+            paginate=True, page_size=10, page=1, sort_by='-global_score'
         ).get('results')
 
         futures = []
@@ -170,19 +171,14 @@ def _worker_collect_download_links_for_the_first_time(source_class, logger):
 @Ticker.execute_each(interval='1-minute')
 def collect_download_links_for_the_first_time():
     logger = collect_download_links_for_the_first_time.log
-    sources = get_all_download_sources()
+    sources = list(get_all_download_sources())
+    random.shuffle(sources)
 
-    threads = []
     for source_class in sources:
         if not source_class.enabled:
             continue
-        thread = threading.Thread(target=_worker_collect_download_links_for_the_first_time, args=[source_class, logger])
-        thread.start()
-        logger(f'Start thread for {source_class.source_name}')
-        threads.append(thread)
-
-    for thread in threads:
-        thread.join()
+        logger(f'Start worker for {source_class.source_name}')
+        _worker_collect_download_links_for_the_first_time(source_class, logger)
 
 
 @Ticker.execute_each(interval='24-hours')
