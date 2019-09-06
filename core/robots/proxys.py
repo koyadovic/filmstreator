@@ -52,3 +52,20 @@ def process_new_proxy_files():
         if changed:
             proxy_config.save()
             os.rename(f_name, f_name + '__processed')
+
+    _clean_configuration_of_bad_proxies()
+
+
+def _clean_configuration_of_bad_proxies():
+    proxy_config = _get_proxy_config()
+    to_delete = [bad for bad in proxy_config.data['bad']]
+    for bad in to_delete:
+        if bad in proxy_config.data['errors']:
+            del proxy_config.data['errors'][bad]
+
+        if bad in proxy_config.data['proxies']:
+            proxy_config.data['proxies'].remove(bad)
+    proxy_config.data['proxies'] = [p for p in proxy_config.data['proxies'] if p != '']
+    proxy_config.data['errors'] = {}
+    proxy_config.data['bad'] = []
+    proxy_config.save()
