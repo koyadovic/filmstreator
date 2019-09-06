@@ -13,7 +13,7 @@ import concurrent
 import urllib.request
 
 
-@Ticker.execute_each(interval='5-minutes')
+@Ticker.execute_each(interval='1-minute')
 def autocomplete_general_information_for_empty_audiovisual_records():
 
     audiovisual_records = AudiovisualRecord.search({
