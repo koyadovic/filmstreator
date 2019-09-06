@@ -265,7 +265,7 @@ def _valid_result(result):
 
 def _get_response_filename(audiovisual_record_name, source_class_name):
     n = 0
-    audiovisual_record_name.replace('/', '-')
+    audiovisual_record_name = audiovisual_record_name.replace('/', '-')
     response_filename = f'{DOWNLOAD_SOURCES_RESPONSES_ROOT_DIRECTORY}' \
                         f'{audiovisual_record_name} {source_class_name} {n}'
     while os.path.isfile(response_filename + '.html'):
@@ -273,5 +273,5 @@ def _get_response_filename(audiovisual_record_name, source_class_name):
         response_filename = f'{DOWNLOAD_SOURCES_RESPONSES_ROOT_DIRECTORY}' \
                             f'{audiovisual_record_name} {source_class_name} {n}'
     response_filename += '.html'
-    response_filename.replace(' ', '-')
+    response_filename = response_filename.replace(' ', '-')
     return response_filename
