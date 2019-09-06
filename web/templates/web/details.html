@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container detail-container">
+    <div class="container">
         <br>
         {% if audiovisual_record.name.50 %}
             <h1>{{ audiovisual_record.name|truncatechars:50 }} ({{ audiovisual_record.year }}) Torrents {% if request.user.is_superuser %}<a href="#" onclick="removeFilm('{{ audiovisual_record.id }}');" style="color: white;" class="btn btn-secondary">Remove entire film</a>{% endif %}</h1>
