@@ -271,7 +271,6 @@ class AudiovisualRecord(BaseModel, EqualityMixin, SearchMixin):
         ]
         self.global_score = 0.0 if len(all_scores) == 0 else sum(all_scores) / len(all_scores)
         self.global_score /= 100000
-        self.global_score = round(self.global_score)
         from core import services
         return services.save_audiovisual_record(self)
 
