@@ -180,6 +180,7 @@ def collect_download_links_for_the_first_time():
             target=_worker_collect_download_links_for_the_first_time,
             args=[source_class, logger]
         )
+        thread.start()
         threads.append(thread)
     for thread in threads:
         thread.join()
