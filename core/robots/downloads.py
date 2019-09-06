@@ -272,4 +272,5 @@ def _get_response_filename(audiovisual_record_name, source_class_name):
         response_filename = f'{DOWNLOAD_SOURCES_RESPONSES_ROOT_DIRECTORY}' \
                             f'{audiovisual_record_name} {source_class_name} {n}'
     response_filename += '.html'
+    response_filename.replace(' ', '-')
     return response_filename
