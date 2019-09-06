@@ -253,17 +253,14 @@ def _check_download_result_existence(dr, download_sources_map, logger):
 
 
 def _valid_result(result):
-    # name_remover = RemoveAudiovisualRecordNameFromString(result.audiovisual_record.name)
-    # text_without_name = name_remover.replace_name_from_string(result.name)
     audiovisual_name = result.audiovisual_record.name.strip()
-    search = re.search(r'(.*)(19\d{2}|20\d{2})(.*)', result.name)
+    pattern = re.compile(f'(.*)({result.year})(.*)')
+    search = re.search(pattern, result.name)
     if search is None:
-        # similar_audiovisual_name = result.name.replace(text_without_name, '')
         return False
     else:
         similar_audiovisual_name = search.group(1).strip()
     return are_similar_strings(audiovisual_name.lower(), similar_audiovisual_name.lower())
-
 
 
 def _get_response_filename(audiovisual_record_name, source_class_name):
