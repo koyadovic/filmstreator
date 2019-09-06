@@ -94,10 +94,12 @@
         {% endif %}
 
         {% for score in audiovisual_record.scores %}
-            <div class="scoring-source">
-                <img class="scoring-source-logo" src="/static/web/img/information_sources/{{ score.source_name }}.png">
-                <h6 class="scoring-source-value">{{ score.value }}</h6>
-            </div>
+            <a href="{{ score.external_url }}" target="_blank">
+                <div class="scoring-source">
+                    <img class="scoring-source-logo" src="/static/web/img/information_sources/{{ score.source_name }}.png">
+                    <h6 class="scoring-source-value">{{ score.value }}</h6>
+                </div>
+            </a>
         {% endfor %}
 
         <div class="float-restore"></div>

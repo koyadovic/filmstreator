@@ -4,7 +4,7 @@ from core.fetchers.general_information.base import AbstractGeneralInformation
 from core.fetchers.new_additions.base import AbstractNewAdditions
 from core.fetchers.scoring_sources.base import AbstractScoringSource
 from core.model.configurations import Configuration
-from core.tools.exceptions import DownloadSourceException
+from core.tools.exceptions import DownloadSourceException, GeneralInformationException
 from core.tools.packages import PackageDiscover, ModuleDiscover
 
 
@@ -35,6 +35,13 @@ def get_download_source_by_name(source_name):
         if source_klass.source_name == source_name:
             return source_klass
     raise DownloadSourceException(f'Source with name {source_name} does not exist')
+
+
+def get_general_information_source_by_name(source_name):
+    for source_klass in get_all_general_information_sources():
+        if source_klass.source_name == source_name:
+            return source_klass
+    raise GeneralInformationException(f'Source with name {source_name} does not exist')
 
 
 def get_all_download_sources():
