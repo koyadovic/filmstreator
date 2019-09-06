@@ -51,13 +51,15 @@ def compile_missing_votes():
 def _refresh_score(klass, audiovisual_record):
     source = klass(audiovisual_record)
     try:
+        found = False
         scoring_source_instance = source.score
         for idx, score in enumerate(audiovisual_record.scores):
             source_name = score.source_name if hasattr(score, 'source_name') else score['source_name']
             if source_name == klass.source_name:
                 audiovisual_record.scores[idx] = scoring_source_instance
+                found = True
                 break
-        else:
+        if not found:
             audiovisual_record.scores.append(scoring_source_instance)
 
         audiovisual_record.save()
