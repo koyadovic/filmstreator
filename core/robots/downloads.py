@@ -83,13 +83,9 @@ def _check_zero_results(results, source_class, audiovisual_record, logger):
 def _worker_get_download_links(source_class, audiovisual_record, logger):
     source = source_class(audiovisual_record.name, year=audiovisual_record.year)
 
-    ar = audiovisual_record
-    people = ar.directors + ar.writers + ar.stars
-    remove_first = [person.name.lower() for person in people]
-
     try:
         logger(f'get downloads links for {audiovisual_record.name}')
-        results = source.get_source_results(logger=logger, sleep_between_requests=60, remove_first=remove_first)
+        results = source.get_source_results(logger=logger, sleep_between_requests=60)
         logger(f'{len(results)} for {audiovisual_record.name}')
 
     except DownloadSourceException as e:
@@ -155,7 +151,7 @@ def _worker_collect_download_links_for_the_first_time(source_class, logger):
         {'deleted': False, 'general_information_fetched': True,
          f'metadata__downloads_fetch__{source_name}__exists': False,
          'global_score__gte': 5.0},
-        paginate=True, page_size=10, page=1, sort_by='-global_score'
+        paginate=True, page_size=50, page=1, sort_by='-global_score'
     ).get('results')
     logger(f'Read {len(audiovisual_records)} records')
     with ThreadPoolExecutor(max_workers=2) as executor:
@@ -175,12 +171,18 @@ def collect_download_links_for_the_first_time():
     logger = collect_download_links_for_the_first_time.log
     sources = list(get_all_download_sources())
     random.shuffle(sources)
-
+    threads = []
     for source_class in sources:
         if not source_class.enabled:
             continue
         logger(f'Start worker for {source_class.source_name}')
-        _worker_collect_download_links_for_the_first_time(source_class, logger)
+        thread = threading.Thread(
+            target=_worker_collect_download_links_for_the_first_time,
+            args=[source_class, logger]
+        )
+        threads.append(thread)
+    for thread in threads:
+        thread.join()
 
 
 @Ticker.execute_each(interval='24-hours')
