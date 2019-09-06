@@ -88,7 +88,9 @@ def _worker_get_download_links(source_class, audiovisual_record, logger):
     remove_first = [person.name.lower() for person in people]
 
     try:
+        logger(f'get downloads links for {audiovisual_record.name}')
         results = source.get_source_results(logger=logger, sleep_between_requests=60, remove_first=remove_first)
+        logger(f'{len(results)} for {audiovisual_record.name}')
 
     except DownloadSourceException as e:
         log_exception(e)
@@ -147,19 +149,19 @@ def _worker_collect_download_links_for_the_first_time(source_class, logger):
     """
     This search for download links for has_downloads or not has_downloads audiovisual_records
     """
+    source_name = source_class.source_name
+    logger(f'Begin to retrieve audiovisual records for {source_name}')
+    audiovisual_records = AudiovisualRecord.search(
+        {'deleted': False, 'general_information_fetched': True,
+         f'metadata__downloads_fetch__{source_name}__exists': False,
+         'global_score__gte': 5.0},
+        paginate=True, page_size=10, page=1, sort_by='-global_score'
+    ).get('results')
+    logger(f'Read {len(audiovisual_records)} records')
     with ThreadPoolExecutor(max_workers=2) as executor:
-        source_name = source_class.source_name
-        logger(f'Begin to retrieve audiovisual records for {source_name}')
-
-        audiovisual_records = AudiovisualRecord.search(
-            {'deleted': False, 'general_information_fetched': True,
-             f'metadata__downloads_fetch__{source_name}__exists': False,
-             'global_score__gte': 5.0},
-            paginate=True, page_size=10, page=1, sort_by='-global_score'
-        ).get('results')
-
         futures = []
         for audiovisual_record in audiovisual_records:
+            logger(f'Sleeping for 30 seconds for {source_class.source_name}')
             time.sleep(30)
             future = executor.submit(_worker_get_download_links, source_class, audiovisual_record, logger)
             futures.append(future)
