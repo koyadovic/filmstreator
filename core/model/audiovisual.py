@@ -267,7 +267,7 @@ class AudiovisualRecord(BaseModel, EqualityMixin, SearchMixin):
         all_scores = [
             score.value * score.votes
             if hasattr(score, 'value') else
-            score['value'] * score['votes'] for score in self.scores
+            score.get('value', 0.0) * score.get('votes', 1) for score in self.scores
         ]
         self.global_score = 0.0 if len(all_scores) == 0 else sum(all_scores) / len(all_scores)
         self.global_score /= 100000
