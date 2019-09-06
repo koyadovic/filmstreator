@@ -81,10 +81,20 @@ class ScoringSource(EqualityMixin):
         self.last_check = utc_now()
         self._value = value
 
+    @property
+    def votes(self):
+        return self._votes
+
+    @votes.setter
+    def votes(self, value):
+        self.last_check = utc_now()
+        self._votes = value
+
     def __init__(self, **kwargs):
         self.last_check = kwargs.pop('last_check', datetime.utcnow().replace(tzinfo=timezone.utc))
         self.source_name = kwargs.pop('source_name')
         self._value = kwargs.pop('value')
+        self._votes = kwargs.pop('votes')
 
 
 class AudiovisualRecord(BaseModel, EqualityMixin, SearchMixin):
@@ -254,8 +264,14 @@ class AudiovisualRecord(BaseModel, EqualityMixin, SearchMixin):
 
     def save(self):
         self.updated_date = utc_now()
-        all_scores = [score.value if hasattr(score, 'value') else score['value'] for score in self.scores]
-        self.global_score = round(0.0 if len(all_scores) == 0 else sum(all_scores) / len(all_scores), 1)
+        all_scores = [
+            score.value * score.votes
+            if hasattr(score, 'value') else
+            score['value'] * score['votes'] for score in self.scores
+        ]
+        self.global_score = 0.0 if len(all_scores) == 0 else sum(all_scores) / len(all_scores)
+        self.global_score /= 100000
+        self.global_score = round(self.global_score)
         from core import services
         return services.save_audiovisual_record(self)
 

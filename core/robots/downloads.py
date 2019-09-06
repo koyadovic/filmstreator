@@ -150,7 +150,7 @@ def _worker_collect_download_links_for_the_first_time(source_class, logger):
     audiovisual_records = AudiovisualRecord.search(
         {'deleted': False, 'general_information_fetched': True,
          f'metadata__downloads_fetch__{source_name}__exists': False,
-         'global_score__gte': 5.0},
+         'global_score__gt': 0},
         paginate=True, page_size=50, page=1, sort_by='-global_score'
     ).get('results')
     logger(f'Read {len(audiovisual_records)} records')

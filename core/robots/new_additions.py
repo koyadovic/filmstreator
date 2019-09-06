@@ -1,6 +1,5 @@
 from core.model.audiovisual import AudiovisualRecord
 from core.model.configurations import Configuration
-from core.model.searches import Search, Condition
 from core.tick_worker import Ticker
 from core.tools.logs import log_message
 

@@ -142,6 +142,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
             'last_check': score.last_check,
             'source_name': score.source_name,
             'value': score.value,
+            'votes': score.votes,
         }
 
     is_searchable = True
