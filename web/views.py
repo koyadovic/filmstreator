@@ -30,9 +30,9 @@ def landing(request):
     last_records = AudiovisualRecord.search(
         {
             'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
-            'global_score__gte': 6.0
+            'global_score__gte': 1.0
         },
-        sort_by=['-year', '-global_score', '-created_date'],
+        sort_by=['-year', '-created_date', '-global_score'],
         page_size=30, page=1, paginate=True
     ).get('results')
 
