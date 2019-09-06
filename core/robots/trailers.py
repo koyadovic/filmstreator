@@ -21,7 +21,12 @@ def compile_trailers_for_audiovisual_records_in_youtube():
         'deleted': False, 'general_information_fetched': True, 'has_downloads': True,
         'metadata__searched_trailers__youtube__exists': False, 'global_score__gt': 0,
         'scores__votes__exists': True,
-    }, paginate=True, page_size=1, page=1, sort_by='-global_score').get('results')[0]
+    }, paginate=True, page_size=1, page=1, sort_by='-global_score').get('results')
+
+    if len(audiovisual_record) == 0:
+        return
+
+    audiovisual_record = audiovisual_record[0]
 
     logger(f'Searching: {audiovisual_record.name}')
     search_string = f'{audiovisual_record.name.lower()} {audiovisual_record.year} trailer'
