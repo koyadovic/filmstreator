@@ -231,7 +231,7 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         collection.create_index([
             ('audiovisual_record', pymongo.ASCENDING),
             ('deleted', pymongo.ASCENDING),
-            ('quality', pymongo.TEXT),
+            ('quality', pymongo.DESCENDING),
         ])
 
     @property
