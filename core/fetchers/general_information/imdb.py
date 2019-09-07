@@ -64,8 +64,8 @@ class IMDBGeneralInformation(AbstractGeneralInformation):
     @property
     def summary(self):
         try:
-            summary_text = self.base_tree.xpath('//div[@class="summary_text"]/text()')[0]
-            summary_text = summary_text or ''
+            summary_text_element = self.base_tree.xpath('//div[@class="summary_text"]')[0]
+            summary_text = summary_text_element.text_content().strip()
         except IndexError:
             summary_text = ''
         return summary_text.strip()

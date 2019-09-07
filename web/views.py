@@ -32,7 +32,7 @@ def landing(request):
             'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
             'global_score__gte': 1.0
         },
-        sort_by=['-year', '-updated_date', '-global_score'],
+        sort_by=['-year', '-global_score'],
         page_size=30, page=1, paginate=True
     ).get('results')
 
@@ -99,13 +99,13 @@ def details(request, slug=None):
     for score in audiovisual_record.scores:
         source = get_general_information_source_by_name(score.get('source_name'))
         score['external_url'] = source.base_url + audiovisual_record.metadata['detailed_page'][source.source_name]
-        print(score['external_url'])
 
     # Add to each person the search url to be used later in the template
     for person in audiovisual_record.directors + audiovisual_record.writers + audiovisual_record.stars:
         person.search_url = f'/s/?ft=a&s="{person.name}"'.replace(' ', '+')
 
     # related audiovisual records
+    # TODO esto toca un poco los huevos
     related_records = AudiovisualRecord.search(
         {
             'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
@@ -114,8 +114,6 @@ def details(request, slug=None):
         },
         page_size=10, page=1, paginate=True, sort_by=['-global_score']
     ).get('results')
-
-    # disabled by now.
     # more = AudiovisualRecord.search(
     #     {
     #         'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
@@ -125,11 +123,11 @@ def details(request, slug=None):
     #     },
     #     page_size=10, page=1, paginate=True, sort_by=['-global_score']
     # ).get('results')
-    more = []
 
-    related_records = related_records + more
+    related_records = related_records  # + more
 
     # downloads
+    # TODO esto toca mucho los huevos
     downloads = DownloadSourceResult.search(
         {'audiovisual_record': audiovisual_record, 'deleted': False},
         sort_by='quality'
