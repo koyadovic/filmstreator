@@ -151,7 +151,7 @@ def _worker_collect_download_links_for_the_first_time(source_class, logger):
         {'deleted': False, 'general_information_fetched': True,
          f'metadata__downloads_fetch__{source_name}__exists': False,
          'scores__votes__exists': True,
-         'global_score__gt': 0},
+         'global_score__gte': 1.0},
         paginate=True, page_size=50, page=1, sort_by='-global_score'
     ).get('results')
     logger(f'Read {len(audiovisual_records)} records')
@@ -197,6 +197,7 @@ def recent_films_search_again_for_download_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
     audiovisual_records = AudiovisualRecord.search({
         'deleted': False, 'general_information_fetched': True,
+        'global_score__gte': 1.0,
         'metadata__downloads_fetch__exists': True, 'year__gte': n_days_ago.strftime('%Y')
     })
     for audiovisual_record in audiovisual_records:

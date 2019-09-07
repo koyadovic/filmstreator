@@ -18,6 +18,7 @@ def _group_by_genres():
 
         audiovisual_records = AudiovisualRecord.search({
             'deleted': False, 'general_information_fetched': True, 'has_downloads': True,
+            'global_score__gte': 1.0,
             'created_date__gt': six_month_ago, 'genres__name': genre.name
         })
 
