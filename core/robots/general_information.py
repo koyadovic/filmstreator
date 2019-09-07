@@ -62,11 +62,12 @@ def _update(audiovisual_record, general_information_klass):
         audiovisual_record.delete()
 
 
+# TODO disable when completed
 @Ticker.execute_each(interval='1-minute')
 def autocomplete_missing_summaries():
     audiovisual_records_without_summary_key = AudiovisualRecord.search(
         {'deleted': False, 'summary__exists': False},
-        paginate=True, page_size=100, page=1
+        paginate=True, page_size=100, page=1, sort_by='-global_score'
     ).get('results')
 
     with ThreadPoolExecutor(max_workers=3) as executor:
@@ -82,6 +83,32 @@ def autocomplete_missing_summaries():
             future.result(timeout=600)
 
 
+# TODO disable when completed
+@Ticker.execute_each(interval='1-minute')
+def complete_correct_summaries():
+    # This is a fix for bad summaries compiled.
+    audiovisual_records_without_summary_key = AudiovisualRecord.search(
+        {'deleted': False, 'metadata__summary_fix__exists': False},
+        paginate=True, page_size=100, page=1, sort_by='-global_score'
+    ).get('results')
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = []
+        for audiovisual_record in audiovisual_records_without_summary_key:
+            for general_information_klass in get_all_general_information_sources():
+                future = executor.submit(_update_only_summary, audiovisual_record, general_information_klass)
+                future.audiovisual_record = audiovisual_record
+                future.log_msg = f'Fix summary of {audiovisual_record.name} with ' \
+                                 f'{general_information_klass.source_name}'
+                futures.append(future)
+        for future in concurrent.futures.as_completed(futures):
+            complete_correct_summaries.log(future.log_msg)
+            future.result(timeout=600)
+            audiovisual_record.refresh()
+            audiovisual_record.metadata['summary_fix'] = True
+            audiovisual_record.save()
+
+
 def _update_only_summary(audiovisual_record, general_information_klass):
     general_information = general_information_klass(audiovisual_record)
     try:
@@ -90,8 +117,10 @@ def _update_only_summary(audiovisual_record, general_information_klass):
         summary = ''
 
     summary = summary or ''
-    audiovisual_record.summary = summary
-    audiovisual_record.save()
+    audiovisual_record.refresh()
+    if audiovisual_record.summary != summary:
+        audiovisual_record.summary = summary
+        audiovisual_record.save()
 
 
 @Ticker.execute_each(interval='1-minute')
@@ -111,7 +140,8 @@ def save_audiovisual_images_locally():
     audiovisual_records = AudiovisualRecord.search(
         {
             'deleted': False, 'general_information_fetched': True,
-            'has_downloads': True, 'metadata__local_image__exists': False
+            'has_downloads': True, 'metadata__local_image__exists': False,
+            'global_score__gte': 1.0,
         },
         paginate=True, page_size=10, page=1, sort_by='-global_score'
     ).get('results')

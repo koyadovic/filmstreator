@@ -162,6 +162,12 @@ class MongoAudiovisualRecord(AudiovisualRecord):
             ],
             weights={'name': 10, 'year': 9, 'directors.name': 3, 'writers.name': 3, 'stars.name': 3}
         )
+        collection.create_index([
+            ('deleted', pymongo.DESCENDING),
+            ('has_downloads', pymongo.ASCENDING),
+            ('general_information_fetched', pymongo.ASCENDING),
+            ('slug', pymongo.ASCENDING),
+        ])
 
     @property
     def id(self):
@@ -197,9 +203,6 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         )
         if isinstance(download_source_result, MongoDownloadSourceResult):
             return download_source_result
-        # TODO check if works without this
-        # if type(download_source_result) == dict:
-        #     return MongoDownloadSourceResult(**download_source_result)
         return MongoDownloadSourceResult(
             _id=getattr(download_source_result, '_id') if hasattr(download_source_result, '_id') else None,
             last_check=download_source_result.last_check,
@@ -222,9 +225,15 @@ class MongoDownloadSourceResult(DownloadSourceResult):
                 ('name', pymongo.TEXT),
                 ('source_name', pymongo.TEXT),
                 ('quality', pymongo.TEXT),
+
             ],
             weights={'name': 5, 'source_name': 1, 'quality': 2}
         )
+        collection.create_index([
+            ('audiovisual_record', pymongo.ASCENDING),
+            ('deleted', pymongo.ASCENDING),
+            ('quality', pymongo.DESCENDING),
+        ])
 
     @property
     def id(self):
