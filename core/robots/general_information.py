@@ -98,11 +98,11 @@ def complete_correct_summaries():
             for general_information_klass in get_all_general_information_sources():
                 future = executor.submit(_update_only_summary, audiovisual_record, general_information_klass)
                 future.audiovisual_record = audiovisual_record
-                future.log_msg = f'Check summary of {audiovisual_record.name} with ' \
+                future.log_msg = f'Fix summary of {audiovisual_record.name} with ' \
                                  f'{general_information_klass.source_name}'
                 futures.append(future)
         for future in concurrent.futures.as_completed(futures):
-            autocomplete_missing_summaries.log(future.log_msg)
+            complete_correct_summaries.log(future.log_msg)
             future.result(timeout=600)
             audiovisual_record.refresh()
             audiovisual_record.metadata['summary_fix'] = True
