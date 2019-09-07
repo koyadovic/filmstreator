@@ -30,7 +30,7 @@ footer#sticky-footer {
  */
 
 * {
-    font-family: 'Roboto';
+    font-family: 'Roboto', sans-serif;
 }
 
 @media (max-width: 575.98px) {
@@ -56,9 +56,14 @@ body {
     overflow-x: hidden;
     background: #fff;
 }
+
+h1, h2, h3, h4, h5, label {
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
 h1, h2, h3 {
     color: #046;
-    font-weight: 800;
+    font-weight: 300;
 }
 
 h1 {
@@ -406,6 +411,19 @@ a.secondary:hover {
 
 .readable-text {
     text-shadow:
+        0.05em 0 #0007,
+        0 0.05em #0007,
+        -0.05em 0 #0007,
+        0 -0.05em #0007,
+        -0.05em -0.05em #0007,
+        -0.05em 0.05em #0007,
+        0.05em -0.05em #0007,
+        0.05em 0.05em #0007;
+}
+
+/*
+.readable-text {
+    text-shadow:
         0.05em 0 black,
         0 0.05em black,
         -0.05em 0 black,
@@ -415,6 +433,8 @@ a.secondary:hover {
         0.05em -0.05em black,
         0.05em 0.05em black;
 }
+ */
+
 
 nav .active {
     background: #99b4c1;
