@@ -32,7 +32,7 @@ def ratio_of_containing_similar_string(container_string, text_string, min_length
 POSSIBLE_SEPARATORS = [' ', '.', '-', '_', '[', ']', '(', ')', '/', '\\', '{', '}', '<', '>', '~', '+', '*']
 
 LANGUAGES = {
-    'spa': ['es', 'spa', 'esp', 'spanish'],
+    'spa': ['es', 'spa', 'esp', 'spanish', 'español'],
     'jpn': ['ja', 'jpn', 'japanese'],
     'fra': ['fr', 'fra', 'french'],
     'hin': ['hi', 'hin', 'hindi'],
