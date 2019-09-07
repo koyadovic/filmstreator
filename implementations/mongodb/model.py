@@ -162,6 +162,11 @@ class MongoAudiovisualRecord(AudiovisualRecord):
             ],
             weights={'name': 10, 'year': 9, 'directors.name': 3, 'writers.name': 3, 'stars.name': 3}
         )
+        collection.create_index([
+            ('deleted', pymongo.DESCENDING),
+            ('has_downloads', pymongo.ASCENDING),
+            ('general_information_fetched', pymongo.ASCENDING),
+        ])
 
     @property
     def id(self):
@@ -223,7 +228,11 @@ class MongoDownloadSourceResult(DownloadSourceResult):
             ],
             weights={'name': 5, 'source_name': 1, 'quality': 2}
         )
-        collection.create_index('audiovisual_record')
+        collection.create_index([
+            ('audiovisual_record', pymongo.ASCENDING),
+            ('deleted', pymongo.ASCENDING),
+            ('quality', pymongo.TEXT),
+        ])
 
     @property
     def id(self):

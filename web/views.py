@@ -99,23 +99,20 @@ def details(request, slug=None):
     for score in audiovisual_record.scores:
         source = get_general_information_source_by_name(score.get('source_name'))
         score['external_url'] = source.base_url + audiovisual_record.metadata['detailed_page'][source.source_name]
-        print(score['external_url'])
 
     # Add to each person the search url to be used later in the template
     for person in audiovisual_record.directors + audiovisual_record.writers + audiovisual_record.stars:
         person.search_url = f'/s/?ft=a&s="{person.name}"'.replace(' ', '+')
 
     # related audiovisual records
-    # related_records = AudiovisualRecord.search(
-    #     {
-    #         'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
-    #         'name__neq': audiovisual_record.name,
-    #         'stars__name__in': [person.name for person in audiovisual_record.stars],
-    #     },
-    #     page_size=10, page=1, paginate=True, sort_by=['-global_score']
-    # ).get('results')
-
-    # disabled by now.
+    related_records = AudiovisualRecord.search(
+        {
+            'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
+            'name__neq': audiovisual_record.name,
+            'stars__name__in': [person.name for person in audiovisual_record.stars],
+        },
+        page_size=10, page=1, paginate=True, sort_by=['-global_score']
+    ).get('results')
     # more = AudiovisualRecord.search(
     #     {
     #         'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
@@ -125,9 +122,8 @@ def details(request, slug=None):
     #     },
     #     page_size=10, page=1, paginate=True, sort_by=['-global_score']
     # ).get('results')
-    more = []
 
-    related_records = []  # related_records + more
+    related_records = related_records  # + more
 
     # downloads
     downloads = DownloadSourceResult.search(
