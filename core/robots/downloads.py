@@ -150,7 +150,8 @@ def _worker_collect_download_links_for_the_first_time(source_class, logger):
     audiovisual_records = AudiovisualRecord.search(
         {'deleted': False, 'general_information_fetched': True,
          f'metadata__downloads_fetch__{source_name}__exists': False,
-         'global_score__gte': 5.0},
+         'scores__votes__exists': True,
+         'global_score__gte': 1.0},
         paginate=True, page_size=50, page=1, sort_by='-global_score'
     ).get('results')
     logger(f'Read {len(audiovisual_records)} records')
@@ -196,6 +197,7 @@ def recent_films_search_again_for_download_links():
     n_days_ago = datetime.utcnow().replace(tzinfo=timezone.utc) - timedelta(days=180)
     audiovisual_records = AudiovisualRecord.search({
         'deleted': False, 'general_information_fetched': True,
+        'global_score__gte': 1.0,
         'metadata__downloads_fetch__exists': True, 'year__gte': n_days_ago.strftime('%Y')
     })
     for audiovisual_record in audiovisual_records:
@@ -265,7 +267,7 @@ def _valid_result(result):
 
 def _get_response_filename(audiovisual_record_name, source_class_name):
     n = 0
-    audiovisual_record_name.replace('/', '-')
+    audiovisual_record_name = audiovisual_record_name.replace('/', '-')
     response_filename = f'{DOWNLOAD_SOURCES_RESPONSES_ROOT_DIRECTORY}' \
                         f'{audiovisual_record_name} {source_class_name} {n}'
     while os.path.isfile(response_filename + '.html'):
@@ -273,5 +275,5 @@ def _get_response_filename(audiovisual_record_name, source_class_name):
         response_filename = f'{DOWNLOAD_SOURCES_RESPONSES_ROOT_DIRECTORY}' \
                             f'{audiovisual_record_name} {source_class_name} {n}'
     response_filename += '.html'
-    response_filename.replace(' ', '-')
+    response_filename = response_filename.replace(' ', '-')
     return response_filename

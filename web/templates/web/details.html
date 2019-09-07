@@ -2,13 +2,13 @@
 {% load static %}
 {% load miscellaneous %}
 
-{% block title %}Filmstreator - Download {{ audiovisual_record.name }}{% for lang, downloads, translation in lang_downloads %} - {{ translation }}{% endfor %}{% endblock %}
+{% block title %}Filmstreator - {{ audiovisual_record.name }} - Full Movie Download{% for lang, downloads, translation in lang_downloads %} - {{ translation }}{% endfor %}{% endblock %}
 
 {% block head_extra %}
 {{ block.super }}
-<meta name="description" content="{% if audiovisual_record.summary %}Summary: {{ audiovisual_record.summary }}. {% endif %}{{ audiovisual_record.name }} was Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.">
-<meta property="og:title" content="{{ audiovisual_record.name }}{% for lang, downloads, translation in  lang_downloads %} {{ translation }}{% endfor %} Downloads.">
-<meta name="keywords" content="{{ audiovisual_record.name }} download torrent magnet links{% for lang, downloads, translation in  lang_downloads %} {{ translation|lower }}{% endfor %}">
+<meta name="description" content="{% if audiovisual_record.summary %}{{ audiovisual_record.summary }}. {% endif %}{{ audiovisual_record.name }} was Writen by {{ audiovisual_record.writers | map:"name" | join:", " }} and directed by {{ audiovisual_record.directors | map:"name" | join:", " }} in the year {{ audiovisual_record.year }}.">
+<meta property="og:title" content="{{ audiovisual_record.name }}{% for lang, downloads, translation in  lang_downloads %} {{ translation }}{% endfor %} Full Movie Downloads.">
+<meta name="keywords" content="{{ audiovisual_record.name }} full movie download torrent magnet links{% for lang, downloads, translation in  lang_downloads %} {{ translation|lower }}{% endfor %}">
 <meta property="og:type" content="video.movie" />
 <meta property="og:url" content="{{ request.build_absolute_uri }}" />
 <meta property="og:image" content="{{ audiovisual_record.images.0 }}" />

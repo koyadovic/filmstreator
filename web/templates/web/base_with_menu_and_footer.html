@@ -64,8 +64,8 @@
 
             <label>Ordering:</label>
             <select name="ordering" class="form-control">
-                <option value="-global_score"{% if filter_params.ordering == '-global_score' %} selected="selected"{% endif %}>Score from best to worst</option>
-                <option value="global_score"{% if filter_params.ordering == 'global_score' %} selected="selected"{% endif %}>Score from worst to best</option>
+                <option value="-global_score"{% if filter_params.ordering == '-global_score' %} selected="selected"{% endif %}>Most relevant first</option>
+                <option value="global_score"{% if filter_params.ordering == 'global_score' %} selected="selected"{% endif %}>Less relevant first</option>
             </select>
             <label>Wanted genres:</label>
             <select id="genres-select" class="form-control" name="genres__in" multiple="multiple" size="7">
