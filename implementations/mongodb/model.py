@@ -166,6 +166,7 @@ class MongoAudiovisualRecord(AudiovisualRecord):
             ('deleted', pymongo.DESCENDING),
             ('has_downloads', pymongo.ASCENDING),
             ('general_information_fetched', pymongo.ASCENDING),
+            ('slug', pymongo.ASCENDING),
         ])
 
     @property

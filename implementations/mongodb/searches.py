@@ -62,11 +62,11 @@ class SearchMongoDB(SearchInterface):
                     if k == '_id':
                         continue
 
-                    if k in ['writers', 'directors', 'stars']:
+                    if k == 'writers' or k == 'directors' or k == 'stars':
                         result[k] = [MongoPerson(**person) for person in v]
                         continue
 
-                    elif k in ['genres']:
+                    elif k == 'genres':
                         result[k] = [MongoGenre(**genre) for genre in v]
                         continue
 
@@ -74,24 +74,20 @@ class SearchMongoDB(SearchInterface):
                         # this automate the translation of an object id into the referenced object
                         # from another collection searching similarities between collection names
                         # and the attribute name that contains the ObjectId
-                        collection_names = CLASS_MAPPINGS.values()
-                        max_ratio = 0.0
-                        selected_collection_name = None
-                        selected_collection_class = None
-                        for collection_class in collection_names:
-                            collection_name = collection_class.collection_name
-                            ratio = ratio_of_containing_similar_string(collection_class.collection_name, k)
-                            if ratio > max_ratio:
-                                max_ratio = ratio
-                                selected_collection_name = collection_name
-                                selected_collection_class = collection_class
-                        if max_ratio > 0.0:
-                            collection = self.db[selected_collection_name]
-                            foreign_element = collection.find_one({'_id': v})
-                            if foreign_element is None:
-                                result[k] = None
-                            else:
-                                result[k] = selected_collection_class(**foreign_element)
+
+                        # the only case is downloads, that have an 'audiovisual_record' attribute
+                        if k == 'audiovisual_record':
+                            selected_collection_class = MongoAudiovisualRecord
+                            selected_collection_name = MongoAudiovisualRecord.collection_name
+                        else:
+                            continue
+
+                        collection = self.db[selected_collection_name]
+                        foreign_element = collection.find_one({'_id': v})
+                        if foreign_element is None:
+                            result[k] = None
+                        else:
+                            result[k] = selected_collection_class(**foreign_element)
 
                 search_results.append(target_class(**result))
 

@@ -105,6 +105,7 @@ def details(request, slug=None):
         person.search_url = f'/s/?ft=a&s="{person.name}"'.replace(' ', '+')
 
     # related audiovisual records
+    # TODO esto toca un poco los huevos
     related_records = AudiovisualRecord.search(
         {
             'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
@@ -126,6 +127,7 @@ def details(request, slug=None):
     related_records = related_records  # + more
 
     # downloads
+    # TODO esto toca mucho los huevos
     downloads = DownloadSourceResult.search(
         {'audiovisual_record': audiovisual_record, 'deleted': False},
         sort_by='quality'
