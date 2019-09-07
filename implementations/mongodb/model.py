@@ -197,9 +197,6 @@ class MongoDownloadSourceResult(DownloadSourceResult):
         )
         if isinstance(download_source_result, MongoDownloadSourceResult):
             return download_source_result
-        # TODO check if works without this
-        # if type(download_source_result) == dict:
-        #     return MongoDownloadSourceResult(**download_source_result)
         return MongoDownloadSourceResult(
             _id=getattr(download_source_result, '_id') if hasattr(download_source_result, '_id') else None,
             last_check=download_source_result.last_check,
@@ -222,9 +219,11 @@ class MongoDownloadSourceResult(DownloadSourceResult):
                 ('name', pymongo.TEXT),
                 ('source_name', pymongo.TEXT),
                 ('quality', pymongo.TEXT),
+
             ],
             weights={'name': 5, 'source_name': 1, 'quality': 2}
         )
+        collection.create_index('audiovisual_record')
 
     @property
     def id(self):
