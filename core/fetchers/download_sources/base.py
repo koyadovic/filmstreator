@@ -1,7 +1,7 @@
 from core.model.audiovisual import DownloadSourceResult
 from core.tools.browsing import PhantomBrowsingSession
 from core.tools.exceptions import DownloadSourceException
-from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector, are_similar_strings, \
+from core.tools.strings import RemoveAudiovisualRecordNameFromString, VideoQualityInStringDetector, \
     are_similar_strings_with_ratio, guess_language
 
 from requests_html import HTML
