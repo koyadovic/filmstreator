@@ -37,7 +37,7 @@ class DownloadSource(metaclass=abc.ABCMeta):
         self._logger = logger
 
         response = self._get_http_response(sleep_between_requests)
-        if response is None:
+        if response is None or response.content is None:
             raise DownloadSourceException('Response from session was None')
 
         if response.status_code == 404:
