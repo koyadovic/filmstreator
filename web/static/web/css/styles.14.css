@@ -59,11 +59,11 @@ body {
 
 h1, h2, h3, h4, h5, label {
     font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 800;
 }
 
 h1, h2, h3 {
     color: #046;
-    font-weight: 300;
 }
 
 h1 {
