@@ -106,14 +106,14 @@ def details(request, slug=None):
         person.search_url = f'/s/?ft=a&s="{person.name}"'.replace(' ', '+')
 
     # related audiovisual records
-    related_records = AudiovisualRecord.search(
-        {
-            'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
-            'name__neq': audiovisual_record.name,
-            'stars__name__in': [person.name for person in audiovisual_record.stars],
-        },
-        page_size=10, page=1, paginate=True, sort_by=['-global_score']
-    ).get('results')
+    # related_records = AudiovisualRecord.search(
+    #     {
+    #         'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
+    #         'name__neq': audiovisual_record.name,
+    #         'stars__name__in': [person.name for person in audiovisual_record.stars],
+    #     },
+    #     page_size=10, page=1, paginate=True, sort_by=['-global_score']
+    # ).get('results')
 
     # disabled by now.
     # more = AudiovisualRecord.search(
@@ -127,7 +127,7 @@ def details(request, slug=None):
     # ).get('results')
     more = []
 
-    related_records = related_records + more
+    related_records = []  # related_records + more
 
     # downloads
     downloads = DownloadSourceResult.search(
