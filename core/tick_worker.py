@@ -50,6 +50,8 @@ class Ticker:
         '5-minutes': {'seconds': 5 * 60, 'functions': []},
         '30-minutes': {'seconds': 30 * 60, 'functions': []},
         '60-minutes': {'seconds': 60 * 60, 'functions': []},
+        '1-hour': {'seconds': 60 * 60, 'functions': []},
+        '6-hours': {'seconds': 6 * 60 * 60, 'functions': []},
         '12-hours': {'seconds': 12 * 60 * 60, 'functions': []},
         '24-hours': {'seconds': 24 * 60 * 60, 'functions': []},
         '2-days': {'seconds': 2 * 24 * 60 * 60, 'functions': []},
