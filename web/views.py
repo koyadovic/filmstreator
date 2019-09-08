@@ -146,9 +146,15 @@ def details(request, slug=None):
         'gre': 'Greek',
         'pol': 'Polish',
     }
+    names_used = []
     lang_downloads = []
     for lang in ['eng', 'rus', 'spa', 'deu', 'fra', 'ita', 'gre', 'pol', 'hin', 'jpn', 'kor']:
-        ds = [d for d in downloads if d.lang == lang]
+        ds = []
+        for d in downloads:
+            if d.lang == lang and d.name not in names_used:
+                names_used.append(d.name)
+                ds.append(d)
+        ds = ds[:10]
         if len(ds) > 0:
             lang_downloads.append(
                 (lang, ds, lang_translations[lang])
