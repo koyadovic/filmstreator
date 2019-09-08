@@ -53,18 +53,21 @@ def guess_language(name, default=None, remove_first=None):
         pattern = re.compile(token, flags=re.IGNORECASE)
         name = re.sub(pattern, '', name)
     name = name.strip()
-    for lang, possibilities in LANGUAGES.items():
-        for possibility in possibilities:
-            if possibility in name:
-                idx = name.index(possibility)
-                try:
-                    if (
-                            name[idx - 1] in POSSIBLE_SEPARATORS and
-                            name[idx + len(possibility)] in POSSIBLE_SEPARATORS
-                    ):
-                        return lang
-                except IndexError:
-                    continue
+
+    possibles = [(possibility, iso_lang) for iso_lang, possibilities in LANGUAGES.items() for possibility in possibilities]
+    possibles.sort(key=lambda l: len(l[0]), reverse=True)
+    for possible in possibles:
+        possibility, lang = possible
+        if possibility in name:
+            idx = name.index(possibility)
+            try:
+                if (
+                        name[idx - 1] in POSSIBLE_SEPARATORS and
+                        name[idx + len(possibility)] in POSSIBLE_SEPARATORS
+                ):
+                    return lang
+            except IndexError:
+                continue
     return 'eng' if default is None else default
 
 
