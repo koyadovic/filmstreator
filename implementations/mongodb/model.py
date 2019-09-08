@@ -246,8 +246,8 @@ class MongoConfiguration(Configuration):
     collection_name = 'configurations'
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
         self._id = kwargs.pop('_id', None)
+        super().__init__(**kwargs)
 
     @classmethod
     def convert(cls, configuration):
