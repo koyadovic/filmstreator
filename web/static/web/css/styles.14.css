@@ -233,14 +233,17 @@ footer {
 }
 
 a {
-    font-weight: 300;
+    font-weight: 800;
+    color: #777;
 }
 
 a:visited {
+    color: #777;
 }
 
 a:hover {
     text-decoration: none;
+    color: #e1ce6f;
 }
 
 a.secondary {
@@ -828,14 +831,28 @@ div.audiovisual-item-container:hover {
 #language-tabs li a {
     height: 100%;
     width: 100%;
-    padding-bottom: 5px;
-    padding-top: 5px;
+    padding-bottom: 10px;
+    padding-top: 10px;
     display: inline-block;
 }
 
+#language-tabs li a {
+    border-top: 4px solid #0000;
+    font-weight: 300;
+}
+
+#language-tabs li a:hover {
+    background: #f7f7f7;
+    color: black;
+}
+
+.filmcard.downloads {
+    padding-top: 0 !important;
+}
+
 #language-tabs li a.active {
-    background-color: #444;
-    color: white;
+    border-top: 4px solid #FAE57C;
+    font-weight: 800;
 }
 .nav-tabs {
     border-bottom: 0px;
@@ -868,14 +885,9 @@ div.audiovisual-item-container:hover {
     padding: 0.5em;
 }
 
-.filmcard-wrapper .filmcard.filmcard-trailer {
-    position: relative;
-    padding-top: 56.25%;
-    width: 100%;
-}
 
 .trailer-container {
     position: relative;
-    padding-top: 56.25%;
+    padding-top: 75%;
     width: 100%;
 }
