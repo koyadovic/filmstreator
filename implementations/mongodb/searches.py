@@ -38,9 +38,15 @@ class SearchMongoDB(SearchInterface):
         else:
             results = collection.find(mongodb_search)
 
+        are_they_searching = False
+        for condition in search.conditions[0]:
+            if condition.field_path == 'search':
+                are_they_searching = True
+                break
+
         # sorting
         mongo_sort_by = tuple()
-        if is_searchable:
+        if is_searchable and are_they_searching:
             mongo_sort_by = mongo_sort_by + tuple([('_textScoreValue', {'$meta': 'textScore'})])
         if sort_by is not None:
             additional_sort = _translate_sort_by_to_mongo_dict(sort_by) if sort_by is not None else tuple()
