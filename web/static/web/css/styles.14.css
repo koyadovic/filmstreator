@@ -2,7 +2,7 @@
 COLORS
  */
 
-
+/*
 nav.notbody.navbar.navbar-dark.bg-dark.top-navbar.top-nav {
     background-color: #004466 !important;
 }
@@ -26,6 +26,8 @@ section.content {
 body div.wrapper {
     background: #eee;
 }
+*/
+
 /*
  COLORS
  */
@@ -37,9 +39,10 @@ body div.wrapper {
 * {
     font-family: 'Roboto', sans-serif;
 }
-html {
+html, section.content {
     background: #eee;
 }
+
 @media (max-width: 575.98px) {
     .container {
         min-width: 100%;
@@ -66,12 +69,8 @@ body {
 
 h1, h2, h3, h4, h5, label {
     font-family: 'Roboto', sans-serif;
-    font-weight: 800;
 }
 
-h1, h2, h3 {
-    color: #046;
-}
 
 h1 {
     font-size: 2.0rem;
@@ -90,25 +89,6 @@ nav.top-nav {
     z-index: 0;
 }
 
-.light-text {
-    color: #4c7c93;
-}
-.dark-text {
-    color: #046;
-}
-.white-text {
-    color: #fff;
-}
-
-.light-back {
-    background-color: #4c7c93;
-}
-.dark-back {
-    background-color: #046;
-}
-.white-back {
-    /* background-color: #fff; */
-}
 
 
 table.downloads-table {
@@ -123,9 +103,6 @@ table.downloads-table {
 table.downloads-table th, table.downloads-table td, table.downloads-table thead th,
 table.downloads-table tbody td, table.downloads-table tfoot td, table.downloads-table tfoot th {
     width: auto;
-}
-table.downloads-table tbody tr:hover {
-    background: #e5ecef;
 }
 
 
@@ -183,40 +160,6 @@ footer {
     height: 60px;
 }
 
-.cent {
-    background: white;
-    opacity: 0.8;
-    padding: 2%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 5px;
-}
-
-.positioncen {
-    color: black;
-    background:white;
-    opacity: 0.5;
-    padding: 2%;
-    position: absolute;
-    top: 40%;
-    left: 20%;
-    transform: translate(-50%, -50%);
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.cont {
-    position: relative;
-    display: inline-block;
-    text-align: center;
-}
-
-.card {
-}
-
 .slick-dots li button {
     background: white !important;
 }
@@ -242,21 +185,7 @@ footer {
 /* */
 
 .advanced-filters {
-    color: white;
-    background: #343a40;
     width: 100%;
-}
-
-.advanced-filters * {
-    color: white;
-}
-
-.advanced-filters input, .advanced-filters i, .advanced-filters select, .advanced-filters option {
-    color: black !important;
-}
-
-.advanced-filters i#hide-advanced-search {
-    color: white !important;
 }
 
 .scoring-source.scoring-source-small .scoring-source-logo {
@@ -266,7 +195,6 @@ footer {
     position: absolute;
     bottom: -8px;
     right: 2px;
-    text-shadow: 2px 2px 4px #000000;
     font-weight: 800;
     font-size: 80%;
 }
@@ -286,7 +214,7 @@ footer {
     position: absolute;
     bottom: -8px;
     right: 2px;
-    text-shadow: 2px 2px 4px #000000;
+    text-shadow: 1px 1px 2px #000000;
     font-weight: 800;
 }
 
@@ -305,35 +233,29 @@ footer {
 }
 
 a {
-    font-weight: 800;
-    color: #5c6166;
+    font-weight: 300;
 }
 
 a:visited {
-    color: #5c6166;
 }
 
 a:hover {
-    color: #8c9093;
     text-decoration: none;
 }
 
 a.secondary {
-    font-weight: 800;
-    color: #84324e;
+    font-weight: 300;
 }
 
 a.secondary:visited {
-    color: #84324e;
 }
 
 a.secondary:hover {
-    color: #b58494;
     text-decoration: none;
 }
 
 .notbody a {
-    font-weight: 800;
+    font-weight: 300;
     color: white;
 }
 
@@ -341,14 +263,13 @@ a.secondary:hover {
 }
 
 .notbody a:hover {
-    color: #ccc;
     text-decoration: none;
 }
 
 
 .filmstreator-logo {
-    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white !important;
-    color: #343a40 !important;
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+    color: #343a40;
     font-size: 1.5em;
 }
 
@@ -384,6 +305,7 @@ a.secondary:hover {
     color: #343a40 !important;
     font-size: 1.5em;
 }
+
 .text_with_2px_border_inverted {
     letter-spacing: 5px;
     text-shadow:
@@ -912,7 +834,7 @@ div.audiovisual-item-container:hover {
 }
 
 #language-tabs li a.active {
-    background-color: #4c7c93;
+    background-color: #444;
     color: white;
 }
 .nav-tabs {
@@ -947,6 +869,12 @@ div.audiovisual-item-container:hover {
 }
 
 .filmcard-wrapper .filmcard.filmcard-trailer {
+    position: relative;
+    padding-top: 56.25%;
+    width: 100%;
+}
+
+.trailer-container {
     position: relative;
     padding-top: 56.25%;
     width: 100%;
