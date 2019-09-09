@@ -108,6 +108,11 @@ class PhantomBrowsingSession:
                     log_message(e, only_file=True)
                     tryings += 1
 
+            except requests.exceptions.ChunkedEncodingError as e:
+                self.log(f'{e}')
+                log_message(e, only_file=True)
+                tryings += 1
+
             except requests.exceptions.RequestException as e:
                 """An general requests error occurred."""
                 self.log(f'{e}')
