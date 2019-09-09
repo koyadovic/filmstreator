@@ -208,6 +208,50 @@ def genre_view(request, genre=None):
     return render(request, 'web/genre.html', context=context)
 
 
+def best_decade(request, decade):
+    # TODO
+    page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
+    year_from, year_until = _get_year_time_frame(decade)
+    filter_dict = {
+        'year__gte': year_from, 'year__lte': year_until,
+        'deleted': False, 'has_downloads': True
+    }
+    additional_kwargs = {
+        'paginate': True,
+        'page_size': 20,
+        'page': page,
+        'sort_by': '-global_score'
+    }
+
+    paginator = AudiovisualRecord.search(filter_dict, **additional_kwargs)
+    serializer = AudiovisualRecordSerializer(paginator.get('results', []), many=True)
+    paginator['results'] = serializer.data
+    context = {
+        'context_class': 'landing',
+        'is_landing': False,
+        'search': paginator,
+        'genres_names': _get_genres(),
+        'qualities': VideoQualityInStringDetector.our_qualities,
+        'year_range': [str(y) for y in range(1970, int(datetime.utcnow().strftime('%Y')) + 1)]
+    }
+    return render(request, 'web/landing.html', context=context)
+
+
+def _get_year_time_frame(decade):
+    if decade == '70':
+        return '1970', '1979'
+    if decade == '80':
+        return '1980', '1989'
+    if decade == '90':
+        return '1990', '1999'
+    if decade == '2000':
+        return '2000', '2009'
+    if decade == '2010':
+        return '2010', '2019'
+    if decade == '2020':
+        return '2020', '2029'
+
+
 def remove_download(request, object_id):
     if not request.user.is_superuser:
         return HttpResponse(status=403)
