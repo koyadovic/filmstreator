@@ -917,8 +917,14 @@ div.audiovisual-item-container:hover {
     text-align: right;
 }
 
+.filmcard-footer * {
+    font-size: 0.9em;
+}
+
 .trailer-container {
     position: relative;
-    padding-top: 75%;
+    /* padding-top: 56.25%; */ /* 16:9 */
+    /* padding-top: 75%; */ /* 4:3 */
+    padding-top: 65%;
     width: 100%;
 }
