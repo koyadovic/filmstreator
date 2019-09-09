@@ -71,10 +71,24 @@ h1, h2, h3, h4, h5, label {
     font-family: 'Roboto', sans-serif;
 }
 
-
 h1 {
-    font-size: 2.0rem;
+    font-size: 1.2em;
 }
+h2 {
+    font-size: 1.15em;
+}
+h3 {
+    font-size: 1.1em;
+}
+h4 {
+    font-size: 1.05em;
+}
+h5 {
+    font-size: 1.0em;
+}
+
+
+
 
 nav.top-nav {
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
@@ -99,6 +113,7 @@ table.downloads-table {
      */
     table-layout: auto;
     max-width: 100% !important;
+    margin-bottom: 0;
 }
 table.downloads-table th, table.downloads-table td, table.downloads-table thead th,
 table.downloads-table tbody td, table.downloads-table tfoot td, table.downloads-table tfoot th {
@@ -200,7 +215,7 @@ footer {
 }
 
 .scoring-source {
-    float: left;
+    float: right;
     position: relative;
     text-align: center;
     color: white;
@@ -397,9 +412,11 @@ nav .active {
     justify-content: center;
 }
 
+
 .resp-sharing-button__link {
-    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);
 }
+
 .resp-sharing-button {
     width: 8em;
 }
@@ -654,15 +671,19 @@ li.nav-item {
     vertical-align: middle;
 }
 
-.table.table-hover.table-dark {
+.table.table-hover {
     border-radius: 5px;
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
 }
-.table.table-hover.table-dark td {
+.table.table-hover td {
     border-radius: 5px;
 }
-.table.table-hover.table-dark th {
+.table.table-hover th {
     border-radius: 5px;
+}
+
+tbody tr:hover {
+    background: #f7f7f7;
 }
 
 table {
@@ -847,7 +868,7 @@ div.audiovisual-item-container:hover {
 }
 
 .filmcard.downloads {
-    padding-top: 0 !important;
+    padding: 0 !important;
 }
 
 #language-tabs li a.active {
@@ -870,7 +891,8 @@ div.audiovisual-item-container:hover {
 
 
 .filmcard-wrapper {
-
+    display: flex;
+    flex-direction: column;
 }
 
 .filmcard-wrapper .filmcard-title h1 {
@@ -883,8 +905,17 @@ div.audiovisual-item-container:hover {
     background: #fff;
     box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);
     padding: 0.5em;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
+.filmcard-wrapper .filmcard .filmcard-footer {
+    margin-top: auto;
+    width:100%;
+    height: 4em;
+    text-align: right;
+}
 
 .trailer-container {
     position: relative;

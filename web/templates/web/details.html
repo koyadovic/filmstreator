@@ -30,109 +30,125 @@
                 </div>
 
                 <div class="filmcard">
-                    <div class="main-image">
-                        <img style="height: 100%; width: 100%;" src="{{ audiovisual_record.images.0 }}" alt="Main cover of {{ audiovisual_record.name }}">
+                    <div class="filmcard-body">
+                        <div class="main-image">
+                            <img style="height: 100%; width: 100%;" src="{{ audiovisual_record.images.0 }}" alt="Main cover of {{ audiovisual_record.name }}">
+                        </div>
+
+                        <h5>Genres:</h5>
+                        {% if audiovisual_record.genres %}
+                        <p>
+                            {% for genre in audiovisual_record.genres %}
+                                {% if forloop.last %}
+                                    <a class="secondary" href="/s/?ft=a&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}.</b></a>
+                                {% else %}
+                                    <a class="secondary" href="/s/?ft=a&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}, </b></a>
+                                {% endif %}
+                            {% endfor %}
+                        </p>
+                        {% else %}
+                        <p>Unavailable.</p>
+                        {% endif %}
+
+                        <h5>Directors:</h5>
+                        {% if audiovisual_record.directors %}
+                        <p>
+                            {% for person in audiovisual_record.directors %}
+                                {% if forloop.last %}
+                                    <a class="secondary" href="{{ person.search_url }}">{{ person.name }}.</a>
+                                {% else %}
+                                    <a class="secondary" href="{{ person.search_url }}">{{ person.name }}, </a>
+                                {% endif %}
+                            {% endfor %}
+                        </p>
+                        {% else %}
+                        <p>Unavailable.</p>
+                        {% endif %}
+
+                        <h5>Writers:</h5>
+                        {% if audiovisual_record.writers %}
+                        <p>
+                            {% for person in audiovisual_record.writers %}
+                                {% if forloop.last %}
+                                    <a class="secondary" href="{{ person.search_url }}">{{ person.name }}.</a>
+                                {% else %}
+                                    <a class="secondary" href="{{ person.search_url }}">{{ person.name }}, </a>
+                                {% endif %}
+                            {% endfor %}
+                        </p>
+                        {% else %}
+                        <p>Unavailable.</p>
+                        {% endif %}
+
+                        <h5>Stars:</h5>
+                        {% if audiovisual_record.stars %}
+                        <p>
+                            {% for person in audiovisual_record.stars %}
+                                {% if forloop.last %}
+                                    <a class="secondary" href="{{ person.search_url }}">{{ person.name }}.</a>
+                                {% else %}
+                                    <a class="secondary" href="{{ person.search_url }}">{{ person.name }}, </a>
+                                {% endif %}
+                            {% endfor %}
+                        </p>
+                        {% else %}
+                        <p>Unavailable.</p>
+                        {% endif %}
+
+                        {% if audiovisual_record.summary %}
+                        <h5>Summary:</h5>
+                        <p>{{ audiovisual_record.summary }}</p>
+                        {% endif %}
+
                     </div>
 
-                    <h5>Genres:</h5>
-                    {% if audiovisual_record.genres %}
-                    <p>
-                        {% for genre in audiovisual_record.genres %}
-                            {% if forloop.last %}
-                                <a class="secondary" href="/s/?ft=a&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}.</b></a>
-                            {% else %}
-                                <a class="secondary" href="/s/?ft=a&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}, </b></a>
-                            {% endif %}
+                    <div class="filmcard-footer">
+                        <hr>
+                        {% for score in audiovisual_record.scores %}
+                            <a href="{{ score.external_url }}" target="_blank">
+                                <div class="scoring-source .details">
+                                    <img class="scoring-source-logo" src="/static/web/img/information_sources/{{ score.source_name }}.png">
+                                    <h6 class="scoring-source-value">{{ score.value }}</h6>
+                                </div>
+                            </a>
                         {% endfor %}
-                    </p>
-                    {% else %}
-                    <p>Unavailable.</p>
-                    {% endif %}
+                    </div>
 
-                    <h5>Directors:</h5>
-                    {% if audiovisual_record.directors %}
-                    <p>
-                        {% for person in audiovisual_record.directors %}
-                            {% if forloop.last %}
-                                <a class="secondary" href="{{ person.search_url }}">{{ person.name }}.</a>
-                            {% else %}
-                                <a class="secondary" href="{{ person.search_url }}">{{ person.name }}, </a>
-                            {% endif %}
-                        {% endfor %}
-                    </p>
-                    {% else %}
-                    <p>Unavailable.</p>
-                    {% endif %}
-
-                    <h5>Writers:</h5>
-                    {% if audiovisual_record.writers %}
-                    <p>
-                        {% for person in audiovisual_record.writers %}
-                            {% if forloop.last %}
-                                <a class="secondary" href="{{ person.search_url }}">{{ person.name }}.</a>
-                            {% else %}
-                                <a class="secondary" href="{{ person.search_url }}">{{ person.name }}, </a>
-                            {% endif %}
-                        {% endfor %}
-                    </p>
-                    {% else %}
-                    <p>Unavailable.</p>
-                    {% endif %}
-
-                    <h5>Stars:</h5>
-                    {% if audiovisual_record.stars %}
-                    <p>
-                        {% for person in audiovisual_record.stars %}
-                            {% if forloop.last %}
-                                <a class="secondary" href="{{ person.search_url }}">{{ person.name }}.</a>
-                            {% else %}
-                                <a class="secondary" href="{{ person.search_url }}">{{ person.name }}, </a>
-                            {% endif %}
-                        {% endfor %}
-                    </p>
-                    {% else %}
-                    <p>Unavailable.</p>
-                    {% endif %}
-
-                    {% if audiovisual_record.summary %}
-                    <h5>Summary:</h5>
-                    <p>{{ audiovisual_record.summary }}</p>
-                    {% endif %}
-
-                    {% for score in audiovisual_record.scores %}
-                        <a href="{{ score.external_url }}" target="_blank">
-                            <div class="scoring-source .details">
-                                <img class="scoring-source-logo" src="/static/web/img/information_sources/{{ score.source_name }}.png">
-                                <h6 class="scoring-source-value">{{ score.value }}</h6>
-                            </div>
-                        </a>
-                    {% endfor %}
-
-                    <br><br>
                 </div>
+
             <br>
             </div>
             <div class="filmcard-wrapper col-sm-7">
 
                 <!-- Youtube trailer -->
-                {% if audiovisual_record.metadata.trailers.youtube %}
                 <div class="filmcard-title">
                     <h1>Trailer:</h1>
                 </div>
 
                 <div class="filmcard">
-                    <div class="trailer-container">
-                        <iframe class="trailer-iframe" frameBorder="0"
-                                allowfullscreen
-                                style="position:absolute;top:0;left:0;width:100%;height:100%;"
-                                src="{{ audiovisual_record.metadata.trailers.youtube }}">
-                        </iframe>
+                    <div class="filmcard-body">
+                        <div class="trailer-container" style="background: #999">
 
+                            {% if audiovisual_record.metadata.trailers.youtube %}
+                            <iframe class="trailer-iframe" frameBorder="0"
+                                    allowfullscreen
+                                    style="position:absolute;top:0;left:0;width:100%;height:100%;"
+                                    src="{{ audiovisual_record.metadata.trailers.youtube }}">
+                            </iframe>
+                            {% else %}
+                            <div class="trailer-iframe">
+                                <p style="color: white; text-align: center;">Not available</p>
+                            </div>
+                            {% endif %}
+
+                        </div>
                     </div>
-
+                    <div class="filmcard-footer">
+                        <hr>
+                        <p>Source YouTube</p>
+                    </div>
                 </div>
 
-                {% endif %}
             <br>
             </div>
         </div>
@@ -216,7 +232,6 @@
 
         <br>
         <br>
-        <br>
         <div class="text-center">
         {% include 'web/fragment_social_links.html'  with text=audiovisual_record.name|add:' Downloads' url=request.build_absolute_uri %}
         </div>
@@ -224,7 +239,6 @@
         <br>
 
         {% if related_records %}
-        <br>
         <br>
         <br>
         <div class="text-center">
