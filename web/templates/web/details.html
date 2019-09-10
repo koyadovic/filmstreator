@@ -152,13 +152,10 @@
             <br>
             </div>
         </div>
-        <!--
-        <br>
-        <div class="text-center">
-            <a href="javascript:history.back()" class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back</a>
-        </div>
-        -->
-
+{#        <br>#}
+{#        <div class="text-center">#}
+{#            <a href="javascript:history.back()" class="btn btn-secondary"><i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back</a>#}
+{#        </div>#}
         <div class="row">
                     <!-- Download sources -->
             <div class="filmcard-wrapper col-sm-12">
@@ -214,7 +211,9 @@
                                     {% if request.user.is_superuser %}
                                     <p><a href="#" onclick="removeDownloadLink('{{ download.id }}');" style="color: white;" class="btn btn-secondary">Remove</a></p>
                                     {% endif %}
+                                    {% if not forloop.last %}
                                     <hr>
+                                    {% endif %}
                                 </div>
                                 {% endfor %}
                             </div>

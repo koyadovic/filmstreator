@@ -249,17 +249,34 @@ footer {
 
 a {
     font-weight: 800;
-    color: #777;
+    color: #9d904d;
 }
 
 a:visited {
-    color: #777;
+    color: #9d904d;
 }
 
 a:hover {
     text-decoration: none;
-    color: #e1ce6f;
+    color: #eadc9a;
 }
+
+
+.navbar a.nav-link, .navbar a.dropdown-item {
+    color: #444;
+}
+.navbar a.nav-link:visited, .navbar a.dropdown-item:visited {
+    color: #444;
+}
+.navbar a.nav-link:hover, .navbar a.dropdown-item:hover {
+    font-weight: 800;
+    color: #999;
+}
+
+
+
+
+
 
 a.secondary {
     font-weight: 300;
@@ -390,7 +407,7 @@ a.secondary:hover {
 
 
 nav .active {
-    background: #99b4c1;
+    background: #ccc;
     border-radius: 4px;
 }
 
@@ -765,6 +782,9 @@ div.audiovisual-item-container:hover {
 /* Narrow screens like mobile phones */
 
 @media (max-width: 750px) {
+    .download-element-container {
+        padding: 5px;
+    }
     .downloads-table-big-screens {
         display: none;
     }
