@@ -17,7 +17,6 @@
 
 {% block content %}
     <div class="container">
-        <br>
         <div class="row">
             <div class="filmcard-wrapper col-sm-5">
                 <!-- name -->
@@ -116,7 +115,6 @@
 
                 </div>
 
-            <br>
             </div>
             <div class="filmcard-wrapper col-sm-7">
 
@@ -149,7 +147,6 @@
                     </div>
                 </div>
 
-            <br>
             </div>
         </div>
 {#        <br>#}
@@ -201,7 +198,6 @@
                                 </tbody>
                             </table>
                             <div class="downloads-table-small-screens">
-                                <br>
                                 {% for download in downloads %}
                                 <div class="download-element-container">
                                     <p><span>Download:</span><a class="secondary" href="{{ download.source_base_url_plus_relative_link }}" target="_blank"> {{ download.name }}</a></p>

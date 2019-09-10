@@ -274,7 +274,9 @@ a:hover {
 }
 
 
-
+.dropdown-item.active, .dropdown-item:active {
+    background-color: #ccc;
+}
 
 
 
@@ -408,9 +410,12 @@ a.secondary:hover {
 
 nav .active {
     background: #ccc;
-    border-radius: 4px;
+    /* border-radius: 4px; */
 }
 
+.dropdown-menu {
+    padding: 0;
+}
 .second-nav {
     /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
     z-index: 1;
@@ -907,12 +912,15 @@ div.audiovisual-item-container:hover {
 }
 
 
-
+:focus {
+    outline: 0;
+}
 
 
 .filmcard-wrapper {
     display: flex;
     flex-direction: column;
+    margin-top: 20px;
 }
 
 .filmcard-wrapper .filmcard-title h1 {

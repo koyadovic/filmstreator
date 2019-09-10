@@ -32,7 +32,7 @@ def landing(request):
             'deleted': False, 'has_downloads': True, 'general_information_fetched': True,
             'global_score__gte': 1.0
         },
-        sort_by=['-year', '-global_score'],
+        sort_by=['-year', '-created_date'],
         page_size=30, page=1, paginate=True
     ).get('results')
 
