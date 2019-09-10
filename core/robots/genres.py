@@ -68,7 +68,16 @@ def calculate_genres_with_films():
         ).get('results')
 
         if len(results) > 0:
-            genre_names_with_films.append(genre.name)
+            ar = AudiovisualRecord.search(
+                {
+                    'deleted': False, 'has_downloads': True,
+                    'general_information_fetched': True, 'genres__name': genre.name
+                }
+            )
+            genre.number = len(ar)
+            genre_names_with_films.append(genre)
+
+    genre_names_with_films.sort(key=lambda g: g.number, reverse=True)
     configuration = _get_or_create_configuration(CONFIG_KEY_GENRES_WITH_FILMS)
-    configuration.data = genre_names_with_films
+    configuration.data = [g.name for g in genre_names_with_films]
     configuration.save()

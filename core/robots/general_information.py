@@ -64,32 +64,11 @@ def _update(audiovisual_record, general_information_klass):
 
 # TODO disable when completed
 @Ticker.execute_each(interval='1-minute')
-def autocomplete_missing_summaries():
-    audiovisual_records_without_summary_key = AudiovisualRecord.search(
-        {'deleted': False, 'summary__exists': False},
-        paginate=True, page_size=100, page=1, sort_by='-global_score'
-    ).get('results')
-
-    with ThreadPoolExecutor(max_workers=3) as executor:
-        futures = []
-        for audiovisual_record in audiovisual_records_without_summary_key:
-            for general_information_klass in get_all_general_information_sources():
-                future = executor.submit(_update_only_summary, audiovisual_record, general_information_klass)
-                future.log_msg = f'Check summary of {audiovisual_record.name} with ' \
-                                 f'{general_information_klass.source_name}'
-                futures.append(future)
-        for future in concurrent.futures.as_completed(futures):
-            autocomplete_missing_summaries.log(future.log_msg)
-            future.result(timeout=600)
-
-
-# TODO disable when completed
-@Ticker.execute_each(interval='1-minute')
 def complete_correct_summaries():
     # This is a fix for bad summaries compiled.
     audiovisual_records_without_summary_key = AudiovisualRecord.search(
-        {'deleted': False, 'metadata__summary_fix__exists': False},
-        paginate=True, page_size=100, page=1, sort_by='-global_score'
+        {'deleted': False, 'metadata__summary_fix__exists': False, 'summary__neq': '', 'global_score__gte': 1.0},
+        paginate=True, page_size=10, page=1, sort_by='-global_score'
     ).get('results')
 
     with ThreadPoolExecutor(max_workers=3) as executor:

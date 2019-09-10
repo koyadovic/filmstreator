@@ -20,7 +20,6 @@ def compile_trailers_for_audiovisual_records_in_youtube():
     audiovisual_record = AudiovisualRecord.search({
         'deleted': False, 'general_information_fetched': True, 'has_downloads': True,
         'metadata__searched_trailers__youtube__exists': False, 'global_score__gte': 1.0,
-        'scores__votes__exists': True,
     }, paginate=True, page_size=1, page=1, sort_by='-global_score').get('results')
 
     if len(audiovisual_record) == 0:
