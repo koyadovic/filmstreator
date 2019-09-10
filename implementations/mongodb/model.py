@@ -159,15 +159,20 @@ class MongoAudiovisualRecord(AudiovisualRecord):
                 ('directors.name', pymongo.TEXT),
                 ('writers.name', pymongo.TEXT),
                 ('stars.name', pymongo.TEXT),
+                ('_textScoreValue', pymongo.TEXT),
             ],
-            weights={'name': 10, 'year': 9, 'directors.name': 3, 'writers.name': 3, 'stars.name': 3}
+            weights={'name': 10, 'year': 9, 'directors.name': 3, 'writers.name': 3, 'stars.name': 3},
+            name='text_field_index'
         )
         collection.create_index([
-            ('deleted', pymongo.DESCENDING),
-            ('has_downloads', pymongo.ASCENDING),
-            ('general_information_fetched', pymongo.ASCENDING),
-            ('slug', pymongo.ASCENDING),
-        ])
+                ('deleted', pymongo.DESCENDING),
+                ('has_downloads', pymongo.ASCENDING),
+                ('general_information_fetched', pymongo.ASCENDING),
+                ('slug', pymongo.ASCENDING)
+            ],
+            name='index'
+        )
+        collection.create_index('_textScoreValue')
 
     @property
     def id(self):
@@ -225,15 +230,19 @@ class MongoDownloadSourceResult(DownloadSourceResult):
                 ('name', pymongo.TEXT),
                 ('source_name', pymongo.TEXT),
                 ('quality', pymongo.TEXT),
-
+                ('_textScoreValue', pymongo.TEXT),
             ],
-            weights={'name': 5, 'source_name': 1, 'quality': 2}
+            weights={'name': 5, 'source_name': 1, 'quality': 2},
+            name='text_field_index'
         )
         collection.create_index([
-            ('audiovisual_record', pymongo.ASCENDING),
-            ('deleted', pymongo.ASCENDING),
-            ('quality', pymongo.DESCENDING),
-        ])
+                ('audiovisual_record', pymongo.ASCENDING),
+                ('deleted', pymongo.ASCENDING),
+                ('quality', pymongo.DESCENDING),
+            ],
+            name='index'
+        )
+        collection.create_index('_textScoreValue')
 
     @property
     def id(self):
@@ -246,8 +255,8 @@ class MongoConfiguration(Configuration):
     collection_name = 'configurations'
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
         self._id = kwargs.pop('_id', None)
+        super().__init__(**kwargs)
 
     @classmethod
     def convert(cls, configuration):

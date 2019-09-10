@@ -102,11 +102,11 @@ def complete_correct_summaries():
                                  f'{general_information_klass.source_name}'
                 futures.append(future)
         for future in concurrent.futures.as_completed(futures):
-            complete_correct_summaries.log(future.log_msg)
             future.result(timeout=600)
             audiovisual_record.refresh()
             audiovisual_record.metadata['summary_fix'] = True
             audiovisual_record.save()
+            complete_correct_summaries.log(future.log_msg)
 
 
 def _update_only_summary(audiovisual_record, general_information_klass):

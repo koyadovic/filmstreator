@@ -108,6 +108,11 @@ class PhantomBrowsingSession:
                     log_message(e, only_file=True)
                     tryings += 1
 
+            except requests.exceptions.ChunkedEncodingError as e:
+                self.log(f'{e}')
+                log_message(e, only_file=True)
+                tryings += 1
+
             except requests.exceptions.RequestException as e:
                 """An general requests error occurred."""
                 self.log(f'{e}')
@@ -206,7 +211,7 @@ class BrowsingIdentity:
             config.data['errors'][current_proxy] = 0
         config.data['errors'][current_proxy] += 1
         if (
-            config.data['errors'][current_proxy] >= 3 and
+            config.data['errors'][current_proxy] >= 10 and
             current_proxy not in config.data['bad']
         ):
             config.data['bad'].append(current_proxy)

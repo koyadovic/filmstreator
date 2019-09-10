@@ -136,7 +136,7 @@ class DAOMongoDB(DAOInterface):
         collection = self._get_collection(MongoConfiguration)
         result = collection.find_one({'key': configuration.key})
         if result is not None:
-            retrieved = MongoConfiguration.convert(**result)
+            retrieved = MongoConfiguration.convert(result)
             configuration.data = retrieved.data
 
     """

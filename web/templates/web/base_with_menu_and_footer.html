@@ -46,13 +46,13 @@
     </div>
 {% if is_landing %}
     </section>
-    <nav class="sidebar white-text dark-back">
+    <nav class="sidebar">
     <!-- {'ft': 'advanced', 'genres__name__in': ['Crime', 'Drama'], 'year__gte': '1970', 'year__lte': '2019'} -->
         <br>
         <h5>Advanced search
             <a id="search-tooltip" data-toggle="tooltip" data-html="true"
                title data-original-title="All fields are optional. If any of them (or all) are empty, search wont use them. <br><br>You can search by <b>titles</b>, <b>writers</b>, <b>directors</b>, <b>actors</b>, <b>years</b>, <b>synopsis</b>.<br><br>You can <b>search by literal</b> texts by quoting them. &quot;Matt Damon&quot;, for example.<br><br>You can <b>exclude</b> text by placing a minus symbol in front, -2015 for example.">
-                <i style="color: white" class="fa fa-info-circle" aria-hidden="true"></i>
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
             </a>
         </h5>
 
@@ -102,7 +102,7 @@
 </div>
 {% endif %}
 <!-- footer -->
-{% include 'web/fragment_footer.html' %}
+{#{% include 'web/fragment_footer.html' %}#}
 {% endblock %}
 
 
