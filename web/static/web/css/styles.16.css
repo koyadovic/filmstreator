@@ -64,7 +64,7 @@ body {
     margin-top: 17px;
     margin-bottom: 5em;
     overflow-x: hidden;
-    /* background: #fff; */
+    background: #eee;
 }
 
 h1, h2, h3, h4, h5, label {
