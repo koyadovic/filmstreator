@@ -76,6 +76,8 @@ class PhantomBrowsingSession:
                         self._identity.proxy_okay()
                         return self
                     if 400 <= response.status_code <= 500 or response.status_code in [503]:
+                        if 400 <= response.status_code <= 500:
+                            tryings += 1
                         self.log(f'Status {response.status_code}. Refreshing identity.')
                         self.refresh_identity()
                     else:
