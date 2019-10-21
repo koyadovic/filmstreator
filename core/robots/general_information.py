@@ -67,7 +67,7 @@ def _update(audiovisual_record, general_information_klass):
 def complete_correct_summaries():
     # This is a fix for bad summaries compiled.
     audiovisual_records_without_summary_key = AudiovisualRecord.search(
-        {'deleted': False, 'metadata__summary_fix__exists': False, 'summary__neq': '', 'global_score__gte': 0.2},
+        {'deleted': False, 'metadata__summary_fix__exists': False, 'summary__neq': '', 'global_score__gte': 0.1},
         paginate=True, page_size=10, page=1, sort_by='-global_score'
     ).get('results')
 
@@ -120,7 +120,7 @@ def save_audiovisual_images_locally():
         {
             'deleted': False, 'general_information_fetched': True,
             'has_downloads': True, 'metadata__local_image__exists': False,
-            'global_score__gte': 0.2,
+            'global_score__gte': 0.1,
         },
         paginate=True, page_size=10, page=1, sort_by='-global_score'
     ).get('results')
