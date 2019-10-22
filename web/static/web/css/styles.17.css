@@ -734,10 +734,11 @@ nav.sidebar {
     position: fixed;
     width: 20em;
     height: 100vh;
-    padding: 0 15px;
+    padding: 0 15px 110px 15px;
     background: #eee;
     top: 0;
-    margin-top: 118px;
+    margin-top: 135px;
+    overflow-y: auto;
 }
 
 section.content {
@@ -785,6 +786,14 @@ div.audiovisual-item-container:hover {
     word-break: break-all;
 }
 /* Narrow screens like mobile phones */
+@media (max-width: 815px) {
+    * {
+        font-size: .900rem;
+    }
+    nav.sidebar {
+        margin-top: 124px;
+    }
+}
 
 @media (max-width: 750px) {
     .download-element-container {
@@ -825,7 +834,7 @@ div.audiovisual-item-container:hover {
         width:100%;
         height: auto;
         box-shadow: none;
-        margin-top: 20px;
+        margin-top: 0px;
     }
     section.content {
         margin-left: 0em;
