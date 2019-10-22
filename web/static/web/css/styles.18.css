@@ -168,6 +168,24 @@ footer {
     width: 100%;
 }
 
+.genre-accordion-btn {
+    width: 100%;
+    padding: 5px;
+    background: #40464b;
+    color: #f4d599;
+    border: 0 solid black;
+    outline:0 !important;
+}
+.genre-accordion-btn[aria-expanded="true"]{
+    background: #50464b;
+    font-weight: 800;
+}
+
+.genre-accordion-btn:not(.collapsed) {
+}
+
+
+
 
 
 /* */

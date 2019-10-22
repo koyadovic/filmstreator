@@ -47,6 +47,37 @@
 {% if is_landing %}
     </section>
     <nav class="sidebar">
+        <br>
+
+
+
+    <div id="accordion">
+    {% for genres_name in genres_names %}
+        <div class="">
+            <div class="nav-item" id="heading{{ genres_name }}">
+                <h5 class="mb-0">
+                <button class="genre-accordion-btn" data-toggle="collapse" data-target="#collapse{{ genres_name }}" aria-expanded="false" aria-controls="collapse{{ genres_name }}">
+                {{ genres_name }}
+                </button>
+                </h5>
+            </div>
+
+            <div id="collapse{{ genres_name }}" class="collapse" aria-labelledby="heading{{ genres_name }}" data-parent="#accordion">
+                <div class="card-body">
+                <a class="btn btn-secondary">Best 70s {{ genres_name }} movies</a>
+                <a class="btn btn-secondary">Best 80s {{ genres_name }} movies</a>
+                <a class="btn btn-secondary">Best 90s {{ genres_name }} movies</a>
+                <a class="btn btn-secondary">Best 2000s {{ genres_name }} movies</a>
+                <a class="btn btn-secondary">Best 2010s {{ genres_name }} movies</a>
+                <a class="btn btn-secondary">Best {{ genres_name }} movies all times</a>
+{#                <a class="btn btn-secondary">Best of 2020</a>#}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+
+
 
         <br>
         <h5>Advanced search
