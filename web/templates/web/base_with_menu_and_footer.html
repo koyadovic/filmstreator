@@ -6,35 +6,35 @@
 
 <nav class="notbody navbar top-navbar top-nav">
     <a class="text_with_2px_border navbar-brand" href="/">Filmstreator</a>
-    {% include 'web/fragment_landing_filters.html' %}
 </nav>
 
 {% if genres_names %}
-<nav class="navbar navbar-default navbar-static-top second-nav {{ context_class }}">
-    {% for genres_name in genres_names %}
-        {% if forloop.counter < 6 %}
-        <li class="nav-item{% if genres_name == current_genre %} active{% endif %}">
-            <a class="nav-link" href="/genres/{{ genres_name }}/">{{ genres_name }}<span class="sr-only">(current)</span></a>
-        </li>
-        {% endif %}
-    {% endfor %}
+{#<nav class="navbar navbar-default navbar-static-top second-nav {{ context_class }}">#}
 
-    {% if genres_names|length > 5 %}
-
-    <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            More
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            {% for genres_name in genres_names %}
-                {% if forloop.counter > 5 %}
-                <a class="dropdown-item{% if genres_name == current_genre %} active{% endif %}" href="/genres/{{ genres_name }}/">{{ genres_name }}</a>
-                {% endif %}
-            {% endfor %}
-        </div>
-    </li>
-    {% endif %}
-</nav>
+{#    {% for genres_name in genres_names %}#}
+{#        {% if forloop.counter < 6 %}#}
+{#        <li class="nav-item{% if genres_name == current_genre %} active{% endif %}">#}
+{#            <a class="nav-link" href="/genres/{{ genres_name }}/">{{ genres_name }}<span class="sr-only">(current)</span></a>#}
+{#        </li>#}
+{#        {% endif %}#}
+{#    {% endfor %}#}
+{##}
+{#    {% if genres_names|length > 5 %}#}
+{##}
+{#    <li class="nav-item dropdown">#}
+{#        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
+{#            More#}
+{#        </a>#}
+{#        <div class="dropdown-menu" aria-labelledby="navbarDropdown">#}
+{#            {% for genres_name in genres_names %}#}
+{#                {% if forloop.counter > 5 %}#}
+{#                <a class="dropdown-item{% if genres_name == current_genre %} active{% endif %}" href="/genres/{{ genres_name }}/">{{ genres_name }}</a>#}
+{#                {% endif %}#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#    </li>#}
+{#    {% endif %}#}
+{#</nav>#}
 {% endif %}
 
 {% if is_landing %}
@@ -47,30 +47,60 @@
 {% if is_landing %}
     </section>
     <nav class="sidebar">
+    {% include 'web/fragment_landing_filters.html' %}
         <br>
 
-
-
+    <h5 class="text-center">Explore all genres</h5>
+    <hr>
     <div id="accordion">
     {% for genres_name in genres_names %}
         <div class="">
             <div class="nav-item" id="heading{{ genres_name }}">
                 <h5 class="mb-0">
-                <button class="genre-accordion-btn" data-toggle="collapse" data-target="#collapse{{ genres_name }}" aria-expanded="false" aria-controls="collapse{{ genres_name }}">
-                {{ genres_name }}
+                <button class="genre-accordion-btn" data-toggle="collapse" data-target="#collapse{{ genres_name }}" aria-expanded="{% if genres_name in filter_params.genres__name__in %}true{% else %}false{% endif %}" aria-controls="collapse{{ genres_name }}">
+                <i class="fa fa-chevron-down"></i> {{ genres_name }}
                 </button>
                 </h5>
             </div>
 
-            <div id="collapse{{ genres_name }}" class="collapse" aria-labelledby="heading{{ genres_name }}" data-parent="#accordion">
+            <div id="collapse{{ genres_name }}" class="collapse{% if genres_name in filter_params.genres__name__in %} show{% endif %}" aria-labelledby="heading{{ genres_name }}" data-parent="#accordion">
                 <div class="card-body">
-                <a class="btn btn-secondary">Best 70s {{ genres_name }} movies</a>
-                <a class="btn btn-secondary">Best 80s {{ genres_name }} movies</a>
-                <a class="btn btn-secondary">Best 90s {{ genres_name }} movies</a>
-                <a class="btn btn-secondary">Best 2000s {{ genres_name }} movies</a>
-                <a class="btn btn-secondary">Best 2010s {{ genres_name }} movies</a>
-                <a class="btn btn-secondary">Best {{ genres_name }} movies all times</a>
-{#                <a class="btn btn-secondary">Best of 2020</a>#}
+                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1979' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=1970&year__lte=1979&ordering=-global_score">
+                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1979' %}
+                    <i class="fa fa-angle-right"></i>
+                    {% endif %}
+                    Best 70s {{ genres_name }} movies
+                </a>
+                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1989' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=1980&year__lte=1989&ordering=-global_score">
+                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1989' %}
+                    <i class="fa fa-angle-right"></i>
+                    {% endif %}
+                    Best 80s {{ genres_name }} movies
+                </a>
+                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1999' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=1990&year__lte=1999&ordering=-global_score">
+                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1999' %}
+                    <i class="fa fa-angle-right"></i>
+                    {% endif %}
+                    Best 90s {{ genres_name }} movies
+                </a>
+                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2009' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=2000&year__lte=2009&ordering=-global_score">
+                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2009' %}
+                    <i class="fa fa-angle-right"></i>
+                    {% endif %}
+                    Best 2000s {{ genres_name }} movies
+                </a>
+                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2019' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=20100&year__lte=2019&ordering=-global_score">
+                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2019' %}
+                    <i class="fa fa-angle-right"></i>
+                    {% endif %}
+                    Best 2010s {{ genres_name }} movies
+                </a>
+                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '3000' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__lte=3000&ordering=-global_score">
+                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '3000' %}
+                    <i class="fa fa-angle-right"></i>
+                    {% endif %}
+                    Best {{ genres_name }} movies all times
+                </a>
                 </div>
             </div>
         </div>
@@ -78,57 +108,8 @@
     </div>
 
 
-
-        <br>
-        <h5>Advanced search
-            <a id="search-tooltip" data-toggle="tooltip" data-html="true"
-               title data-original-title="All fields are optional. If any of them (or all) are empty, search wont use them. <br><br>You can search by <b>titles</b>, <b>writers</b>, <b>directors</b>, <b>actors</b>, <b>years</b>, <b>synopsis</b>.<br><br>You can <b>search by literal</b> texts by quoting them. &quot;Matt Damon&quot;, for example.<br><br>You can <b>exclude</b> text by placing a minus symbol in front, -2015 for example.">
-                <i class="fa fa-info-circle" aria-hidden="true"></i>
-            </a>
-        </h5>
-
-        <form id="advanced-search-form" action="/s/" method="GET" autocomplete="off">
-            <input type="hidden" name="ft" value="a">
-            <label>Search:</label>
-            <input type="text" class="form-control" placeholder="Title, writers, directors, actors, years" name="s"
-                    value="{% if filter_params.ft == 'a' %}{{ filter_params.s }}{% endif %}">
-
-            <label>Ordering:</label>
-            <select name="ordering" class="form-control">
-                <option value="-global_score"{% if filter_params.ordering == '-global_score' %} selected="selected"{% endif %}>Most relevant first</option>
-                <option value="global_score"{% if filter_params.ordering == 'global_score' %} selected="selected"{% endif %}>Less relevant first</option>
-            </select>
-            <label>Wanted genres:</label>
-            <select id="genres-select" class="form-control" name="genres__in" multiple="multiple" size="7">
-                {% for genres_name in genres_names %}
-                    <option value="{{ genres_name }}"
-                    {% if genres_name in filter_params.genres__name__in %} selected="selected"{% endif %}>{{ genres_name }}</option>
-                {% endfor %}
-            </select>
-            <label>Film from year:</label>
-            <select name="year__gte" class="form-control">
-                {% for y in year_range %}
-                <option value="{{ y }}"{% if y == filter_params.year__gte %} selected="selected"{% endif %}>{{ y }}</option>
-                {% endfor %}
-            </select>
-            <label>To year:</label>
-            <select name="year__lte" class="form-control">
-                {% if filter_params.year__lte %}
-                    {% for y in year_range %}
-                        <option a="a" value="{{ y }}"{% if y == filter_params.year__lte %} selected="selected"{% endif %}>{{ y }}</option>
-                    {% endfor %}
-                {% else %}
-                    {% for y in year_range %}
-                        <option b="b" value="{{ y }}"{% if forloop.last %} selected="selected"{% endif %}>{{ y }}</option>
-                    {% endfor %}
-                {% endif %}
-            </select>
-            <br>
-            <div class="text-center">
-                <input type="submit" name="submit" value="Search" class="btn btn-secondary">
-            </div>
-            <br><br>
-        </form>
+    <br>
+{#    {% include 'web/fragment_advanced_search.html' %}#}
     </nav>
 </div>
 {% endif %}
