@@ -102,7 +102,7 @@ def details(request, slug=None):
 
     # Add to each person the search url to be used later in the template
     for person in audiovisual_record.directors + audiovisual_record.writers + audiovisual_record.stars:
-        person.search_url = f'/s/?ft=a&s="{person.name}"'.replace(' ', '+')
+        person.search_url = f'/s/?ft=b&s="{person.name}"'.replace(' ', '+')
 
     # related audiovisual records
     # TODO esto toca un poco los huevos

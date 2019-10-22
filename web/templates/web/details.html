@@ -40,9 +40,9 @@
                         <p>
                             {% for genre in audiovisual_record.genres %}
                                 {% if forloop.last %}
-                                    <a class="secondary" href="/s/?ft=a&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}.</b></a>
+                                    <a class="secondary" href="/s/?ft=b&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}.</b></a>
                                 {% else %}
-                                    <a class="secondary" href="/s/?ft=a&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}, </b></a>
+                                    <a class="secondary" href="/s/?ft=b&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}, </b></a>
                                 {% endif %}
                             {% endfor %}
                         </p>
@@ -157,9 +157,9 @@
                         <p>
                             {% for genre in audiovisual_record.genres %}
                                 {% if forloop.last %}
-                                    <a class="secondary" href="/s/?ft=a&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}.</b></a>
+                                    <a class="secondary" href="/s/?ft=b&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}.</b></a>
                                 {% else %}
-                                    <a class="secondary" href="/s/?ft=a&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}, </b></a>
+                                    <a class="secondary" href="/s/?ft=b&genres__name__in={{ genre.name }}&ordering=-global_score"><b>{{ genre.name }}, </b></a>
                                 {% endif %}
                             {% endfor %}
                         </p>
