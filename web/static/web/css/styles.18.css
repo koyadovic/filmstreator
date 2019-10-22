@@ -236,14 +236,14 @@ a:hover {
 
 
 .navbar a.nav-link, .navbar a.dropdown-item {
-    color: #c1a266;
+    color: #f4d599;
 }
 .navbar a.nav-link:visited, .navbar a.dropdown-item:visited {
-    color: #c1a266;
+    color: #f4d599;
 }
 .navbar a.nav-link:hover, .navbar a.dropdown-item:hover {
     font-weight: 800;
-    color: #f4d599;
+    color: #fff;
 }
 
 
