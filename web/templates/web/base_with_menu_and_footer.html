@@ -3,62 +3,52 @@
 {% block title %}Filmstreator{% endblock %}
 
 {% block body %}
-
-<nav class="notbody navbar top-navbar top-nav">
-    <a class="text_with_2px_border navbar-brand" href="/">Filmstreator</a>
-    <span class="hidden-sidebar-hamburger" style="font-size:30px;cursor:pointer" onclick="toggleNav()">&#9776;</span>
-</nav>
-
-{% if is_landing %}
-<div class="wrapper">
-    <section class="content">
-{% endif %}
-    <div class="main-container {% if is_landing %}container-fluid{% else %}container{% endif %}">
-        {% block content %}{% endblock %}
-    </div>
-{% if is_landing %}
-    </section>
-    <nav class="sidebar">
-    {% include 'web/fragment_explore_genres.html' %}
+    <nav class="notbody navbar top-navbar top-nav">
+        <span id="hidden-sidebar-hamburger" class="hidden-sidebar-hamburger" style="font-size:1.8em;cursor:pointer" onclick="toggleNav()">&#9776;</span>
+        <a class="text_with_2px_border navbar-brand" href="/">Filmstreator</a>
     </nav>
-</div>
-{% endif %}
-<!-- footer -->
-{#{% include 'web/fragment_footer.html' %}#}
+    {% if is_landing %}
+    <div class="wrapper">
+        <section id="content" class="content">
+    {% endif %}
+        <div class="main-container {% if is_landing %}container-fluid{% else %}container{% endif %}">
+            {% block content %}{% endblock %}
+        </div>
+    {% if is_landing %}
+        </section>
+        <nav id="sidebar" class="sidebar">
+        {% include 'web/fragment_explore_genres.html' %}
+        </nav>
+    </div>
+    {% endif %}
 {% endblock %}
 
-
 {% block body_extra_js %}
-<script>
-function toggleNav() {
-    var current = $('nav.sidebar').css('left');
-    if (current == "0px") $('nav.sidebar').css('left', '-20em'); else $('nav.sidebar').css('left', '0px');
-}
-</script>
-<script>
-$(document).ready(function () {
-    $('#search-tooltip').tooltip();
+    <script>
+    </script>
 
-    $('#advanced-search-form').on('submit', function (event) {
-        event.preventDefault();
-        var selectedGenresArray = [];
-        $('#genres-select :selected').each(function(i, selected){
-            selectedGenresArray.push($(selected).text());
+    <script>
+    $(document).ready(function () {
+        $('#search-tooltip').tooltip();
+        $('#advanced-search-form').on('submit', function (event) {
+            event.preventDefault();
+            var selectedGenresArray = [];
+            $('#genres-select :selected').each(function(i, selected){
+                selectedGenresArray.push($(selected).text());
+            });
+            var selectedGenres = selectedGenresArray.join(',');
+            var searchSimilar = $("#advanced-search-form input[name=s]").val();
+            var ordering = $("#advanced-search-form select[name=ordering]").val();
+            var yearGte = $("#advanced-search-form select[name=year__gte]").val();
+            var yearLte = $("#advanced-search-form select[name=year__lte]").val();
+            var url = '/s/?ft=a';
+            if(searchSimilar !== '') url += '&s=' + searchSimilar;
+            if (selectedGenres !== '') url += '&genres__name__in=' + selectedGenres;
+            url += '&year__gte=' + yearGte;
+            url += '&year__lte=' + yearLte;
+            url += '&ordering=' + ordering;
+            window.location = url;
         });
-        var selectedGenres = selectedGenresArray.join(',');
-        var searchSimilar = $("#advanced-search-form input[name=s]").val();
-        var ordering = $("#advanced-search-form select[name=ordering]").val();
-        var yearGte = $("#advanced-search-form select[name=year__gte]").val();
-        var yearLte = $("#advanced-search-form select[name=year__lte]").val();
-
-        var url = '/s/?ft=a';
-        if(searchSimilar !== '') url += '&s=' + searchSimilar;
-        if (selectedGenres !== '') url += '&genres__name__in=' + selectedGenres;
-        url += '&year__gte=' + yearGte;
-        url += '&year__lte=' + yearLte;
-        url += '&ordering=' + ordering;
-        window.location = url;
     });
-});
-</script>
+    </script>
 {% endblock %}
