@@ -733,6 +733,7 @@ td {
 nav.sidebar {
     position: fixed;
     width: 20em;
+    /*width: 0;*/
     height: 100vh;
     padding: 20px 0px 110px 0px;
     background: #40464b;
@@ -740,6 +741,7 @@ nav.sidebar {
     margin-top: 62px;
     overflow-y: auto;
     z-index: 1000;
+    transition: 0.3s;
 }
 
 nav.sidebar form {
@@ -798,6 +800,15 @@ div.audiovisual-item-container:hover {
     display: none;
     word-break: break-all;
 }
+
+
+/* Hidden sidebar */
+.hidden-sidebar-hamburger {
+    display: none;
+}
+
+
+
 /* Narrow screens like mobile phones */
 @media (max-width: 815px) {
     * {
@@ -809,6 +820,9 @@ div.audiovisual-item-container:hover {
 }
 
 @media (max-width: 750px) {
+    .hidden-sidebar-hamburger {
+        display: inherit;
+    }
     .download-element-container {
         padding: 5px;
     }
@@ -843,8 +857,11 @@ div.audiovisual-item-container:hover {
     }
     nav.sidebar {
         display: block;
-        position: static;
-        width:100%;
+        position: fixed;
+        width: 0;
+        top: 0;
+        left: 0;
+        bottom: 0;
         height: auto;
         box-shadow: none;
         margin-top: 0px;
