@@ -39,8 +39,9 @@ def landing(request):
     # filtering by users
     try:
         ordering = get_params.pop('ordering', None)
-
         filter_dict = _process_get_params_and_get_filter_dict(get_params)
+        get_params['ordering'] = ordering
+
         filter_dict['deleted'] = False
         filter_dict['has_downloads'] = True
         additional_kwargs = {
@@ -236,7 +237,7 @@ def genre_epoch_view(request, genre=None, epoch=None):
     elif epoch == '2010s':
         search.update({'year__gte': '2010', 'year__lte': '2019'})
     else:
-        epoch = 'all-times'
+        epoch = 'All-Times'
 
     paginator = AudiovisualRecord.search(search, paginate=True, page_size=20, page=page,
                                          sort_by=['-global_score'])
@@ -258,35 +259,6 @@ def genre_epoch_view(request, genre=None, epoch=None):
     }
 
     return render(request, 'web/genre_epoch.html', context=context)
-
-
-def best_decade(request, decade):
-    # TODO
-    page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
-    year_from, year_until = _get_year_time_frame(decade)
-    filter_dict = {
-        'year__gte': year_from, 'year__lte': year_until,
-        'deleted': False, 'has_downloads': True
-    }
-    additional_kwargs = {
-        'paginate': True,
-        'page_size': 20,
-        'page': page,
-        'sort_by': '-global_score'
-    }
-
-    paginator = AudiovisualRecord.search(filter_dict, **additional_kwargs)
-    serializer = AudiovisualRecordSerializer(paginator.get('results', []), many=True)
-    paginator['results'] = serializer.data
-    context = {
-        'context_class': 'landing',
-        'is_landing': False,
-        'search': paginator,
-        'genres_names': _get_genres(),
-        'qualities': VideoQualityInStringDetector.our_qualities,
-        'year_range': [str(y) for y in range(1970, int(datetime.utcnow().strftime('%Y')) + 1)]
-    }
-    return render(request, 'web/landing.html', context=context)
 
 
 def _get_year_time_frame(decade):
@@ -403,7 +375,7 @@ def _process_get_params_and_get_filter_dict(params):
             continue
         k_parts = k.split('__')
         if k_parts[-1] in ['in', 'nin']:
-            v = [v]
+            v = v.split(',')
 
         if k == 's':
             filter_dict['search__simil'] = v
