@@ -208,6 +208,58 @@ def genre_view(request, genre=None):
     return render(request, 'web/genre.html', context=context)
 
 
+@view_function_timer()
+def genre_epoch_view(request, genre=None, epoch=None):
+    try:
+        referer_uri = request.META['HTTP_REFERER']
+        # get_params = {p.split('=')[0]: p.split('=')[1] for p in referer_uri.split('?')[1].split('&')}
+    except (IndexError, KeyError):
+        pass
+        # get_params = {}
+
+    page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)
+    search = {
+        'deleted': False,
+        'has_downloads': True,
+        'general_information_fetched': True,
+        'genres__name': genre,
+        'global_score__gte': 0.1,
+    }
+    if epoch == '70s':
+        search.update({'year__gte': '1970', 'year__lte': '1979'})
+    elif epoch == '80s':
+        search.update({'year__gte': '1980', 'year__lte': '1989'})
+    elif epoch == '90s':
+        search.update({'year__gte': '1990', 'year__lte': '1999'})
+    elif epoch == '2000s':
+        search.update({'year__gte': '2000', 'year__lte': '2009'})
+    elif epoch == '2010s':
+        search.update({'year__gte': '2010', 'year__lte': '2019'})
+    else:
+        epoch = 'all-times'
+
+    paginator = AudiovisualRecord.search(search, paginate=True, page_size=20, page=page,
+                                         sort_by=['-year', '-created_date', '-global_score'])
+
+    serializer = AudiovisualRecordSerializer(paginator.get('results', []), many=True)
+    paginator['results'] = serializer.data
+    _add_previous_and_next_navigation_uris_to_search(raw_uri, paginator)
+
+    context = {
+        # 'filter_params': get_params,
+        'context_class': 'genre_view',
+        'is_landing': True,
+        'current_genre': genre,
+        'genres_names': _get_genres(),
+        'epoch': epoch,
+        'qualities': VideoQualityInStringDetector.our_qualities,
+        'search': paginator,
+        'year_range': range(1970, int(datetime.utcnow().strftime('%Y')) + 1)
+    }
+
+    return render(request, 'web/genre_epoch.html', context=context)
+
+
 def best_decade(request, decade):
     # TODO
     page, raw_uri = _check_if_erroneous_page_and_get_page_and_right_uri(request)

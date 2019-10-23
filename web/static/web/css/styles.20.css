@@ -868,11 +868,11 @@ div.audiovisual-item-container:hover {
         position: fixed;
         /*width: 0;*/
         top: 0;
-        left: -19em;
+        left: -20em;
         bottom: 0;
         height: auto;
-        box-shadow: none;
         margin-top: 0px;
+        box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
     }
     section.content {
         margin-left: 0em;

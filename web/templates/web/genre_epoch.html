@@ -1,0 +1,35 @@
+{% extends "web/base_with_menu_and_footer.html" %}
+{% load static %}
+{% block title %}Filmstreator - {{ current_genre }}{% endblock %}
+
+    {% block head_extra %}
+    <meta name="description" content="Filmstreator Most recent films about {{ current_genre.lower }}.">
+    {% endblock %}
+
+{% block content %}
+    <br>
+    <h1 class="text-center">Best {{ epoch }} {{ current_genre.lower }} movies</h1>
+
+    {% include 'web/fragment_page_navigation.html' %}
+
+    <!-- results -->
+    <div class="text-center">
+    {% for audiovisual_item in search.results %}
+        {% include 'web/fragment_audiovisual_item.html' with ai=audiovisual_item %}
+    {% empty %}
+        <p>Sorry but there is nothing to show here ...</p>
+    {% endfor %}
+    </div>
+
+    {% if search.results %}
+    {% include 'web/fragment_page_navigation.html' %}
+    <br>
+    <br>
+    <div class="text-center">
+    {% include 'web/fragment_social_links.html'  with text='Best films about '|add:current_genre url=request.build_absolute_uri %}
+    </div>
+    <br>
+    <br>
+    {% endif %}
+
+{% endblock %}

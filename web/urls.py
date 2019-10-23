@@ -17,6 +17,7 @@ urlpatterns = [
     path('remove-film/<str:object_id>/', views.remove_film),
 
     # regular pages
+    path('genres/<str:genre>/<str:epoch>/', views.genre_epoch_view),
     path('best/<str:decade>/', views.best_decade),
     path('genres/<str:genre>/', views.genre_view),
     path('s/', views.landing),
