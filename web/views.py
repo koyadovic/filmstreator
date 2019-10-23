@@ -239,7 +239,7 @@ def genre_epoch_view(request, genre=None, epoch=None):
         epoch = 'all-times'
 
     paginator = AudiovisualRecord.search(search, paginate=True, page_size=20, page=page,
-                                         sort_by=['-year', '-created_date', '-global_score'])
+                                         sort_by=['-global_score'])
 
     serializer = AudiovisualRecordSerializer(paginator.get('results', []), many=True)
     paginator['results'] = serializer.data
