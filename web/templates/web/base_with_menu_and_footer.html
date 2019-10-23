@@ -31,8 +31,9 @@
 {% block body_extra_js %}
 <script>
 function toggleNav() {
-    var currentW = $('nav.sidebar').width();
-    if (currentW == 0) $('nav.sidebar').width('20em'); else $('nav.sidebar').width('0');
+    console.log($('nav.sidebar').css('left'));
+    var current = $('nav.sidebar').css('left');
+    if (current == "0px") $('nav.sidebar').css('left', '-19em'); else $('nav.sidebar').css('left', '0px');
 }
 </script>
 <script>

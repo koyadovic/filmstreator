@@ -181,6 +181,7 @@ footer {
 .genre-accordion-btn[aria-expanded="true"]{
     background: #53585d;
     font-weight: 800;
+    color: #fff;
 }
 .genre-accordion-btn i {
     margin-right: 5px;
@@ -732,8 +733,9 @@ td {
 
 nav.sidebar {
     position: fixed;
-    width: 20em;
+    width: 19em;
     /*width: 0;*/
+    left: 0px;
     height: 100vh;
     padding: 20px 0px 110px 0px;
     background: #40464b;
@@ -757,7 +759,7 @@ nav.sidebar h5, nav.sidebar label {
 }
 
 section.content {
-    margin-left: 20em;
+    margin-left: 19em;
 }
 
 section.content .main-container.container-fluid {
@@ -816,7 +818,7 @@ div.audiovisual-item-container:hover {
     }
     nav.sidebar {
         margin-top: 52px;
-        width: 20em;
+        width: 19em;
     }
 }
 
@@ -859,9 +861,9 @@ div.audiovisual-item-container:hover {
     nav.sidebar {
         display: block;
         position: fixed;
-        width: 0;
+        /*width: 0;*/
         top: 0;
-        left: 0;
+        left: -19em;
         bottom: 0;
         height: auto;
         box-shadow: none;
