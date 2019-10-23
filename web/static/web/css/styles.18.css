@@ -2,38 +2,10 @@
 COLORS
  */
 
-/*
-nav.notbody.navbar.navbar-dark.bg-dark.top-navbar.top-nav {
-    background-color: #004466 !important;
-}
-footer#sticky-footer {
-    background-color: #004466 !important;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);
-}
-.btn.btn-secondary {
-    background-color: #326984 !important;
-    border-color: #046;
-}
-.btn.btn-secondary:hover {
-    background-color: #4c7c93 !important;
-}
-.sidebar {
-    color: #046;
-}
-section.content {
-    background: #eee;
-}
-body div.wrapper {
-    background: #eee;
-}
-*/
-
-/*
- COLORS
- */
 .second-nav {
-    background: #eee;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);
+    background: #40464b;
+    border-bottom: 2px solid #f2cb80;
+    /*box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);*/
 }
 
 * {
@@ -58,6 +30,7 @@ html, section.content {
     top: 0;
     left: 0;
     right: 0;
+    background: #F2CB80;
 }
 
 body {
@@ -91,7 +64,7 @@ h5 {
 
 
 nav.top-nav {
-    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1), 0 3px 5px 0 rgba(0, 0, 0, 0.09);
     z-index: 2;
 }
 
@@ -195,6 +168,56 @@ footer {
     width: 100%;
 }
 
+.genre-accordion-btn {
+    width: 100%;
+    padding: 8px 5px;
+    background: #40464b;
+    color: #f4d599;
+    border: 0 solid black;
+    outline:0 !important;
+    text-align: left;
+    padding-left: 20px;
+}
+.genre-accordion-btn[aria-expanded="true"]{
+    background: #53585d;
+    font-weight: 800;
+}
+.genre-accordion-btn i {
+    margin-right: 5px;
+}
+.genre-accordion-btn[aria-expanded="false"] i {
+    /*transition: transform .3s ease-in-out;*/
+    transform: rotate(0deg);
+}
+.genre-accordion-btn[aria-expanded="true"] i {
+    transform: rotate(90deg);
+    /*transition: transform .3s ease-in-out;*/
+}
+
+
+#accordion .card-body {
+    padding: 0;
+}
+
+.genre-epoch-link {
+    padding: 8px 1.8rem;
+    /*margin-left: 10px;*/
+    color: #f4d599;
+    background: #40464b;
+    display: block;
+}
+.genre-epoch-link:visited {
+    color: #f4d599;
+    background: #40464b;
+}
+.genre-epoch-link.active {
+    /*margin-left: 10px;*/
+    color: #fff;
+    background: #53585d;
+}
+
+
+
 
 
 /* */
@@ -245,6 +268,7 @@ footer {
     float: right;
     width: 200px;
     height: 294px;
+    max-width: 100%;
 }
 
 a {
@@ -263,14 +287,14 @@ a:hover {
 
 
 .navbar a.nav-link, .navbar a.dropdown-item {
-    color: #444;
+    color: #f4d599;
 }
 .navbar a.nav-link:visited, .navbar a.dropdown-item:visited {
-    color: #444;
+    color: #f4d599;
 }
 .navbar a.nav-link:hover, .navbar a.dropdown-item:hover {
     font-weight: 800;
-    color: #999;
+    color: #fff;
 }
 
 
@@ -311,34 +335,7 @@ a.secondary:hover {
 }
 
 .text_with_2px_border {
-    letter-spacing: 5px;
-    text-shadow:
-        /* first layer at 1px */
-        -1px -1px 0px #fff,
-         0px -1px 0px #fff,
-         1px -1px 0px #fff,
-        -1px  0px 0px #fff,
-         1px  0px 0px #fff,
-        -1px  1px 0px #fff,
-         0px  1px 0px #fff,
-         1px  1px 0px #fff,
-        /* second layer at 2px */
-        -2px -2px 0px #fff7,
-        -1px -2px 0px #fff7,
-         0px -2px 0px #fff7,
-         1px -2px 0px #fff7,
-         2px -2px 0px #fff7,
-         2px -1px 0px #fff7,
-         2px  0px 0px #fff7,
-         2px  1px 0px #fff7,
-         2px  2px 0px #fff7,
-         1px  2px 0px #fff7,
-         0px  2px 0px #fff7,
-        -1px  2px 0px #fff7,
-        -2px  2px 0px #fff7,
-        -2px  1px 0px #fff7,
-        -2px  0px 0px #fff7,
-        -2px -1px 0px #fff7 !important;
+    font-family: 'Fascinate Inline', cursive;
     color: #343a40 !important;
     font-size: 1.5em;
 }
@@ -409,7 +406,8 @@ a.secondary:hover {
 
 
 nav .active {
-    background: #ccc;
+    /*background: #ccc;*/
+    background: #53585d;
     /* border-radius: 4px; */
 }
 
@@ -423,6 +421,8 @@ nav .active {
     left: 0;
     right: 0;
     margin-top: -1px;
+    border-bottom: 2px solid #f2cb80;
+    background: #40464b;
 }
 
 /* SOCIAL LINKS */
@@ -733,12 +733,27 @@ td {
 nav.sidebar {
     position: fixed;
     width: 20em;
+    /*width: 0;*/
     height: 100vh;
-    padding: 0 15px 110px 15px;
-    background: #eee;
+    padding: 20px 0px 110px 0px;
+    background: #40464b;
     top: 0;
-    margin-top: 135px;
+    margin-top: 62px;
     overflow-y: auto;
+    z-index: 1000;
+    transition: 0.3s;
+}
+
+nav.sidebar form {
+    margin: 10px;
+}
+nav.sidebar hr {
+    border-top: 1px solid #777;
+    margin: 10px;
+}
+
+nav.sidebar h5, nav.sidebar label {
+    color: #f4d599;
 }
 
 section.content {
@@ -753,9 +768,9 @@ section.content .main-container.container-fluid {
     margin-top: 56px;
 }
 
-.wrapper {
-    margin-top: 56px;
-}
+/*.wrapper {*/
+/*    margin-top: 56px;*/
+/*}*/
 
 nav.sidebar label {
     margin-top: 10px;
@@ -785,17 +800,30 @@ div.audiovisual-item-container:hover {
     display: none;
     word-break: break-all;
 }
+
+
+/* Hidden sidebar */
+.hidden-sidebar-hamburger {
+    display: none;
+}
+
+
+
 /* Narrow screens like mobile phones */
 @media (max-width: 815px) {
     * {
         font-size: .900rem;
     }
     nav.sidebar {
-        margin-top: 124px;
+        margin-top: 52px;
+        width: 20em;
     }
 }
 
 @media (max-width: 750px) {
+    .hidden-sidebar-hamburger {
+        display: inherit;
+    }
     .download-element-container {
         padding: 5px;
     }
@@ -830,8 +858,11 @@ div.audiovisual-item-container:hover {
     }
     nav.sidebar {
         display: block;
-        position: static;
-        width:100%;
+        position: fixed;
+        width: 0;
+        top: 0;
+        left: 0;
+        bottom: 0;
         height: auto;
         box-shadow: none;
         margin-top: 0px;
@@ -870,6 +901,7 @@ div.audiovisual-item-container:hover {
         float: right;
         width: 150px;
         height: 224px;
+        max-width: 100%;
     }
     .second-nav.details, .second-nav.dmca, .second-nav.terms {
         display: none;

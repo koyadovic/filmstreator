@@ -1,0 +1,63 @@
+<div class="filmcard-title">
+    <h1>Download Sources for {{ audiovisual_record.name }}</h1>
+</div>
+<div class="filmcard downloads">
+
+    <ul class="nav nav-tabs justify-content-center" id="language-tabs">
+        {% for lang, downloads, translation in  lang_downloads %}
+        <li class="text-center"><a data-toggle="tab" id="tab{{ forloop.counter }}" href="#menu{{ forloop.counter }}">{{ translation }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content">
+        {% for lang, downloads, translation in  lang_downloads %}
+        <div id="menu{{ forloop.counter }}" class="tab-pane fade{% if forloop.counter == 0 %} in active{% endif %}">
+            <table class="downloads-table table table-borderless downloads-table-big-screens">
+                <thead>
+                    <tr>
+                        <td class="text-center"><b>Quality</b></td>
+                        <td class="text-center"><b>Language</b></td>
+                        <td class="text-center"><b>Source</b></td>
+                        <td class="text-center"><b>Name</b></td>
+                        {% if request.user.is_superuser %}<td><b>Remove</b></td>{% endif %}
+                    </tr>
+                </thead>
+                <tbody class="table-hover">
+
+                {% for download in downloads %}
+                    <tr>
+                        <td class="text-center" onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');">{{ download.quality }}</td>
+                        <td class="text-center" onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');"><img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></td>
+                        <td class="text-center" onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');">{{ download.source_name }}</td>
+                        <td style="word-break: break-word;" onclick="window.open('{{ download.source_base_url_plus_relative_link }}', target='_blank');">{{ download.name }}</td>
+                        {% if request.user.is_superuser %}
+                        <td>
+                            <a href="#" onclick="removeDownloadLink('{{ download.id }}');" style="color: white;" class="btn btn-secondary">Remove</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="downloads-table-small-screens">
+                {% for download in downloads %}
+                <div class="download-element-container">
+                    <p><span>Download:</span><a class="secondary" href="{{ download.source_base_url_plus_relative_link }}" target="_blank"> {{ download.name }}</a></p>
+                    <p><span>Quality:</span> {{ download.quality }}</p>
+                    <p><span>Source Language:</span> <img style="width: 1.5em; height: 1.5em;" src="/static/web/img/languages/{{ download.lang }}.png"></p>
+                    <p><span>Source:</span> {{ download.source_name }}</p>
+                    {% if request.user.is_superuser %}
+                    <p><a href="#" onclick="removeDownloadLink('{{ download.id }}');" style="color: white;" class="btn btn-secondary">Remove</a></p>
+                    {% endif %}
+                    {% if not forloop.last %}
+                    <hr>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
