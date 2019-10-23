@@ -168,20 +168,32 @@ footer {
     width: 100%;
 }
 
+
+
+#accordion .card-body {
+    padding: 0;
+}
+
 .genre-accordion-btn {
     width: 100%;
-    padding: 8px 5px;
     background: #40464b;
     color: #f4d599;
     border: 0 solid black;
     outline:0 !important;
     text-align: left;
-    padding-left: 20px;
+    padding: 8px 0px 8px 20px;
+}
+.genre-epoch-link {
+    padding: 8px 1.8rem;
+    /*margin-left: 10px;*/
+    color: #f4d599;
+    background: #40464b;
+    display: block;
 }
 .genre-accordion-btn[aria-expanded="true"]{
-    background: #53585d;
+    background: #f4d599;
     font-weight: 800;
-    color: #fff;
+    color: #40464b;
 }
 .genre-accordion-btn i {
     margin-right: 5px;
@@ -194,27 +206,14 @@ footer {
     transform: rotate(90deg);
     /*transition: transform .3s ease-in-out;*/
 }
-
-
-#accordion .card-body {
-    padding: 0;
-}
-
-.genre-epoch-link {
-    padding: 8px 1.8rem;
-    /*margin-left: 10px;*/
-    color: #f4d599;
-    background: #40464b;
-    display: block;
-}
 .genre-epoch-link:visited {
     color: #f4d599;
     background: #40464b;
 }
 .genre-epoch-link.active {
     /*margin-left: 10px;*/
-    color: #fff;
-    background: #53585d;
+    color: #40464b;
+    background: #f4d599;
 }
 
 
@@ -823,6 +822,12 @@ div.audiovisual-item-container:hover {
 }
 
 @media (max-width: 750px) {
+    .genre-accordion-btn {
+        padding: 15px 0px 15px 20px;
+    }
+    .genre-epoch-link {
+        padding: 15px 1.8rem;
+    }
     .hidden-sidebar-hamburger {
         display: inherit;
     }
@@ -840,7 +845,7 @@ div.audiovisual-item-container:hover {
         position: static;
     }
     .notbody.navbar * {
-        font-size: .950rem;
+        /*font-size: .950rem;*/
         letter-spacing: initial;
     }
     * {
