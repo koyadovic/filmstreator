@@ -65,51 +65,66 @@
 
             <div id="collapse{{ genres_name }}" class="collapse{% if genres_name in filter_params.genres__name__in %} show{% endif %}" aria-labelledby="heading{{ genres_name }}" data-parent="#accordion">
                 <div class="card-body">
-                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1979' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=1970&year__lte=1979&ordering=-global_score">
-                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1979' %}
-                    <i class="fa fa-angle-right"></i>
-                    {% endif %}
-                    Best 70s {{ genres_name }} movies
-                </a>
-                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1989' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=1980&year__lte=1989&ordering=-global_score">
-                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1989' %}
-                    <i class="fa fa-angle-right"></i>
-                    {% endif %}
-                    Best 80s {{ genres_name }} movies
-                </a>
-                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1999' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=1990&year__lte=1999&ordering=-global_score">
-                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1999' %}
-                    <i class="fa fa-angle-right"></i>
-                    {% endif %}
-                    Best 90s {{ genres_name }} movies
-                </a>
-                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2009' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=2000&year__lte=2009&ordering=-global_score">
-                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2009' %}
-                    <i class="fa fa-angle-right"></i>
-                    {% endif %}
-                    Best 2000s {{ genres_name }} movies
-                </a>
-                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2019' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=20100&year__lte=2019&ordering=-global_score">
-                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2019' %}
-                    <i class="fa fa-angle-right"></i>
-                    {% endif %}
-                    Best 2010s {{ genres_name }} movies
-                </a>
-                <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '3000' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__lte=3000&ordering=-global_score">
-                    {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '3000' %}
-                    <i class="fa fa-angle-right"></i>
-                    {% endif %}
-                    Best {{ genres_name }} movies all times
-                </a>
+                    <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1979' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=1970&year__lte=1979&ordering=-global_score">
+                        {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1979' %}
+                        <i class="fa fa-angle-right"></i>
+                        {% endif %}
+                        Best 70s {{ genres_name }} movies
+                    </a>
+                    <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1989' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=1980&year__lte=1989&ordering=-global_score">
+                        {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1989' %}
+                        <i class="fa fa-angle-right"></i>
+                        {% endif %}
+                        Best 80s {{ genres_name }} movies
+                    </a>
+                    <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1999' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=1990&year__lte=1999&ordering=-global_score">
+                        {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '1999' %}
+                        <i class="fa fa-angle-right"></i>
+                        {% endif %}
+                        Best 90s {{ genres_name }} movies
+                    </a>
+                    <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2009' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=2000&year__lte=2009&ordering=-global_score">
+                        {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2009' %}
+                        <i class="fa fa-angle-right"></i>
+                        {% endif %}
+                        Best 2000s {{ genres_name }} movies
+                    </a>
+                    <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2019' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__gte=20100&year__lte=2019&ordering=-global_score">
+                        {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '2019' %}
+                        <i class="fa fa-angle-right"></i>
+                        {% endif %}
+                        Best 2010s {{ genres_name }} movies
+                    </a>
+                    <a class="genre-epoch-link{% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '3000' %} active{% endif %}" href="/s/?ft=a&genres__name__in={{ genres_name }}&year__lte=3000&ordering=-global_score">
+                        {% if genres_name in filter_params.genres__name__in and filter_params.year__lte == '3000' %}
+                        <i class="fa fa-angle-right"></i>
+                        {% endif %}
+                        Best {{ genres_name }} movies all times
+                    </a>
                 </div>
             </div>
         </div>
     {% endfor %}
+        <hr>
+        <div class="">
+            <div class="nav-item" id="headingadvancedsearch">
+                <h5 class="mb-0">
+                <button class="genre-accordion-btn" data-toggle="collapse" data-target="#collapseadvancedsearch" aria-expanded="false" aria-controls="collapseadvancedsearch">
+                <i class="fa fa-chevron-down"></i> Advanced Search
+                </button>
+                </h5>
+            </div>
+
+            <div id="collapseadvancedsearch" class="collapse" aria-labelledby="headingadvancedsearch" data-parent="#accordion">
+                <div class="card-body">
+                {% include 'web/fragment_advanced_search.html' %}
+                </div>
+            </div>
+        </div>
     </div>
 
 
     <br>
-{#    {% include 'web/fragment_advanced_search.html' %}#}
     </nav>
 </div>
 {% endif %}
