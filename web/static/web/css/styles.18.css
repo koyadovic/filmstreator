@@ -816,6 +816,7 @@ div.audiovisual-item-container:hover {
     }
     nav.sidebar {
         margin-top: 52px;
+        width: 20em;
     }
 }
 
