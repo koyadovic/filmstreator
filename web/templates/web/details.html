@@ -21,7 +21,7 @@
 
 
             {% if audiovisual_record.metadata.trailers.youtube %}
-            <div class="filmcard-wrapper col-sm-5">
+            <div class="filmcard-wrapper col-xl-5 col-lg-12">
                 <!-- name -->
                 <div class="filmcard-title">
                     {% if audiovisual_record.name.50 %}
@@ -110,7 +110,7 @@
                 </div>
             </div>
 
-            <div class="filmcard-wrapper col-sm-7">
+            <div class="filmcard-wrapper col-xl-7 col-lg-12">
 
                 <!-- Youtube trailer -->
                 <div class="filmcard-title">
@@ -138,7 +138,7 @@
 
             {% else %} {# If there is no trailer: #}
 
-            <div class="filmcard-wrapper col-sm-4">
+            <div class="filmcard-wrapper col-xl-4 col-lg-12">
                 <!-- name -->
                 <div class="filmcard-title">
                     {% if audiovisual_record.name.50 %}
@@ -227,7 +227,7 @@
                 </div>
             </div>
 
-            <div class="filmcard-wrapper col-sm-8">
+            <div class="filmcard-wrapper col-xl-8 col-lg-12">
                 {% include 'web/fragment_download_sources.html' %}
             </div>
             {% endif %}
